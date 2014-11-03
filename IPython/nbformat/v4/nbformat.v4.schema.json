@@ -1,9 +1,9 @@
 {
     "$schema": "http://json-schema.org/draft-04/schema#",
-    "description": "IPython Notebook v3.0 JSON schema.",
+    "description": "IPython Notebook v4.0 JSON schema.",
     "type": "object",
     "additionalProperties": false,
-    "required": ["metadata", "nbformat_minor", "nbformat", "worksheets"],
+    "required": ["metadata", "nbformat_minor", "nbformat", "cells"],
     "properties": {
         "metadata": {
             "description": "Notebook root-level metadata.",
@@ -32,6 +32,11 @@
                 "signature": {
                     "description": "Hash of the notebook.",
                     "type": "string"
+                },
+                "orig_nbformat": {
+                    "description": "Original notebook format (major number) before converting the notebook between versions. This should never be written to a file.",
+                    "type": "integer",
+                    "minimum": 1
                 }
             }
         },
@@ -43,50 +48,30 @@
         "nbformat": {
             "description": "Notebook format (major number). Incremented between backwards incompatible changes to the notebook format.",
             "type": "integer",
-            "minimum": 3,
-            "maximum": 3
+            "minimum": 4,
+            "maximum": 4
         },
-        "orig_nbformat": {
-            "description": "Original notebook format (major number) before converting the notebook between versions.",
-            "type": "integer",
-            "minimum": 1
-        },
-        "worksheets" : {
-            "description": "Array of worksheets",
+        "cells": {
+            "description": "Array of cells of the current notebook.",
             "type": "array",
-            "items": {"$ref": "#/definitions/worksheet"}
+            "items": {
+                "type": "object",
+                "oneOf": [
+                    {"$ref": "#/definitions/raw_cell"},
+                    {"$ref": "#/definitions/markdown_cell"},
+                    {"$ref": "#/definitions/code_cell"}
+                ]
+            }
         }
     },
 
     "definitions": {
-        "worksheet": {
-            "additionalProperties": false,
-            "required" : ["cells"],
-            "properties":{
-                "cells": {
-                    "description": "Array of cells of the current notebook.",
-                    "type": "array",
-                    "items": {
-                        "type": "object",
-                        "oneOf": [
-                            {"$ref": "#/definitions/raw_cell"},
-                            {"$ref": "#/definitions/markdown_cell"},
-                            {"$ref": "#/definitions/heading_cell"},
-                            {"$ref": "#/definitions/code_cell"}
-                        ]
-                    }
-                },
-                "metadata": {
-                    "type": "object",
-                    "description": "metadata of the current worksheet"
-                }
-            }
-        },
+
         "raw_cell": {
             "description": "Notebook raw nbconvert cell.",
             "type": "object",
             "additionalProperties": false,
-            "required": ["cell_type", "source"],
+            "required": ["cell_type", "metadata", "source"],
             "properties": {
                 "cell_type": {
                     "description": "String identifying the type of cell.",
@@ -113,11 +98,11 @@
             "description": "Notebook markdown cell.",
             "type": "object",
             "additionalProperties": false,
-            "required": ["cell_type", "source"],
+            "required": ["cell_type", "metadata", "source"],
             "properties": {
                 "cell_type": {
                     "description": "String identifying the type of cell.",
-                    "enum": ["markdown", "html"]
+                    "enum": ["markdown"]
                 },
                 "metadata": {
                     "description": "Cell-level metadata.",
@@ -132,60 +117,40 @@
             }
         },
 
-        "heading_cell": {
-            "description": "Notebook heading cell.",
-            "type": "object",
-            "additionalProperties": false,
-            "required": ["cell_type", "source", "level"],
-            "properties": {
-                "cell_type": {
-                    "description": "String identifying the type of cell.",
-                    "enum": ["heading"]
-                },
-                "metadata": {
-                    "description": "Cell-level metadata.",
-                    "type": "object",
-                    "additionalProperties": true
-                },
-                "source": {"$ref": "#/definitions/misc/source"},
-                "level": {
-                    "description": "Level of heading cells.",
-                    "type": "integer",
-                    "minimum": 1
-                }
-            }
-        },
-
         "code_cell": {
             "description": "Notebook code cell.",
             "type": "object",
             "additionalProperties": false,
-            "required": ["cell_type", "input", "outputs", "language"],
+            "required": ["cell_type", "metadata", "source", "outputs", "execution_count"],
             "properties": {
                 "cell_type": {
                     "description": "String identifying the type of cell.",
                     "enum": ["code"]
                 },
-                "language": {
-                    "description": "The cell's language (always Python)",
-                    "type": "string"
-                },
-                "collapsed": {
-                    "description": "Whether the cell is collapsed/expanded.",
-                    "type": "boolean"
-                },
                 "metadata": {
                     "description": "Cell-level metadata.",
                     "type": "object",
-                    "additionalProperties": true
+                    "additionalProperties": true,
+                    "properties": {
+                        "collapsed": {
+                            "description": "Whether the cell is collapsed/expanded.",
+                            "type": "boolean"
+                        },
+                        "autoscroll": {
+                            "description": "Whether the cell's output is scrolled, unscrolled, or autoscrolled.",
+                            "enum": [true, false, "auto"]
+                        },
+                        "name": {"$ref": "#/definitions/misc/metadata_name"},
+                        "tags": {"$ref": "#/definitions/misc/metadata_tags"}
+                    }
                 },
-                "input": {"$ref": "#/definitions/misc/source"},
+                "source": {"$ref": "#/definitions/misc/source"},
                 "outputs": {
                     "description": "Execution, display, or stream outputs.",
                     "type": "array",
                     "items": {"$ref": "#/definitions/output"}
                 },
-                "prompt_number": {
+                "execution_count": {
                     "description": "The code cell's prompt number. Will be null if the cell has not been run.",
                     "type": ["integer", "null"],
                     "minimum": 0
@@ -195,43 +160,30 @@
         "output": {
             "type": "object",
             "oneOf": [
-                {"$ref": "#/definitions/pyout"},
+                {"$ref": "#/definitions/execute_result"},
                 {"$ref": "#/definitions/display_data"},
                 {"$ref": "#/definitions/stream"},
-                {"$ref": "#/definitions/pyerr"}
+                {"$ref": "#/definitions/error"}
             ]
         },
-        "pyout": {
+
+        "execute_result": {
             "description": "Result of executing a code cell.",
             "type": "object",
             "additionalProperties": false,
-            "required": ["output_type", "prompt_number"],
+            "required": ["output_type", "data", "metadata", "execution_count"],
             "properties": {
                 "output_type": {
                     "description": "Type of cell output.",
-                    "enum": ["pyout"]
+                    "enum": ["execute_result"]
                 },
-                "prompt_number": {
+                "execution_count": {
                     "description": "A result's prompt number.",
-                    "type": ["integer"],
+                    "type": ["integer", "null"],
                     "minimum": 0
                 },
-                "text": {"$ref": "#/definitions/misc/multiline_string"},
-                "latex": {"$ref": "#/definitions/misc/multiline_string"},
-                "png": {"$ref": "#/definitions/misc/multiline_string"},
-                "jpeg": {"$ref": "#/definitions/misc/multiline_string"},
-                "svg": {"$ref": "#/definitions/misc/multiline_string"},
-                "html": {"$ref": "#/definitions/misc/multiline_string"},
-                "javascript": {"$ref": "#/definitions/misc/multiline_string"},
-                "json": {"$ref": "#/definitions/misc/multiline_string"},
-                "pdf": {"$ref": "#/definitions/misc/multiline_string"},
+                "data": {"$ref": "#/definitions/misc/mimebundle"},
                 "metadata": {"$ref": "#/definitions/misc/output_metadata"}
-            },
-            "patternProperties": {
-                "^[a-zA-Z0-9]+/[a-zA-Z0-9\\-\\+\\.]+$": {
-                    "description": "mimetype output (e.g. text/plain), represented as either an array of strings or a string.",
-                    "$ref": "#/definitions/misc/multiline_string"
-                }
             }
         },
 
@@ -239,28 +191,14 @@
             "description": "Data displayed as a result of code cell execution.",
             "type": "object",
             "additionalProperties": false,
-            "required": ["output_type"],
+            "required": ["output_type", "data", "metadata"],
             "properties": {
                 "output_type": {
                     "description": "Type of cell output.",
                     "enum": ["display_data"]
                 },
-                "text": {"$ref": "#/definitions/misc/multiline_string"},
-                "latex": {"$ref": "#/definitions/misc/multiline_string"},
-                "png": {"$ref": "#/definitions/misc/multiline_string"},
-                "jpeg": {"$ref": "#/definitions/misc/multiline_string"},
-                "svg": {"$ref": "#/definitions/misc/multiline_string"},
-                "html": {"$ref": "#/definitions/misc/multiline_string"},
-                "javascript": {"$ref": "#/definitions/misc/multiline_string"},
-                "json": {"$ref": "#/definitions/misc/multiline_string"},
-                "pdf": {"$ref": "#/definitions/misc/multiline_string"},
+                "data": {"$ref": "#/definitions/misc/mimebundle"},
                 "metadata": {"$ref": "#/definitions/misc/output_metadata"}
-            },
-            "patternProperties": {
-                "[a-zA-Z0-9]+/[a-zA-Z0-9\\-\\+\\.]+$": {
-                    "description": "mimetype output (e.g. text/plain), represented as either an array of strings or a string.",
-                    "$ref": "#/definitions/misc/multiline_string"
-                }
             }
         },
 
@@ -268,14 +206,14 @@
             "description": "Stream output from a code cell.",
             "type": "object",
             "additionalProperties": false,
-            "required": ["output_type", "stream", "text"],
+            "required": ["output_type", "name", "text"],
             "properties": {
                 "output_type": {
                     "description": "Type of cell output.",
                     "enum": ["stream"]
                 },
-                "stream": {
-                    "description": "The stream type/destination.",
+                "name": {
+                    "description": "The name of the stream (stdout, stderr).",
                     "type": "string"
                 },
                 "text": {
@@ -285,7 +223,7 @@
             }
         },
 
-        "pyerr": {
+        "error": {
             "description": "Output of an error that occurred during code cell execution.",
             "type": "object",
             "additionalProperties": false,
@@ -293,7 +231,7 @@
             "properties": {
                 "output_type": {
                     "description": "Type of cell output.",
-                    "enum": ["pyerr"]
+                    "enum": ["error"]
                 },
                 "ename": {
                     "description": "The name of the error.",
@@ -330,15 +268,23 @@
                 "description": "Contents of the cell, represented as an array of lines.",
                 "$ref": "#/definitions/misc/multiline_string"
             },
-            "prompt_number": {
+            "execution_count": {
                 "description": "The code cell's prompt number. Will be null if the cell has not been run.",
                 "type": ["integer", "null"],
                 "minimum": 0
             },
-            "mimetype": {
+            "mimebundle": {
+                "description": "A mime-type keyed dictionary of data",
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                    "application/json": {
+                        "type": "object"
+                    }
+                },
                 "patternProperties": {
-                    "^[a-zA-Z0-9\\-\\+]+/[a-zA-Z0-9\\-\\+]+": {
-                        "description": "The cell's mimetype output (e.g. text/plain), represented as either an array of strings or a string.",
+                    "^(?!application/json$)[a-zA-Z0-9]+/[a-zA-Z0-9\\-\\+\\.]+$": {
+                        "description": "mimetype output (e.g. text/plain), represented as either an array of strings or a string.",
                         "$ref": "#/definitions/misc/multiline_string"
                     }
                 }
