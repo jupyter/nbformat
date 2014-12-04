@@ -10,31 +10,57 @@
             "type": "object",
             "additionalProperties": true,
             "properties": {
-                "kernel_info": {
+                "kernelspec": {
                     "description": "Kernel information.",
                     "type": "object",
-                    "required": ["name", "language"],
+                    "required": ["name", "display_name"],
                     "properties": {
                         "name": {
                             "description": "Name of the kernel specification.",
                             "type": "string"
                         },
-                        "language": {
-                            "description": "The programming language which this kernel runs.",
-                            "type": "string"
-                        },
-                        "codemirror_mode": {
-                            "description": "The codemirror mode to use for code in this language.",
+                        "display_name": {
+                            "description": "Name to display in UI.",
                             "type": "string"
                         }
                     }
+                },
+                "language_info": {
+                  "description": "Kernel information.",
+                  "type": "object",
+                  "required": ["name"],
+                  "properties": {
+                    "name": {
+                        "description": "The programming language which this kernel runs.",
+                        "type": "string"
+                    },
+                    "codemirror_mode": {
+                        "description": "The codemirror mode to use for code in this language.",
+                        "oneOf": [
+                          {"type": "string"},
+                          {"type": "object"}
+                        ]
+                    },
+                    "file_extension": {
+                        "description": "The file extension for files in this language.",
+                        "type": "string"
+                    },
+                    "mimetype": {
+                        "description": "The mimetype corresponding to files in this language.",
+                        "type": "string"
+                    },
+                    "pygments_lexer": {
+                        "description": "The pygments lexer to use for code in this language.",
+                        "type": "string"
+                    }
+                  }
                 },
                 "signature": {
                     "description": "Hash of the notebook.",
                     "type": "string"
                 },
                 "orig_nbformat": {
-                    "description": "Original notebook format (major number) before converting the notebook between versions.",
+                    "description": "Original notebook format (major number) before converting the notebook between versions. This should never be written to a file.",
                     "type": "integer",
                     "minimum": 1
                 }
@@ -54,25 +80,25 @@
         "cells": {
             "description": "Array of cells of the current notebook.",
             "type": "array",
-            "items": {
-                "type": "object",
-                "oneOf": [
-                    {"$ref": "/definitions/raw_cell"},
-                    {"$ref": "/definitions/markdown_cell"},
-                    {"$ref": "/definitions/heading_cell"},
-                    {"$ref": "/definitions/code_cell"}
-                ]
-            }
+            "items": {"$ref": "#/definitions/cell"}
         }
     },
 
     "definitions": {
+        "cell": {
+            "type": "object",
+            "oneOf": [
+                {"$ref": "#/definitions/raw_cell"},
+                {"$ref": "#/definitions/markdown_cell"},
+                {"$ref": "#/definitions/code_cell"}
+            ]
+        },
 
         "raw_cell": {
             "description": "Notebook raw nbconvert cell.",
             "type": "object",
             "additionalProperties": false,
-            "required": ["cell_type", "metadata"],
+            "required": ["cell_type", "metadata", "source"],
             "properties": {
                 "cell_type": {
                     "description": "String identifying the type of cell.",
@@ -87,11 +113,11 @@
                             "description": "Raw cell metadata format for nbconvert.",
                             "type": "string"
                         },
-                        "name": {"$ref": "/definitions/misc/metadata_name"},
-                        "tags": {"$ref": "/definitions/misc/metadata_tags"}
+                        "name": {"$ref": "#/definitions/misc/metadata_name"},
+                        "tags": {"$ref": "#/definitions/misc/metadata_tags"}
                     }
                 },
-                "source": {"$ref": "/definitions/misc/source"}
+                "source": {"$ref": "#/definitions/misc/source"}
             }
         },
 
@@ -99,7 +125,7 @@
             "description": "Notebook markdown cell.",
             "type": "object",
             "additionalProperties": false,
-            "required": ["cell_type", "metadata"],
+            "required": ["cell_type", "metadata", "source"],
             "properties": {
                 "cell_type": {
                     "description": "String identifying the type of cell.",
@@ -109,41 +135,12 @@
                     "description": "Cell-level metadata.",
                     "type": "object",
                     "properties": {
-                        "name": {"$ref": "/definitions/misc/metadata_name"},
-                        "tags": {"$ref": "/definitions/misc/metadata_tags"}
+                        "name": {"$ref": "#/definitions/misc/metadata_name"},
+                        "tags": {"$ref": "#/definitions/misc/metadata_tags"}
                     },
                     "additionalProperties": true
                 },
-                "source": {"$ref": "/definitions/misc/source"}
-            }
-        },
-
-        "heading_cell": {
-            "description": "Notebook heading cell.",
-            "type": "object",
-            "additionalProperties": false,
-            "required": ["cell_type", "metadata", "source", "level"],
-            "properties": {
-                "cell_type": {
-                    "description": "String identifying the type of cell.",
-                    "enum": ["heading"]
-                },
-                "metadata": {
-                    "description": "Cell-level metadata.",
-                    "type": "object",
-                    "properties": {
-                        "name": {"$ref": "/definitions/misc/metadata_name"},
-                        "tags": {"$ref": "/definitions/misc/metadata_tags"}
-                    },
-                    "additionalProperties": true
-                },
-                "source": {"$ref": "/definitions/misc/source"},
-                "level": {
-                    "description": "Level of heading cells.",
-                    "type": "integer",
-                    "minimum": 1,
-                    "maximum": 6
-                }
+                "source": {"$ref": "#/definitions/misc/source"}
             }
         },
 
@@ -151,7 +148,7 @@
             "description": "Notebook code cell.",
             "type": "object",
             "additionalProperties": false,
-            "required": ["cell_type", "metadata", "source", "outputs", "prompt_number"],
+            "required": ["cell_type", "metadata", "source", "outputs", "execution_count"],
             "properties": {
                 "cell_type": {
                     "description": "String identifying the type of cell.",
@@ -170,96 +167,124 @@
                             "description": "Whether the cell's output is scrolled, unscrolled, or autoscrolled.",
                             "enum": [true, false, "auto"]
                         },
-                        "name": {"$ref": "/definitions/misc/metadata_name"},
-                        "tags": {"$ref": "/definitions/misc/metadata_tags"}
+                        "name": {"$ref": "#/definitions/misc/metadata_name"},
+                        "tags": {"$ref": "#/definitions/misc/metadata_tags"}
                     }
                 },
-                "source": {"$ref": "/definitions/misc/source"},
+                "source": {"$ref": "#/definitions/misc/source"},
                 "outputs": {
                     "description": "Execution, display, or stream outputs.",
                     "type": "array",
-                    "items": {
-                        "type": "object",
-                        "oneOf": [
-                            {"$ref": "/definitions/execute_result"},
-                            {"$ref": "/definitions/display_data_output"},
-                            {"$ref": "/definitions/stream_output"},
-                            {"$ref": "/definitions/error_output"}
-                        ]
-                    }
+                    "items": {"$ref": "#/definitions/output"}
                 },
-                "prompt_number": {
+                "execution_count": {
                     "description": "The code cell's prompt number. Will be null if the cell has not been run.",
                     "type": ["integer", "null"],
                     "minimum": 0
                 }
             }
         },
+        
+        "unrecognized_cell": {
+            "description": "Unrecognized cell from a future minor-revision to the notebook format.",
+            "type": "object",
+            "additionalProperties": true,
+            "required": ["cell_type", "metadata"],
+            "properties": {
+                "cell_type": {
+                    "description": "String identifying the type of cell.",
+                    "not" : {
+                      "enum": ["markdown", "code", "raw"]
+                    }
+                },
+                "metadata": {
+                    "description": "Cell-level metadata.",
+                    "type": "object",
+                    "properties": {
+                        "name": {"$ref": "#/definitions/misc/metadata_name"},
+                        "tags": {"$ref": "#/definitions/misc/metadata_tags"}
+                    },
+                    "additionalProperties": true
+                }
+            }
+        },
+        
+        "output": {
+            "type": "object",
+            "oneOf": [
+                {"$ref": "#/definitions/execute_result"},
+                {"$ref": "#/definitions/display_data"},
+                {"$ref": "#/definitions/stream"},
+                {"$ref": "#/definitions/error"}
+            ]
+        },
 
         "execute_result": {
             "description": "Result of executing a code cell.",
             "type": "object",
             "additionalProperties": false,
-            "required": ["output_type", "metadata", "prompt_number"],
+            "required": ["output_type", "data", "metadata", "execution_count"],
             "properties": {
                 "output_type": {
                     "description": "Type of cell output.",
                     "enum": ["execute_result"]
                 },
-                "metadata": {"$ref": "/definitions/misc/output_metadata"},
-                "prompt_number": {"$ref": "/definitions/misc/prompt_number"}
-            },
-            "patternProperties": {"$ref": "/definitions/misc/mimetype"}
+                "execution_count": {
+                    "description": "A result's prompt number.",
+                    "type": ["integer", "null"],
+                    "minimum": 0
+                },
+                "data": {"$ref": "#/definitions/misc/mimebundle"},
+                "metadata": {"$ref": "#/definitions/misc/output_metadata"}
+            }
         },
 
-        "display_data_output": {
+        "display_data": {
             "description": "Data displayed as a result of code cell execution.",
             "type": "object",
             "additionalProperties": false,
-            "required": ["output_type", "metadata"],
+            "required": ["output_type", "data", "metadata"],
             "properties": {
                 "output_type": {
                     "description": "Type of cell output.",
                     "enum": ["display_data"]
                 },
-                "metadata": {"$ref": "/definitions/misc/output_metadata"}
-            },
-            "patternProperties": {"$ref": "/definitions/misc/mimetype"}
+                "data": {"$ref": "#/definitions/misc/mimebundle"},
+                "metadata": {"$ref": "#/definitions/misc/output_metadata"}
+            }
         },
 
-        "stream_output": {
+        "stream": {
             "description": "Stream output from a code cell.",
             "type": "object",
             "additionalProperties": false,
-            "required": ["output_type", "metadata", "stream"],
+            "required": ["output_type", "name", "text"],
             "properties": {
                 "output_type": {
                     "description": "Type of cell output.",
                     "enum": ["stream"]
                 },
-                "metadata": {"$ref": "/definitions/misc/output_metadata"},
-                "stream": {
-                    "description": "The stream type/destination.",
+                "name": {
+                    "description": "The name of the stream (stdout, stderr).",
                     "type": "string"
                 },
-                "text/plain": {
+                "text": {
                     "description": "The stream's text output, represented as an array of strings.",
-                    "oneOf": {"$ref": "/definitions/misc/multiline_string"}
+                    "$ref": "#/definitions/misc/multiline_string"
                 }
             }
         },
 
-        "error_output": {
+        "error": {
             "description": "Output of an error that occurred during code cell execution.",
             "type": "object",
             "additionalProperties": false,
-            "required": ["output_type", "metadata", "ename", "evalue", "traceback"],
+            "required": ["output_type", "ename", "evalue", "traceback"],
             "properties": {
                 "output_type": {
                     "description": "Type of cell output.",
                     "enum": ["error"]
                 },
-                "metadata": {"$ref": "/definitions/misc/output_metadata"},
                 "ename": {
                     "description": "The name of the error.",
                     "type": "string"
@@ -272,6 +297,21 @@
                     "description": "The error's traceback, represented as an array of strings.",
                     "type": "array",
                     "items": {"type": "string"}
+                }
+            }
+        },
+
+        "unrecognized_output": {
+            "description": "Unrecognized output from a future minor-revision to the notebook format.",
+            "type": "object",
+            "additionalProperties": true,
+            "required": ["output_type"],
+            "properties": {
+                "output_type": {
+                    "description": "Type of cell output.",
+                    "not": {
+                        "enum": ["execute_result", "display_data", "stream", "error"]
+                    }
                 }
             }
         },
@@ -293,17 +333,27 @@
             },
             "source": {
                 "description": "Contents of the cell, represented as an array of lines.",
-                "oneOf": {"$ref": "/definitions/misc/multiline_string"}
+                "$ref": "#/definitions/misc/multiline_string"
             },
-            "prompt_number": {
+            "execution_count": {
                 "description": "The code cell's prompt number. Will be null if the cell has not been run.",
                 "type": ["integer", "null"],
                 "minimum": 0
             },
-            "mimetype": {
-                "^[a-zA-Z0-9+-]+/[a-zA-Z0-9+-]+$": {
-                    "description": "The cell's mimetype output (e.g. text/plain), represented as either an array of strings or a string.",
-                    "oneOf": {"$ref": "/definitions/misc/multiline_string"}
+            "mimebundle": {
+                "description": "A mime-type keyed dictionary of data",
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                    "application/json": {
+                        "type": "object"
+                    }
+                },
+                "patternProperties": {
+                    "^(?!application/json$)[a-zA-Z0-9]+/[a-zA-Z0-9\\-\\+\\.]+$": {
+                        "description": "mimetype output (e.g. text/plain), represented as either an array of strings or a string.",
+                        "$ref": "#/definitions/misc/multiline_string"
+                    }
                 }
             },
             "output_metadata": {
@@ -311,13 +361,15 @@
                 "type": "object",
                 "additionalProperties": true
             },
-            "multiline_string": [
-                {"type": "string"},
-                {
-                    "type": "array",
-                    "items": {"type": "string"}
-                }
-            ]
+            "multiline_string": {
+                "oneOf" : [
+                    {"type": "string"},
+                    {
+                        "type": "array",
+                        "items": {"type": "string"}
+                    }
+                ]
+            }
         }
     }
 }
