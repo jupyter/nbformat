@@ -1,6 +1,6 @@
 """NotebookNode - adding attribute access to dicts"""
 
-from IPython.utils.ipstruct import Struct
+from ipython_genutils.ipstruct import Struct
 
 class NotebookNode(Struct):
     """A dict-like node with attribute-access"""

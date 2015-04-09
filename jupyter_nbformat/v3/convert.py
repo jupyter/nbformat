@@ -56,7 +56,7 @@ def upgrade(nb, from_version=2, from_minor=0):
         return nb
     else:
         raise ValueError('Cannot convert a notebook directly from v%s to v3.  ' \
-                'Try using the IPython.nbformat.convert module.' % from_version)
+                'Try using the jupyter_nbformat.convert module.' % from_version)
  
 
 def heading_to_md(cell):

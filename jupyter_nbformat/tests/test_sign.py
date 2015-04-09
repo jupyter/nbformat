@@ -4,26 +4,31 @@
 # Distributed under the terms of the Modified BSD License.
 
 import copy
+import shutil
 import time
+import tempfile
 
 from .base import TestsBase
 
-from IPython.nbformat import read, sign
-from IPython.core.getipython import get_ipython
-
+from jupyter_nbformat import read, sign
+from IPython.core.profiledir import ProfileDir
 
 class TestNotary(TestsBase):
     
     def setUp(self):
+        self.profile_dir = ProfileDir(location=tempfile.mkdtemp())
         self.notary = sign.NotebookNotary(
             db_file=':memory:',
             secret=b'secret',
-            profile_dir=get_ipython().profile_dir,
+            profile_dir=self.profile_dir,
         )
         with self.fopen(u'test3.ipynb', u'r') as f:
             self.nb = read(f, as_version=4)
         with self.fopen(u'test3.ipynb', u'r') as f:
             self.nb3 = read(f, as_version=3)
+    
+    def tearDown(self):
+        shutil.rmtree(self.profile_dir.location)
     
     def test_algorithms(self):
         last_sig = ''

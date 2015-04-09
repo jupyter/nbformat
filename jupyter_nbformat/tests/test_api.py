@@ -8,9 +8,9 @@ import os
 
 from .base import TestsBase
 
-from IPython.utils.tempdir import TemporaryDirectory
+from ipython_genutils.tempdir import TemporaryDirectory
 from ..reader import get_version
-from IPython.nbformat import read, current_nbformat, writes, write
+from jupyter_nbformat import read, current_nbformat, writes, write
 
 
 class TestAPI(TestsBase):

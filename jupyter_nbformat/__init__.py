@@ -1,4 +1,4 @@
-"""The IPython notebook format
+"""The Jupyter notebook format
 
 Use this module to read or write notebook files as particular nbformat versions.
 """
@@ -6,9 +6,9 @@ Use this module to read or write notebook files as particular nbformat versions.
 # Copyright (c) IPython Development Team.
 # Distributed under the terms of the Modified BSD License.
 import io
-from IPython.utils import py3compat
+from ipython_genutils import py3compat
 
-from IPython.utils.log import get_logger
+from traitlets.log import get_logger
 from ._version import version_info, __version__
 
 from . import v1

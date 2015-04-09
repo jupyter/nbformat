@@ -12,7 +12,7 @@ try:
 except ImportError as e:
     verbose_msg = """
 
-    IPython notebook format depends on the jsonschema package:
+    Jupyter notebook format depends on the jsonschema package:
     
         https://pypi.python.org/pypi/jsonschema
     
@@ -20,7 +20,7 @@ except ImportError as e:
     """
     raise ImportError(str(e) + verbose_msg)
 
-from IPython.utils.importstring import import_item
+from ipython_genutils.importstring import import_item
 
 
 validators = {}

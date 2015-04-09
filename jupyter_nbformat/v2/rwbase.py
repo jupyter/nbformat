@@ -19,7 +19,7 @@ Authors:
 from base64 import encodestring, decodestring
 import pprint
 
-from IPython.utils.py3compat import str_to_bytes, unicode_type, string_types
+from ipython_genutils.py3compat import str_to_bytes, unicode_type, string_types
 
 #-----------------------------------------------------------------------------
 # Code

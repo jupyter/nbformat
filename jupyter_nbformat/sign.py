@@ -19,10 +19,10 @@ except ImportError:
     except ImportError:
         sqlite3 = None
 
-from IPython.utils.py3compat import unicode_type, cast_bytes
-from IPython.utils.traitlets import Instance, Bytes, Enum, Any, Unicode, Bool, Integer
-from IPython.config import LoggingConfigurable, MultipleInstanceError
+from ipython_genutils.py3compat import unicode_type, cast_bytes
+from traitlets import Instance, Bytes, Enum, Any, Unicode, Bool, Integer
 from IPython.core.application import BaseIPythonApplication, base_flags
+from traitlets.config import LoggingConfigurable, MultipleInstanceError
 
 from . import read, write, NO_CONVERT
 
@@ -364,7 +364,7 @@ trust_flags.pop('init')
 
 class TrustNotebookApp(BaseIPythonApplication):
     
-    description="""Sign one or more IPython notebooks with your key,
+    description="""Sign one or more Jupyter notebooks with your key,
     to trust their dynamic (HTML, Javascript) output.
     
     Trusting a notebook only applies to the current IPython profile.

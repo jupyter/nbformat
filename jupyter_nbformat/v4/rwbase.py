@@ -3,7 +3,7 @@
 # Copyright (c) IPython Development Team.
 # Distributed under the terms of the Modified BSD License.
 
-from IPython.utils.py3compat import string_types, cast_unicode_py2
+from ipython_genutils.py3compat import string_types, cast_unicode_py2
 
 
 def rejoin_lines(nb):
