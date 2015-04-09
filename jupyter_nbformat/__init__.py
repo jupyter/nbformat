@@ -9,6 +9,7 @@ import io
 from IPython.utils import py3compat
 
 from IPython.utils.log import get_logger
+from ._version import version_info, __version__
 
 from . import v1
 from . import v2
@@ -18,7 +19,9 @@ from .sentinel import Sentinel
 
 __all__ = ['versions', 'validate', 'ValidationError', 'convert', 'from_dict',
            'NotebookNode', 'current_nbformat', 'current_nbformat_minor',
-           'NBFormatError', 'NO_CONVERT', 'reads', 'read', 'writes', 'write']
+           'NBFormatError', 'NO_CONVERT', 'reads', 'read', 'writes', 'write',
+           'version_info', '__version__',
+]
 
 versions = {
     1: v1,
