@@ -21,10 +21,10 @@ except ImportError:
 
 from ipython_genutils.py3compat import unicode_type, cast_bytes
 from traitlets import Instance, Bytes, Enum, Any, Unicode, Bool, Integer
-from IPython.core.application import BaseIPythonApplication, base_flags
 from traitlets.config import LoggingConfigurable, MultipleInstanceError
+from jupyter_core.application import JupyterApp, base_flags
 
-from . import read, write, NO_CONVERT
+from . import read, NO_CONVERT
 
 try:
     # Python 3
@@ -86,30 +86,29 @@ def signature_removed(nb):
 class NotebookNotary(LoggingConfigurable):
     """A class for computing and verifying notebook signatures."""
     
-    profile_dir = Instance("IPython.core.profiledir.ProfileDir", allow_none=True)
-    def _profile_dir_default(self):
-        from IPython.core.application import BaseIPythonApplication
+    data_dir = Unicode()
+    def _data_dir_default(self):
         app = None
         try:
-            if BaseIPythonApplication.initialized():
-                app = BaseIPythonApplication.instance()
+            if JupyterApp.initialized():
+                app = JupyterApp.instance()
         except MultipleInstanceError:
             pass
         if app is None:
             # create an app, without the global instance
-            app = BaseIPythonApplication()
+            app = JupyterApp()
             app.initialize(argv=[])
-        return app.profile_dir
+        return app.data_dir
     
     db_file = Unicode(config=True,
         help="""The sqlite file in which to store notebook signatures.
-        By default, this will be in your IPython profile.
+        By default, this will be in your Jupyter runtime directory.
         You can set it to ':memory:' to disable sqlite writing to the filesystem.
         """)
     def _db_file_default(self):
-        if self.profile_dir is None:
+        if not self.data_dir:
             return ':memory:'
-        return os.path.join(self.profile_dir.security_dir, u'nbsignatures.db')
+        return os.path.join(self.data_dir, u'nbsignatures.db')
     
     # 64k entries ~ 12MB
     cache_size = Integer(65535, config=True,
@@ -157,9 +156,9 @@ class NotebookNotary(LoggingConfigurable):
         help="""The file where the secret key is stored."""
     )
     def _secret_file_default(self):
-        if self.profile_dir is None:
+        if not self.data_dir:
             return ''
-        return os.path.join(self.profile_dir.security_dir, 'notebook_secret')
+        return os.path.join(self.data_dir, 'notebook_secret')
     
     secret = Bytes(config=True,
         help="""The secret key with which notebooks are signed."""
@@ -359,24 +358,18 @@ trust_flags = {
     ),
 }
 trust_flags.update(base_flags)
-trust_flags.pop('init')
 
 
-class TrustNotebookApp(BaseIPythonApplication):
+class TrustNotebookApp(JupyterApp):
     
     description="""Sign one or more Jupyter notebooks with your key,
     to trust their dynamic (HTML, Javascript) output.
-    
-    Trusting a notebook only applies to the current IPython profile.
-    To trust a notebook for use with a profile other than default,
-    add `--profile [profile name]`.
     
     Otherwise, you will have to re-execute the notebook to see output.
     """
     
     examples = """
-    ipython trust mynotebook.ipynb and_this_one.ipynb
-    ipython trust --profile myprofile mynotebook.ipynb
+    jupyter trust mynotebook.ipynb and_this_one.ipynb
     """
     
     flags = trust_flags
@@ -389,7 +382,7 @@ class TrustNotebookApp(BaseIPythonApplication):
     
     notary = Instance(NotebookNotary)
     def _notary_default(self):
-        return NotebookNotary(parent=self, profile_dir=self.profile_dir)
+        return NotebookNotary(parent=self, data_dir=self.data_dir)
     
     def sign_notebook(self, notebook_path):
         if not os.path.exists(notebook_path):
