@@ -19,8 +19,8 @@ Authors:
 import pprint
 import uuid
 
-from IPython.utils.ipstruct import Struct
-from IPython.utils.py3compat import unicode_type
+from ipython_genutils.ipstruct import Struct
+from ipython_genutils.py3compat import unicode_type
 
 #-----------------------------------------------------------------------------
 # Code

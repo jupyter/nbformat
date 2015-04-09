@@ -12,7 +12,7 @@ from .rwbase import (
     strip_transient,
 )
 
-from IPython.utils import py3compat
+from ipython_genutils import py3compat
 
 
 class BytesEncoder(json.JSONEncoder):

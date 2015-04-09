@@ -2,7 +2,7 @@
 
 from unittest import TestCase
 
-from IPython.utils.py3compat import string_types, iteritems
+from ipython_genutils.py3compat import string_types, iteritems
 
 from . import formattest
 

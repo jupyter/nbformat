@@ -5,8 +5,8 @@
 
 from base64 import encodestring, decodestring
 
-from IPython.utils import py3compat
-from IPython.utils.py3compat import str_to_bytes, unicode_type, string_types
+from ipython_genutils import py3compat
+from ipython_genutils.py3compat import str_to_bytes, unicode_type, string_types
 
 
 def restore_bytes(nb):

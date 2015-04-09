@@ -6,7 +6,7 @@
 import copy
 import json
 
-from IPython.utils import py3compat
+from ipython_genutils import py3compat
 
 from .nbbase import from_dict
 from .rwbase import (

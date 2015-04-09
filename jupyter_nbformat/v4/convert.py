@@ -12,11 +12,11 @@ from .nbbase import (
 )
 
 from jupyter_nbformat import v3
-from IPython.utils.log import get_logger
+from traitlets.log import get_logger
 
 def _warn_if_invalid(nb, version):
     """Log validation errors, if there are any."""
-    from IPython.nbformat import validate, ValidationError
+    from jupyter_nbformat import validate, ValidationError
     try:
         validate(nb, version=version)
     except ValidationError as e:
@@ -69,7 +69,7 @@ def upgrade(nb, from_version=3, from_minor=0):
         return nb
     else:
         raise ValueError('Cannot convert a notebook directly from v%s to v4.  ' \
-                'Try using the IPython.nbformat.convert module.' % from_version)
+                'Try using the jupyter_nbformat.convert module.' % from_version)
 
 def upgrade_cell(cell):
     """upgrade a cell from v3 to v4

@@ -2,7 +2,7 @@
 
 The Python representation of a notebook is a nested structure of
 dictionary subclasses that support attribute access
-(IPython.utils.ipstruct.Struct). The functions in this module are merely
+(ipython_genutils.ipstruct.Struct). The functions in this module are merely
 helpers to build the structs in the right form.
 
 Authors:
@@ -24,8 +24,8 @@ Authors:
 import pprint
 import uuid
 
-from IPython.utils.ipstruct import Struct
-from IPython.utils.py3compat import unicode_type
+from ipython_genutils.ipstruct import Struct
+from ipython_genutils.py3compat import unicode_type
 
 #-----------------------------------------------------------------------------
 # Code

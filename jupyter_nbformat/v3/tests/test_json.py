@@ -3,7 +3,7 @@ import json
 from base64 import decodestring
 from unittest import TestCase
 
-from IPython.utils.py3compat import unicode_type
+from ipython_genutils.py3compat import unicode_type
 from ..nbjson import reads, writes
 from ..nbbase import from_dict
 from .. import nbjson

@@ -3,12 +3,12 @@ import copy
 
 import nose.tools as nt
 
-from IPython.nbformat import validate
+from jupyter_nbformat import validate
 from .. import convert
 
 from . import nbexamples
-from IPython.nbformat.v3.tests import nbexamples as v3examples
-from IPython.nbformat import v3, v4
+from jupyter_nbformat.v3.tests import nbexamples as v3examples
+from jupyter_nbformat import v3, v4
 
 def test_upgrade_notebook():
     nb03 = copy.deepcopy(v3examples.nb0)
