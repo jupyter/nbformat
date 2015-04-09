@@ -11,16 +11,15 @@ import tempfile
 from .base import TestsBase
 
 from jupyter_nbformat import read, sign
-from IPython.core.profiledir import ProfileDir
 
 class TestNotary(TestsBase):
     
     def setUp(self):
-        self.profile_dir = ProfileDir(location=tempfile.mkdtemp())
+        self.data_dir = tempfile.mkdtemp()
         self.notary = sign.NotebookNotary(
             db_file=':memory:',
             secret=b'secret',
-            profile_dir=self.profile_dir,
+            data_dir=self.data_dir,
         )
         with self.fopen(u'test3.ipynb', u'r') as f:
             self.nb = read(f, as_version=4)
@@ -28,7 +27,7 @@ class TestNotary(TestsBase):
             self.nb3 = read(f, as_version=3)
     
     def tearDown(self):
-        shutil.rmtree(self.profile_dir.location)
+        shutil.rmtree(self.data_dir)
     
     def test_algorithms(self):
         last_sig = ''
