@@ -41,6 +41,14 @@ for d, _, _ in os.walk(pjoin(here, name)):
     if os.path.exists(pjoin(d, '__init__.py')):
         packages.append(d[len(here)+1:].replace(os.path.sep, '.'))
 
+package_data = {
+    'jupyter_nbformat' : [
+        'tests/*.ipynb',
+        'v3/nbformat.v3.schema.json',
+        'v4/nbformat.v4.schema.json',
+    ],
+}
+
 version_ns = {}
 with open(pjoin(here, name, '_version.py')) as f:
     exec(f.read(), {}, version_ns)
@@ -51,6 +59,7 @@ setup_args = dict(
     version         = version_ns['__version__'],
     scripts         = glob(pjoin('scripts', '*')),
     packages        = packages,
+    package_data    = package_data,
     description     = "The Jupyter Notebook format",
     long_description= """
     This package contains the base implementation of the Jupyter Notebook format,
