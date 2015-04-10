@@ -6,8 +6,8 @@ python:
 sudo: false
 env:
 install:
-    - pip install -e . coveralls -r requirements.txt
+    - pip install . coveralls -r requirements.txt
 script:
-    - nosetests --with-coverage jupyter_nbformat
+    - nosetests --with-coverage --cover-package=jupyter_nbformat jupyter_nbformat
 after_success:
     - coveralls
