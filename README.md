@@ -5,4 +5,4 @@ and Python APIs for working with notebooks.
 
 There is also a JSON schema for notebook format versions >= 3.
 
-[Jupyter Notebook format]: http://ipython.org/stable/notebook/nbformat.html
+[Jupyter Notebook format]: http://ipython.org/ipython-doc/stable/notebook/nbformat.html
