@@ -137,7 +137,10 @@ def read(fp, as_version, **kwargs):
         with io.open(fp, encoding='utf-8') as f:
             return read(f, as_version, **kwargs)
 
-    return reads(fp.read(), as_version, **kwargs)
+    s = fp.read()
+    if isinstance(s, bytes):
+        s = s.decode('utf8')
+    return reads(s, as_version, **kwargs)
 
 
 def write(nb, fp, version=NO_CONVERT, **kwargs):
