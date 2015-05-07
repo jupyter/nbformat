@@ -122,7 +122,8 @@ def read(fp, as_version, **kwargs):
     Parameters
     ----------
     fp : file or str
-        Any file-like object with a read method, or a path to a file.
+        A file-like object with a read method that returns unicode (use
+        ``io.open()`` in Python 2), or a path to a file.
     as_version: int
         The version of the notebook format to return.
         The notebook will be converted, if necessary.
