@@ -7,7 +7,7 @@
 from __future__ import print_function
 
 # the name of the project
-name = 'jupyter_nbformat'
+name = 'nbformat'
 
 #-----------------------------------------------------------------------------
 # Minimal Python version sanity check
@@ -42,7 +42,7 @@ for d, _, _ in os.walk(pjoin(here, name)):
         packages.append(d[len(here)+1:].replace(os.path.sep, '.'))
 
 package_data = {
-    'jupyter_nbformat' : [
+    'nbformat' : [
         'tests/*.ipynb',
         'v3/nbformat.v3.schema.json',
         'v4/nbformat.v4.schema.json',

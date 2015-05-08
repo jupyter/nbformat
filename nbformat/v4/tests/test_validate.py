@@ -8,7 +8,7 @@ import os
 
 import nose.tools as nt
 
-from jupyter_nbformat.validator import validate, ValidationError
+from nbformat.validator import validate, ValidationError
 from ..nbjson import reads
 from ..nbbase import (
     nbformat,
