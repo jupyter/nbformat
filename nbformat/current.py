@@ -1,7 +1,7 @@
 """Deprecated API for working with notebooks
 
-- use jupyter_nbformat for read/write/validate public API
-- use jupyter_nbformat.vX directly for Python API for composing notebooks
+- use nbformat for read/write/validate public API
+- use nbformat.vX directly for Python API for composing notebooks
 """
 
 # Copyright (c) IPython Development Team.
@@ -12,19 +12,19 @@ from __future__ import print_function
 import re
 import warnings
 
-warnings.warn("""jupyter_nbformat.current is deprecated.
+warnings.warn("""nbformat.current is deprecated.
 
-- use jupyter_nbformat for read/write/validate public API
-- use jupyter_nbformat.vX directly to composing notebooks of a particular version
+- use nbformat for read/write/validate public API
+- use nbformat.vX directly to composing notebooks of a particular version
 """)
 
-from jupyter_nbformat.v3 import (
+from nbformat.v3 import (
     NotebookNode,
     new_code_cell, new_text_cell, new_notebook, new_output, new_worksheet,
     parse_filename, new_metadata, new_author, new_heading_cell, nbformat,
     nbformat_minor, nbformat_schema, to_notebook_json,
 )
-from jupyter_nbformat import v3 as _v_latest
+from nbformat import v3 as _v_latest
 
 from .reader import reads as reader_reads
 from . import versions

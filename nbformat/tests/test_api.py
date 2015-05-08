@@ -10,7 +10,7 @@ from .base import TestsBase
 
 from ipython_genutils.tempdir import TemporaryDirectory
 from ..reader import get_version
-from jupyter_nbformat import read, current_nbformat, writes, write
+from nbformat import read, current_nbformat, writes, write
 
 
 class TestAPI(TestsBase):

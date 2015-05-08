@@ -10,7 +10,7 @@ import tempfile
 
 from .base import TestsBase
 
-from jupyter_nbformat import read, sign
+from nbformat import read, sign
 
 class TestNotary(TestsBase):
     

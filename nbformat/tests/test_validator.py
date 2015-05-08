@@ -7,7 +7,7 @@ import os
 
 from .base import TestsBase
 from jsonschema import ValidationError
-from jupyter_nbformat import read
+from nbformat import read
 from ..validator import isvalid, validate
 
 

@@ -8,6 +8,6 @@ env:
 install:
     - pip install . coveralls -r requirements.txt
 script:
-    - nosetests --with-coverage --cover-package=jupyter_nbformat jupyter_nbformat
+    - nosetests --with-coverage --cover-package=nbformat nbformat
 after_success:
     - coveralls
