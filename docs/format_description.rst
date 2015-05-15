@@ -146,7 +146,7 @@ stream output
 
 .. versionchanged:: nbformat 4.0
 
-    The keys ``stream`` key was changed to ``name`` to match
+    The ``stream`` key was changed to ``name`` to match
     the stream message.
 
 
@@ -317,7 +317,6 @@ The following metadata keys are defined at the notebook level:
 Key         Value           Interpretation
 =========== =============== ==============
 kernelspec  dict            A :ref:`kernel specification <kernelspecs>`
-signature   str             A hashed :ref:`signature <notebook_security>` of the notebook
 =========== =============== ==============
 
 
