@@ -1,3 +1,4 @@
 ipython_genutils
+numpydoc
 -e git+https://github.com/ipython/traitlets.git#egg=traitlets
 -e git+https://github.com/jupyter/jupyter_core.git#egg=jupyter_core
