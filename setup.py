@@ -90,7 +90,7 @@ setuptools_args = {}
 install_requires = setuptools_args['install_requires'] = [
     'ipython_genutils',
     'traitlets',
-    'jsonschema>=2.0',
+    'jsonschema>=2.0,!=2.5.0',
     'jupyter_core',
 ]
 
