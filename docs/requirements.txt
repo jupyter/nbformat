@@ -1,5 +1,5 @@
 ipython_genutils
 numpydoc
 jsonschema
--e git+https://github.com/ipython/traitlets.git#egg=traitlets
+traitlets
 -e git+https://github.com/jupyter/jupyter_core.git#egg=jupyter_core
