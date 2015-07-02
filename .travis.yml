@@ -6,7 +6,7 @@ python:
 sudo: false
 env:
 install:
-    - pip install . coveralls -r requirements.txt
+    - pip install . coveralls
 script:
     - nosetests --with-coverage --cover-package=nbformat nbformat
 after_success:
