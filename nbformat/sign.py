@@ -24,7 +24,7 @@ from traitlets import Instance, Bytes, Enum, Any, Unicode, Bool, Integer
 from traitlets.config import LoggingConfigurable, MultipleInstanceError
 from jupyter_core.application import JupyterApp, base_flags
 
-from . import read, NO_CONVERT
+from . import read, NO_CONVERT, __version__
 
 try:
     # Python 3
@@ -361,7 +361,7 @@ trust_flags.update(base_flags)
 
 
 class TrustNotebookApp(JupyterApp):
-    
+    version = __version__
     description="""Sign one or more Jupyter notebooks with your key,
     to trust their dynamic (HTML, Javascript) output.
     
