@@ -117,6 +117,7 @@ class NotebookNotary(LoggingConfigurable):
         the oldest 25% of signatures will be culled.
         """
     ).tag(config=True)
+
     db = Any()
     def _db_default(self):
         if sqlite3 is None:
