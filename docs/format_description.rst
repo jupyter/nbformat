@@ -1,3 +1,5 @@
+.. _notebook_file_format:
+
 ========================
 The Notebook file format
 ========================
