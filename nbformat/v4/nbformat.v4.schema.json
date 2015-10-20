@@ -113,6 +113,7 @@
                         "tags": {"$ref": "#/definitions/misc/metadata_tags"}
                     }
                 },
+                "attachments": {"$ref": "#/definitions/misc/attachments"},
                 "source": {"$ref": "#/definitions/misc/source"}
             }
         },
@@ -136,6 +137,7 @@
                     },
                     "additionalProperties": true
                 },
+                "attachments": {"$ref": "#/definitions/misc/attachments"},
                 "source": {"$ref": "#/definitions/misc/source"}
             }
         },
@@ -167,6 +169,7 @@
                         "tags": {"$ref": "#/definitions/misc/metadata_tags"}
                     }
                 },
+                "attachments": {"$ref": "#/definitions/misc/attachments"},
                 "source": {"$ref": "#/definitions/misc/source"},
                 "outputs": {
                     "description": "Execution, display, or stream outputs.",
@@ -201,7 +204,8 @@
                         "tags": {"$ref": "#/definitions/misc/metadata_tags"}
                     },
                     "additionalProperties": true
-                }
+                },
+                "attachments": {"$ref": "#/definitions/misc/attachments"}
             }
         },
         
@@ -325,6 +329,16 @@
                 "items": {
                     "type": "string",
                     "pattern": "^[^,]+$"
+                }
+            },
+            "attachments": {
+                "description": "Media attachments (e.g. inline images), stored as mimebundle keyed by filename.",
+                "type": "object",
+                "patternProperties": {
+                    ".*": {
+                        "description": "The attachment's data stored as a mimebundle.",
+                        "$ref": "#/definitions/misc/mimebundle"
+                    }
                 }
             },
             "source": {

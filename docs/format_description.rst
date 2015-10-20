@@ -66,6 +66,7 @@ All cells have the following basic structure:
       "cell_type" : "name",
       "metadata" : {},
       "source" : "single string or [list, of, strings]",
+      "attachments" : {},
     }
 
 .. note::
@@ -155,6 +156,7 @@ stream output
     The ``stream`` key was changed to ``name`` to match
     the stream message.
 
+.. _display-data:
 
 display_data
 ************
@@ -289,6 +291,27 @@ regardless of format.
         "format" : "mime/type"
       },
       "source" : "[some nbformat output text]"
+    }
+
+
+Cell attachments
+----------------
+A cell can have a number of attachments, typically inline images that can be referenced in the markdown
+content of a cell. The attachment dictionary of a cell contains a set of mime-bundles (see :ref:`display_data`)
+keyed by filename that represents the files attached to the cell.
+
+
+.. sourcecode:: python
+
+    {
+      "cell_type" : "markdown",
+      "metadata" : {},
+      "source" : ["Here is an *inline* image ![inline image](attachment:test.png)"],
+      "attachments" : {
+        "test.png": {
+            "image/png" : ["base64-encoded-png-data"],
+        },
+      },
     }
 
 Backward-compatible changes
