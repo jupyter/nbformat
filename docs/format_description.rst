@@ -27,7 +27,6 @@ At the highest level, a Jupyter notebook is a dictionary with a few keys:
 
     {
       "metadata" : {
-        "signature": "hex-digest", # used for authenticating unsafe outputs on load
         "kernel_info": {
             # if kernel_info is defined, its name field is required.
             "name" : "the name of the kernel"
