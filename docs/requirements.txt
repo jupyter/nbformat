@@ -1,5 +1,4 @@
 ipython_genutils
-numpydoc
 jsonschema
 traitlets
 -e git+https://github.com/jupyter/jupyter_core.git#egg=jupyter_core
