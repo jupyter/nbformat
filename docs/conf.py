@@ -33,7 +33,7 @@ import shlex
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.intersphinx',
-    'numpydoc',
+    'sphinx.ext.napoleon',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -294,4 +294,8 @@ texinfo_documents = [
 
 
 # Example configuration for intersphinx: refer to the Python standard library.
-intersphinx_mapping = {'https://docs.python.org/': None}
+intersphinx_mapping = {
+    'https://docs.python.org/3': None,
+    'https://jupyter_client.readthedocs.org/en/stable': None,
+    'https://nbconvert.readthedocs.org/en/stable': None,
+}

@@ -68,6 +68,11 @@ All cells have the following basic structure:
       "source" : "single string or [list, of, strings]",
     }
 
+.. note::
+
+    On disk, multi-line strings **MAY** be split into lists of strings.
+    When read with the nbformat Python API,
+    these multi-line strings will always be a single string.
 
 Markdown cells
 --------------
@@ -83,7 +88,7 @@ as defined in `GitHub-flavored markdown`_, and implemented in marked_.
     {
       "cell_type" : "markdown",
       "metadata" : {},
-      "source" : ["some *markdown*"],
+      "source" : "[multi-line *markdown*]",
     }
 
 .. versionchanged:: nbformat 4.0
@@ -108,7 +113,7 @@ They also have an execution_count, which must be an integer or ``null``.
           "collapsed" : True, # whether the output of the cell is collapsed
           "autoscroll": False, # any of true, false or "auto"
       },
-      "source" : ["some code"],
+      "source" : "[some multi-line code]",
       "outputs": [{
           # list of output dicts (described below)
           "output_type": "stream",
@@ -142,7 +147,7 @@ stream output
     {
       "output_type" : "stream",
       "name" : "stdout", # or stderr
-      "text" : ["multiline stream text"],
+      "text" : "[multiline stream text]",
     }
 
 .. versionchanged:: nbformat 4.0
@@ -166,8 +171,8 @@ The metadata of these messages may be keyed by mime-type as well.
     {
       "output_type" : "display_data",
       "data" : {
-        "text/plain" : ["multiline text data"],
-        "image/png": ["base64-encoded-png-data"],
+        "text/plain" : "[multiline text data]",
+        "image/png": "[base64-encoded-multiline-png-data]",
         "application/json": {
           # JSON data is included as-is
           "json": "data",
@@ -207,8 +212,8 @@ adding only a ``execution_count`` field, which must be an integer.
       "output_type" : "execute_result",
       "execution_count": 42,
       "data" : {
-        "text/plain" : ["multiline text data"],
-        "image/png": ["base64-encoded-png-data"],
+        "text/plain" : "[multiline text data]",
+        "image/png": "[base64-encoded-multiline-png-data]",
         "application/json": {
           # JSON data is included as-is
           "json": "data",
@@ -239,6 +244,7 @@ Failed execution may show a traceback
 .. sourcecode:: python
 
     {
+	  'output_type': 'error',
       'ename' : str,   # Exception name, as a string
       'evalue' : str,  # Exception value, as a string
 
@@ -257,7 +263,9 @@ Failed execution may show a traceback
 Raw NBConvert cells
 -------------------
 
-A raw cell is defined as content that should be included *unmodified* in :ref:`nbconvert <nbconvert>` output.
+.. _nbconvert: https://nbconvert.readthedocs.org
+
+A raw cell is defined as content that should be included *unmodified* in `nbconvert`_ output.
 For example, this cell could include raw LaTeX for nbconvert to pdf via latex,
 or restructured text for use in Sphinx documentation.
 
@@ -280,7 +288,7 @@ regardless of format.
         # nbconvert to formats other than this will exclude this cell.
         "format" : "mime/type"
       },
-      "source" : ["some nbformat mime-type data"]
+      "source" : "[some nbformat output text]"
     }
 
 Backward-compatible changes
