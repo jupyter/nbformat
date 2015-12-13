@@ -27,7 +27,7 @@ class JSONReader(NotebookReader):
 
     def reads(self, s, **kwargs):
         """Read a JSON string into a Notebook object"""
-        kwargs['object_pairs_hook'] = collections.OrderedDict()  # >= py2.7
+        kwargs['object_pairs_hook'] = collections.OrderedDict  # >= py2.7
         nb = json.loads(s, **kwargs)
         nb = self.to_notebook(nb, **kwargs)
         return nb
