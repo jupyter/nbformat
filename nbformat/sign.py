@@ -10,6 +10,8 @@ import hashlib
 from hmac import HMAC
 import io
 import os
+import shutil
+import warnings
 
 try:
     import sqlite3
@@ -23,6 +25,7 @@ from ipython_genutils.py3compat import unicode_type, cast_bytes
 from traitlets import Instance, Bytes, Enum, Any, Unicode, Bool, Integer
 from traitlets.config import LoggingConfigurable, MultipleInstanceError
 from jupyter_core.application import JupyterApp, base_flags
+from jupyter_core.paths import jupyter_data_dir, jupyter_runtime_dir
 
 from . import read, NO_CONVERT, __version__
 
@@ -82,23 +85,61 @@ def signature_removed(nb):
         if save_signature is not None:
             nb['metadata']['signature'] = save_signature
 
+def _check_data_dir(data_dir, runtime_dir, log=None):
+    """Check for signature files in data_dir
+    
+    These should have been in runtime_dir, but weren't prior to nbformat-4.1.
+    
+    If found in the old data_dir location, these files are copied to their runtime location.
+    """
+    for fname in (u'nbsignatures.db', u'notebook_secret'):
+        runtime_path = os.path.join(runtime_dir, fname)
+        if os.path.exists(runtime_path):
+            # new path in use, moving on
+            continue
+        data_path = os.path.join(data_dir, fname)
+        if os.path.exists(data_path):
+            msg = "Found in data dir: {0}, copying to runtime dir: {1}".format(
+                data_path, runtime_path,
+            )
+            if log:
+                log.warn(msg)
+            else:
+                warnings.warn(msg)
+            shutil.copy(data_path, runtime_path)
+    
 
 class NotebookNotary(LoggingConfigurable):
     """A class for computing and verifying notebook signatures."""
     
-    data_dir = Unicode()
-    def _data_dir_default(self):
+    secret_dir = Unicode(help="""
+        Directory in which to store secrets and signatures.
+        Defaults to Jupyter runtime dir.
+    """)
+    def _secret_dir_default(self):
         app = None
         try:
             if JupyterApp.initialized():
                 app = JupyterApp.instance()
+                _check_data_dir(app.data_dir, app.runtime_dir, app.log)
         except MultipleInstanceError:
             pass
         if app is None:
-            # create an app, without the global instance
-            app = JupyterApp()
-            app.initialize(argv=[])
-        return app.data_dir
+            data_dir = jupyter_data_dir()
+            runtime_dir = jupyter_runtime_dir()
+            _check_data_dir(data_dir, runtime_dir)
+            return runtime_dir
+        else:
+            return app.runtime_dir
+    
+    data_dir = Unicode()
+    def _data_dir_default(self):
+        warnings.warn("NotebookNotary.data_dir is deprecated, use secret_dir", DeprecationWarning)
+        return self.secret_dir
+    
+    def _data_dir_changed(self, name, old, new):
+        warnings.warn("NotebookNotary.data_dir is deprecated, use secret_dir", DeprecationWarning)
+        self.secret_dir = new
     
     db_file = Unicode(config=True,
         help="""The sqlite file in which to store notebook signatures.
@@ -106,9 +147,9 @@ class NotebookNotary(LoggingConfigurable):
         You can set it to ':memory:' to disable sqlite writing to the filesystem.
         """)
     def _db_file_default(self):
-        if not self.data_dir:
+        if not self.secret_dir:
             return ':memory:'
-        return os.path.join(self.data_dir, u'nbsignatures.db')
+        return os.path.join(self.secret_dir, u'nbsignatures.db')
     
     # 64k entries ~ 12MB
     cache_size = Integer(65535, config=True,
@@ -156,9 +197,9 @@ class NotebookNotary(LoggingConfigurable):
         help="""The file where the secret key is stored."""
     )
     def _secret_file_default(self):
-        if not self.data_dir:
+        if not self.secret_dir:
             return ''
-        return os.path.join(self.data_dir, 'notebook_secret')
+        return os.path.join(self.secret_dir, 'notebook_secret')
     
     secret = Bytes(config=True,
         help="""The secret key with which notebooks are signed."""
@@ -382,7 +423,7 @@ class TrustNotebookApp(JupyterApp):
     
     notary = Instance(NotebookNotary)
     def _notary_default(self):
-        return NotebookNotary(parent=self, data_dir=self.data_dir)
+        return NotebookNotary(parent=self, secret_dir=self.runtime_dir)
     
     def sign_notebook(self, notebook_path):
         if not os.path.exists(notebook_path):
@@ -402,6 +443,7 @@ class TrustNotebookApp(JupyterApp):
         self.notary._write_secret_file(os.urandom(1024))
     
     def start(self):
+        _check_data_dir(self.data_dir, self.runtime_dir, self.log)
         if self.reset:
             if os.path.exists(self.notary.db_file):
                 print("Removing trusted signature cache: %s" % self.notary.db_file)
