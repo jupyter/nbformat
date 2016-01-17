@@ -8,6 +8,7 @@ sudo: false
 env:
 install:
     - pip install . coveralls
+    - pip install nbformat[test]
 script:
     - nosetests --with-coverage --cover-package=nbformat nbformat
 after_success:

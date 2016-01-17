@@ -123,8 +123,19 @@ class NotebookNotary(LoggingConfigurable):
             self.log.warn("Missing SQLite3, all notebooks will be untrusted!")
             return
         kwargs = dict(detect_types=sqlite3.PARSE_DECLTYPES|sqlite3.PARSE_COLNAMES)
-        db = sqlite3.connect(self.db_file, **kwargs)
-        self.init_db(db)
+        try:
+            db = sqlite3.connect(self.db_file, **kwargs)
+            self.init_db(db)
+        except sqlite3.DatabaseError:
+            old_db_location = os.path.join(self.data_dir, self.db_file + ".bak")
+            self.log.warn("""The signatures database cannot be opened; maybe it is corrupted or encrypted.  You may need to rerun your notebooks to ensure that they are trusted to run Javascript.  The old signatures database has been renamed to %s and a new one has been created.""",
+                old_db_location)
+            if self.db_file != ':memory:':
+                os.rename(self.db_file, self.db_file + u'.bak')
+                db = sqlite3.connect(self.db_file, **kwargs)
+                self.init_db(db)
+            else:
+                raise
         return db
     
     def init_db(self, db):
