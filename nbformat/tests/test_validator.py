@@ -55,4 +55,14 @@ class TestValidator(TestsBase):
         
         self.assertEqual(isvalid(nb, version=4), False)
         self.assertEqual(isvalid(nb), True)
-
+    
+    def test_validation_error(self):
+        with self.fopen(u'invalid.ipynb', u'r') as f:
+            nb = read(f, as_version=4)
+        with self.assertRaises(ValidationError) as e:
+            validate(nb)
+        s = str(e.exception)
+        self.assertRegexpMatches(s, "validating.*required.* in markdown_cell")
+        self.assertRegexpMatches(s, "source.* is a required property")
+        self.assertRegexpMatches(s, r"On instance\[u?['\"].*cells['\"]\]\[0\]")
+        self.assertLess(len(s.splitlines()), 10)

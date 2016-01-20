@@ -4,6 +4,8 @@
 from __future__ import print_function
 import json
 import os
+import pprint
+import sys
 import warnings
 
 try:
@@ -95,6 +97,85 @@ def isvalid(nbjson, ref=None, version=None, version_minor=None):
     else:
         return True
 
+def _format_as_index(indices):
+    """
+    (from jsonschema._utils.format_as_index, copied to avoid relying on private API)
+    
+    Construct a single string containing indexing operations for the indices.
+
+    For example, [1, 2, "foo"] -> [1][2]["foo"]
+    """
+
+    if not indices:
+        return ""
+    return "[%s]" % "][".join(repr(index) for index in indices)
+
+_ITEM_LIMIT = 16
+_STR_LIMIT = 64
+
+def _truncate_obj(obj):
+    """Truncate objects for use in validation tracebacks
+    
+    Cell and output lists are squashed, as are long strings, lists, and dicts.
+    """
+    if isinstance(obj, dict):
+        truncated = { k:_truncate_obj(v) for k,v in list(obj.items())[:_ITEM_LIMIT] }
+        if isinstance(truncated.get('cells'), list):
+            truncated['cells'] = ['...%i cells...' % len(obj['cells'])]
+        if isinstance(truncated.get('outputs'), list):
+            truncated['outputs'] = ['...%i outputs...' % len(obj['outputs'])]
+
+        if len(obj) > _ITEM_LIMIT:
+            truncated['...'] = '%i keys truncated' % (len(obj) - _ITEM_LIMIT)
+        return truncated
+    elif isinstance(obj, list):
+        truncated = [ _truncate_obj(item) for item in obj[:_ITEM_LIMIT] ]
+        if len(obj) > _ITEM_LIMIT:
+            truncated.append('...%i items truncated...' % (len(obj) - _ITEM_LIMIT))
+        return truncated
+    elif isinstance(obj, str):
+        truncated = obj[:_STR_LIMIT]
+        if len(obj) > _STR_LIMIT:
+            truncated += '...'
+        return truncated
+    else:
+        return obj
+
+class NotebookValidationError(ValidationError):
+    """Schema ValidationError with truncated representation
+    
+    to avoid massive verbose tracebacks.
+    """
+    def __init__(self, original, ref=None):
+        self.original = original
+        self.ref = getattr(self.original, 'ref', ref)
+        self.message = self.original.message
+    
+    def __getattr__(self, key):
+        return getattr(self.original, key)
+    
+    def __unicode__(self):
+        """Custom str for validation errors
+    
+        avoids dumping full schema and notebook to logs
+        """
+        error = self.original
+        instance = _truncate_obj(error.instance)
+    
+        return u'\n'.join([
+            error.message,
+            u'',
+            u"Failed validating %r in %s%s:" % (
+                error.validator,
+                self.ref or 'notebook',
+                _format_as_index(list(error.relative_schema_path)[:-1])),
+            u'',
+            u'On instance%s:' % _format_as_index(error.relative_path),
+            pprint.pformat(instance, width=78),
+        ])
+    
+    if sys.version_info >= (3,):
+        __str__ = __unicode__
 
 def better_validation_error(error, version, version_minor):
     """Get better ValidationError on oneOf failures
@@ -104,9 +185,9 @@ def better_validation_error(error, version, version_minor):
     try validating directly based on the type for a better error message
     """
     key = error.schema_path[-1]
+    ref = None
     if key.endswith('Of'):
 
-        ref = None
         if isinstance(error.instance, dict):
             if 'cell_type' in error.instance:
                 ref = error.instance['cell_type'] + "_cell"
@@ -120,14 +201,19 @@ def better_validation_error(error, version, version_minor):
                     version=version,
                     version_minor=version_minor,
                 )
-            except ValidationError as e:
-                return better_validation_error(e, version, version_minor)
-            except:
+            except ValidationError as sub_error:
+                # keep extending relative path
+                error.relative_path.extend(sub_error.relative_path)
+                sub_error.relative_path = error.relative_path
+                better = better_validation_error(sub_error, version, version_minor)
+                if better.ref is None:
+                    better.ref = ref
+                return better
+            except Exception:
                 # if it fails for some reason,
                 # let the original error through
                 pass
-
-    return error
+    return NotebookValidationError(error, ref)
 
 
 def validate(nbjson, ref=None, version=None, version_minor=None):
