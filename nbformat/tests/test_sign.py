@@ -15,11 +15,11 @@ from nbformat import read, sign
 class TestNotary(TestsBase):
     
     def setUp(self):
-        self.data_dir = tempfile.mkdtemp()
+        self.secret_dir = tempfile.mkdtemp()
         self.notary = sign.NotebookNotary(
             db_file=':memory:',
             secret=b'secret',
-            data_dir=self.data_dir,
+            secret_dir=self.secret_dir,
         )
         with self.fopen(u'test3.ipynb', u'r') as f:
             self.nb = read(f, as_version=4)
@@ -27,7 +27,7 @@ class TestNotary(TestsBase):
             self.nb3 = read(f, as_version=3)
     
     def tearDown(self):
-        shutil.rmtree(self.data_dir)
+        shutil.rmtree(self.secret_dir)
     
     def test_algorithms(self):
         last_sig = ''
