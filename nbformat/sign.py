@@ -102,7 +102,7 @@ class NotebookNotary(LoggingConfigurable):
     
     db_file = Unicode(config=True,
         help="""The sqlite file in which to store notebook signatures.
-        By default, this will be in your Jupyter runtime directory.
+        By default, this will be in your Jupyter data directory.
         You can set it to ':memory:' to disable sqlite writing to the filesystem.
         """)
     def _db_file_default(self):
