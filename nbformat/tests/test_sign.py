@@ -4,9 +4,11 @@
 # Distributed under the terms of the Modified BSD License.
 
 import copy
+import os
 import shutil
 import time
 import tempfile
+import testpath
 
 from .base import TestsBase
 
@@ -28,6 +30,20 @@ class TestNotary(TestsBase):
     
     def tearDown(self):
         shutil.rmtree(self.data_dir)
+   
+    def test_invalid_db_file(self):
+        invalid_sql_file = os.path.join(self.data_dir, 'invalid_db_file.db')
+        with open(invalid_sql_file, 'w') as tempfile:
+            tempfile.write(u'[invalid data]')
+
+        invalid_notary = sign.NotebookNotary(
+            db_file=invalid_sql_file,
+            secret=b'secret',
+        )
+        invalid_notary.sign(self.nb)
+
+        testpath.assert_isfile(os.path.join(self.data_dir, invalid_sql_file))
+        testpath.assert_isfile(os.path.join(self.data_dir, invalid_sql_file + '.bak'))
     
     def test_algorithms(self):
         last_sig = ''
@@ -191,5 +207,4 @@ class TestNotary(TestsBase):
         self.assertFalse(self.notary.check_cells(nb))
         for cell in cells:
             self.assertNotIn('trusted', cell)
-        
 
