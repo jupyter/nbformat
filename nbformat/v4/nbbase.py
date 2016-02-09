@@ -13,7 +13,7 @@ from ..notebooknode import from_dict, NotebookNode
 
 # Change this when incrementing the nbformat version
 nbformat = 4
-nbformat_minor = 0
+nbformat_minor = 1
 nbformat_schema = 'nbformat.v4.schema.json'
 
 
