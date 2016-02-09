@@ -169,7 +169,6 @@
                         "tags": {"$ref": "#/definitions/misc/metadata_tags"}
                     }
                 },
-                "attachments": {"$ref": "#/definitions/misc/attachments"},
                 "source": {"$ref": "#/definitions/misc/source"},
                 "outputs": {
                     "description": "Execution, display, or stream outputs.",
@@ -204,8 +203,7 @@
                         "tags": {"$ref": "#/definitions/misc/metadata_tags"}
                     },
                     "additionalProperties": true
-                },
-                "attachments": {"$ref": "#/definitions/misc/attachments"}
+                }
             }
         },
         

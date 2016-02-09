@@ -66,7 +66,6 @@ All cells have the following basic structure:
       "cell_type" : "name",
       "metadata" : {},
       "source" : "single string or [list, of, strings]",
-      "attachments" : {},
     }
 
 .. note::
@@ -296,8 +295,9 @@ regardless of format.
 
 Cell attachments
 ----------------
-A cell can have a number of attachments, typically inline images that can be referenced in the markdown
-content of a cell. The attachment dictionary of a cell contains a set of mime-bundles (see :ref:`display_data`)
+Markdown and raw cells can have a number of attachments, typically inline
+images that can be referenced in the markdown content of a cell. The attachment
+dictionary of a cell contains a set of mime-bundles (see :ref:`display_data`)
 keyed by filename that represents the files attached to the cell.
 
 
