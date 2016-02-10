@@ -100,23 +100,24 @@ class NotebookNotary(LoggingConfigurable):
             app.initialize(argv=[])
         return app.data_dir
     
-    db_file = Unicode(config=True,
+    db_file = Unicode(
         help="""The sqlite file in which to store notebook signatures.
         By default, this will be in your Jupyter data directory.
         You can set it to ':memory:' to disable sqlite writing to the filesystem.
-        """)
+        """).tag(config=True)
     def _db_file_default(self):
         if not self.data_dir:
             return ':memory:'
         return os.path.join(self.data_dir, u'nbsignatures.db')
     
     # 64k entries ~ 12MB
-    cache_size = Integer(65535, config=True,
+    cache_size = Integer(65535, 
         help="""The number of notebook signatures to cache.
         When the number of signatures exceeds this value,
         the oldest 25% of signatures will be culled.
         """
-    )
+    ).tag(config=True)
+
     db = Any()
     def _db_default(self):
         if sqlite3 is None:
@@ -153,9 +154,9 @@ class NotebookNotary(LoggingConfigurable):
         """)
         db.commit()
     
-    algorithm = Enum(algorithms, default_value='sha256', config=True,
+    algorithm = Enum(algorithms, default_value='sha256', 
         help="""The hashing algorithm used to sign notebooks."""
-    )
+    ).tag(config=True)
     def _algorithm_changed(self, name, old, new):
         self.digestmod = getattr(hashlib, self.algorithm)
     
@@ -163,17 +164,17 @@ class NotebookNotary(LoggingConfigurable):
     def _digestmod_default(self):
         return getattr(hashlib, self.algorithm)
     
-    secret_file = Unicode(config=True,
+    secret_file = Unicode(
         help="""The file where the secret key is stored."""
-    )
+    ).tag(config=True)
     def _secret_file_default(self):
         if not self.data_dir:
             return ''
         return os.path.join(self.data_dir, 'notebook_secret')
     
-    secret = Bytes(config=True,
+    secret = Bytes(
         help="""The secret key with which notebooks are signed."""
-    )
+    ).tag(config=True)
     def _secret_default(self):
         # note : this assumes an Application is running
         if os.path.exists(self.secret_file):
@@ -385,11 +386,11 @@ class TrustNotebookApp(JupyterApp):
     
     flags = trust_flags
     
-    reset = Bool(False, config=True,
+    reset = Bool(False, 
         help="""If True, delete the trusted signature cache.
         After reset, all previously signed notebooks will become untrusted.
         """
-    )
+    ).tag(config=True)
     
     notary = Instance(NotebookNotary)
     def _notary_default(self):
