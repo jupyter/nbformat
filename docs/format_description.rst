@@ -295,10 +295,16 @@ regardless of format.
 
 Cell attachments
 ----------------
+.. versionadded:: 4.1
+
 Markdown and raw cells can have a number of attachments, typically inline
-images that can be referenced in the markdown content of a cell. The attachment
+images that can be referenced in the markdown content of a cell. The ``attachments``
 dictionary of a cell contains a set of mime-bundles (see :ref:`display_data`)
 keyed by filename that represents the files attached to the cell.
+
+.. note::
+
+  The ``attachments`` dictionary is an optional field and can be undefined or empty if the cell does not have any attachments.
 
 
 .. sourcecode:: python
@@ -313,6 +319,7 @@ keyed by filename that represents the files attached to the cell.
         },
       },
     }
+
 
 Backward-compatible changes
 ===========================
