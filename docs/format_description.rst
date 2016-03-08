@@ -155,6 +155,7 @@ stream output
     The ``stream`` key was changed to ``name`` to match
     the stream message.
 
+.. _display-data:
 
 display_data
 ************
@@ -290,6 +291,35 @@ regardless of format.
       },
       "source" : "[some nbformat output text]"
     }
+
+
+Cell attachments
+----------------
+.. versionadded:: 4.1
+
+Markdown and raw cells can have a number of attachments, typically inline
+images that can be referenced in the markdown content of a cell. The ``attachments``
+dictionary of a cell contains a set of mime-bundles (see :ref:`display_data`)
+keyed by filename that represents the files attached to the cell.
+
+.. note::
+
+  The ``attachments`` dictionary is an optional field and can be undefined or empty if the cell does not have any attachments.
+
+
+.. sourcecode:: python
+
+    {
+      "cell_type" : "markdown",
+      "metadata" : {},
+      "source" : ["Here is an *inline* image ![inline image](attachment:test.png)"],
+      "attachments" : {
+        "test.png": {
+            "image/png" : ["base64-encoded-png-data"],
+        },
+      },
+    }
+
 
 Backward-compatible changes
 ===========================
