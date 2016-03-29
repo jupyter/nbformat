@@ -1,5 +1,8 @@
 # The Jupyter Notebook Format
 
+[![codecov.io](https://codecov.io/github/jupyter/nbformat/coverage.svg?branch=master)](https://codecov.io/github/jupyter/nbformat?branch=master)
+
+
 `nbformat` contains the reference implementation of the [Jupyter Notebook format][],
 and Python APIs for working with notebooks.
 
