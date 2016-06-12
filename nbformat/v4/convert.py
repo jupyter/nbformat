@@ -40,7 +40,9 @@ def upgrade(nb, from_version=3, from_minor=0):
 
         # Mark the original nbformat so consumers know it has been converted
         orig_nbformat = nb.pop('orig_nbformat', None)
+        orig_nbformat_minor = nb.pop('orig_nbformat_minor', None)
         nb.metadata.orig_nbformat = orig_nbformat or 3
+        nb.metadata.orig_nbformat_minor = orig_nbformat_minor or 0
 
         # Mark the new format
         nb.nbformat = nbformat
@@ -243,11 +245,11 @@ def downgrade(nb):
     cells = [ downgrade_cell(cell) for cell in nb.pop('cells') ]
     nb.worksheets = [v3.new_worksheet(cells=cells)]
     nb.metadata.setdefault('name', '')
-    
+
     # Validate the converted notebook before returning it
     _warn_if_invalid(nb, v3.nbformat)
-    
+
     nb.orig_nbformat = nb.metadata.pop('orig_nbformat', nbformat)
     nb.orig_nbformat_minor = nb.metadata.pop('orig_nbformat_minor', nbformat_minor)
-    
+
     return nb
