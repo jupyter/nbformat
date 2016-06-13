@@ -7,6 +7,7 @@ from .base import TestsBase
 
 from ..converter import convert
 from ..reader import read, get_version
+from ..validator import isvalid, validate
 from .. import current_nbformat
 
 
@@ -38,8 +39,20 @@ class TestConvert(TestsBase):
         self.assertEqual(major, 3)
 
 
+    def test_upgrade_downgrade_4_3_4(self):
+        """Test that a v4 notebook downgraded to v3 and then upgraded to v4
+        passes validation tests"""
+        with self.fopen(u'test4.ipynb', u'r') as f:
+            nb = read(f)
+        validate(nb)
+        nb = convert(nb, 3)
+        validate(nb)
+        nb = convert(nb, 4)
+        self.assertEqual(isvalid(nb), True)
+
+
     def test_open_current(self):
-        """Can an old notebook be opened and converted to the current version 
+        """Can an old notebook be opened and converted to the current version
         while remembering the original version of the notebook?"""
 
         # Open a version 2 notebook and attempt to upgrade it to the current version
