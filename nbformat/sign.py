@@ -136,6 +136,11 @@ class NotebookNotary(LoggingConfigurable):
                 self.init_db(db)
             else:
                 raise
+        except sqlite3.OperationalError:
+            self.log.warn("Failed commiting trust database to disk.  You may need to move the database file to a non-networked file system, using config option `NotebookNotary.db_file`.  Using in-memory trust database.")
+            self.db_file = ':memory:'
+            db = sqlite3.connect(self.db_file, **kwargs)
+            self.init_db(db)
         return db
     
     def init_db(self, db):
