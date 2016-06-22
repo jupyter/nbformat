@@ -126,21 +126,22 @@ class NotebookNotary(LoggingConfigurable):
         try:
             db = sqlite3.connect(self.db_file, **kwargs)
             self.init_db(db)
-        except sqlite3.DatabaseError:
-            old_db_location = os.path.join(self.data_dir, self.db_file + ".bak")
-            self.log.warn("""The signatures database cannot be opened; maybe it is corrupted or encrypted.  You may need to rerun your notebooks to ensure that they are trusted to run Javascript.  The old signatures database has been renamed to %s and a new one has been created.""",
-                old_db_location)
+        except (sqlite3.DatabaseError, sqlite3.OperationalError):
             if self.db_file != ':memory:':
-                os.rename(self.db_file, self.db_file + u'.bak')
-                db = sqlite3.connect(self.db_file, **kwargs)
-                self.init_db(db)
+                old_db_location = os.path.join(self.data_dir, self.db_file + ".bak")
+                self.log.warn("""The signatures database cannot be opened; maybe it is corrupted or encrypted.  You may need to rerun your notebooks to ensure that they are trusted to run Javascript.  The old signatures database has been renamed to %s and a new one has been created.""",
+                    old_db_location)
+                try:
+                    os.rename(self.db_file, self.db_file + u'.bak')
+                    db = sqlite3.connect(self.db_file, **kwargs)
+                    self.init_db(db)
+                except (sqlite3.DatabaseError, sqlite3.OperationalError):
+                    self.log.warn("""Failed commiting signatures database to disk.  You may need to move the database file to a non-networked file system, using config option `NotebookNotary.db_file`.  Using in-memory signatures database for the remainder of this session.""")
+                    self.db_file = ':memory:'
+                    db = sqlite3.connect(self.db_file, **kwargs)
+                    self.init_db(db)
             else:
                 raise
-        except sqlite3.OperationalError:
-            self.log.warn("Failed commiting trust database to disk.  You may need to move the database file to a non-networked file system, using config option `NotebookNotary.db_file`.  Using in-memory trust database.")
-            self.db_file = ':memory:'
-            db = sqlite3.connect(self.db_file, **kwargs)
-            self.init_db(db)
         return db
     
     def init_db(self, db):
