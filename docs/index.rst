@@ -13,6 +13,7 @@ Contents:
 
    format_description
    api
+   changelog
 
 Indices and tables
 ==================
