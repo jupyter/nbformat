@@ -34,6 +34,13 @@ class TestValidator(TestsBase):
         validate(nb)
         self.assertEqual(isvalid(nb), True)
 
+    def test_nb4custom(self):
+        """Test that a notebook with a custom JSON mimetype passes validation"""
+        with self.fopen(u'test4custom.ipynb', u'r') as f:
+            nb = read(f, as_version=4)
+        validate(nb)
+        self.assertEqual(isvalid(nb), True)
+
     def test_invalid(self):
         """Test than an invalid notebook does not pass validation"""
         # this notebook has a few different errors:
@@ -52,10 +59,10 @@ class TestValidator(TestsBase):
             nb = read(f, as_version=4)
         with self.assertRaises(ValidationError):
             validate(nb, version=4)
-        
+
         self.assertEqual(isvalid(nb, version=4), False)
         self.assertEqual(isvalid(nb), True)
-    
+
     def test_validation_error(self):
         with self.fopen(u'invalid.ipynb', u'r') as f:
             nb = read(f, as_version=4)
