@@ -60,19 +60,13 @@
                     "type": "integer",
                     "minimum": 1
                 },
-                "document_info": {
-                    "description": "Document information",
-                    "type": "object",
-                    "properties": {
-                        "title": {
-                            "description": "The title of the notebook document",
-                            "type": "string"
-                        },
-                        "author": {
-                            "description": "The author(s) of the notebook document",
-                            "type": "string",
-                        }
-                    }
+                "title": {
+                    "description": "The title of the notebook document",
+                    "type": "string"
+                },
+                "author": {
+                    "description": "The author(s) of the notebook document",
+                    "type": "string"
                 }
             }
         },
