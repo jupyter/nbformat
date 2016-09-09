@@ -59,6 +59,20 @@
                     "description": "Original notebook format (major number) before converting the notebook between versions. This should never be written to a file.",
                     "type": "integer",
                     "minimum": 1
+                },
+                "document_info": {
+                    "description": "Document information",
+                    "type": "object",
+                    "properties": {
+                        "title": {
+                            "description": "The title of the notebook document",
+                            "type": "string"
+                        },
+                        "author": {
+                            "description": "The author(s) of the notebook document",
+                            "type": "string",
+                        }
+                    }
                 }
             }
         },
