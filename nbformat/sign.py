@@ -20,8 +20,13 @@ except ImportError:
         sqlite3 = None
 
 from ipython_genutils.py3compat import unicode_type, cast_bytes
-from traitlets import Instance, Bytes, Enum, Any, Unicode, Bool, Integer
+from traitlets import (
+    Instance, Bytes, Enum, Any, Unicode, Bool, Integer,
+    DottedObjectName, Dict, Tuple,
+    default,
+)
 from traitlets.config import LoggingConfigurable, MultipleInstanceError
+from traitlets.utils.importstring import import_item
 from jupyter_core.application import JupyterApp, base_flags
 
 from . import read, NO_CONVERT, __version__
@@ -82,6 +87,11 @@ def signature_removed(nb):
         if save_signature is not None:
             nb['metadata']['signature'] = save_signature
 
+_param_styles = {
+    'qmark': '?',
+    'pyformat': '%s',
+    'format': '%s',
+}
 
 class NotebookNotary(LoggingConfigurable):
     """A class for computing and verifying notebook signatures."""
@@ -104,12 +114,57 @@ class NotebookNotary(LoggingConfigurable):
         help="""The sqlite file in which to store notebook signatures.
         By default, this will be in your Jupyter data directory.
         You can set it to ':memory:' to disable sqlite writing to the filesystem.
+
+        To use a database other than sqlite,
+        specify db_connect and db_connect_args|kwargs.
+
+        db_file will be ignored if db_connect is used.
         """)
     def _db_file_default(self):
         if not self.data_dir:
             return ':memory:'
         return os.path.join(self.data_dir, u'nbsignatures.db')
+
+    db_connect = DottedObjectName(None, allow_none=True,
+        help="""Import string for a Python DB-API v2 connect callable.
+        
+        e.g. 'psycopg2.connect' for postgres.
+        """
+    ).tag(config=True)
+
+    db_connect_args = Tuple(
+        help="""Positional arguments to pass to db_connect.
+        
+        Only used if db_connect is specified.
+        """
+    ).tag(config=True)
+
+    db_connect_kwargs = Dict(
+        help="""Keyword arguments to pass to db_connect.
+        
+        Only used if db_connect is specified.
+        """
+    ).tag(config=True)
+
+    db_table_name = Unicode('nbsignatures',
+        help="""The name of the signature table in the database."""
+    ).tag(config=True)
     
+    db_param = Unicode(
+        help="""db parameter format.
+        
+        Use '?' for sqlite, '%s' for most other dbapi implementers.
+        
+        The default is '%s' if a custom db implementation is used,
+        '?' if the default sqlite file is used.
+        
+        Only specify this if '%s' is wrong for your dbapi implementation.
+        """
+    )
+    @default('db_param')
+    def _db_param(self):
+        return '%s' if self.db_connect else '?'
+
     # 64k entries ~ 12MB
     cache_size = Integer(65535, config=True,
         help="""The number of notebook signatures to cache.
@@ -119,6 +174,15 @@ class NotebookNotary(LoggingConfigurable):
     )
     db = Any()
     def _db_default(self):
+        if self.db_connect:
+            connect = import_item(self.db_connect)
+            db = connect(*self.db_connect_args, **self.db_connect_kwargs)
+            self.init_db(db)
+            return db
+        else:
+            return self._connect_db_sqlite()
+    
+    def _connect_db_sqlite(self):
         if sqlite3 is None:
             self.log.warn("Missing SQLite3, all notebooks will be untrusted!")
             return
@@ -129,14 +193,19 @@ class NotebookNotary(LoggingConfigurable):
         except (sqlite3.DatabaseError, sqlite3.OperationalError):
             if self.db_file != ':memory:':
                 old_db_location = os.path.join(self.data_dir, self.db_file + ".bak")
-                self.log.warn("""The signatures database cannot be opened; maybe it is corrupted or encrypted.  You may need to rerun your notebooks to ensure that they are trusted to run Javascript.  The old signatures database has been renamed to %s and a new one has been created.""",
+                self.log.warn("The signatures database cannot be opened; maybe it is corrupted or encrypted."
+                    "  You may need to rerun your notebooks to ensure that they are trusted to run Javascript."
+                    "  The old signatures database has been renamed to %s and a new one has been created.",
                     old_db_location)
                 try:
                     os.rename(self.db_file, self.db_file + u'.bak')
                     db = sqlite3.connect(self.db_file, **kwargs)
                     self.init_db(db)
                 except (sqlite3.DatabaseError, sqlite3.OperationalError):
-                    self.log.warn("""Failed commiting signatures database to disk.  You may need to move the database file to a non-networked file system, using config option `NotebookNotary.db_file`.  Using in-memory signatures database for the remainder of this session.""")
+                    self.log.warn("Failed committing signatures database to disk."
+                        "  You may need to move the database file to a non-networked file system,"
+                        " using config option `NotebookNotary.db_file`."
+                        "  Using in-memory signatures database for the remainder of this session.")
                     self.db_file = ':memory:'
                     db = sqlite3.connect(self.db_file, **kwargs)
                     self.init_db(db)
@@ -145,18 +214,18 @@ class NotebookNotary(LoggingConfigurable):
         return db
     
     def init_db(self, db):
-        db.execute("""
-        CREATE TABLE IF NOT EXISTS nbsignatures
+        c = db.cursor()
+        c.execute("""
+        CREATE TABLE IF NOT EXISTS {}
         (
-            id integer PRIMARY KEY AUTOINCREMENT,
             algorithm text,
             signature text,
             path text,
             last_seen timestamp
-        )""")
-        db.execute("""
-        CREATE INDEX IF NOT EXISTS algosig ON nbsignatures(algorithm, signature)
-        """)
+        )""".format(self.db_table_name))
+        c.execute("""
+        CREATE INDEX IF NOT EXISTS algosig ON {} (algorithm, signature)
+        """.format(self.db_table_name))
         db.commit()
     
     algorithm = Enum(algorithms, default_value='sha256', config=True,
@@ -237,16 +306,19 @@ class NotebookNotary(LoggingConfigurable):
         if self.db is None:
             return False
         signature = self.compute_signature(nb)
-        r = self.db.execute("""SELECT id FROM nbsignatures WHERE
-            algorithm = ? AND
-            signature = ?;
-            """, (self.algorithm, signature)).fetchone()
+        c = self.db.cursor()
+        c.execute("""SELECT signature FROM {0} WHERE
+            algorithm = {1} AND
+            signature = {1};
+            """.format(self.db_table_name, self.db_param),
+            (self.algorithm, signature))
+        r = c.fetchone()
         if r is None:
             return False
-        self.db.execute("""UPDATE nbsignatures SET last_seen = ? WHERE
-            algorithm = ? AND
-            signature = ?;
-            """,
+        c.execute("""UPDATE {0} SET last_seen = {1} WHERE
+            algorithm = {1} AND
+            signature = {1};
+            """.format(self.db_table_name, self.db_param),
             (datetime.utcnow(), self.algorithm, signature),
         )
         self.db.commit()
@@ -265,18 +337,21 @@ class NotebookNotary(LoggingConfigurable):
     def store_signature(self, signature, nb):
         if self.db is None:
             return
-        self.db.execute("""INSERT OR IGNORE INTO nbsignatures
-            (algorithm, signature, last_seen) VALUES (?, ?, ?)""",
+        c = self.db.cursor()
+        c.execute("""INSERT INTO {0}
+            (algorithm, signature, last_seen) VALUES ({1}, {1}, {1})
+            """.format(self.db_table_name, self.db_param),
             (self.algorithm, signature, datetime.utcnow())
         )
-        self.db.execute("""UPDATE nbsignatures SET last_seen = ? WHERE
-            algorithm = ? AND
-            signature = ?;
-            """,
+        c.execute("""UPDATE {0} SET last_seen = {1} WHERE
+            algorithm = {1} AND
+            signature = {1};
+            """.format(self.db_table_name, self.db_param),
             (datetime.utcnow(), self.algorithm, signature),
         )
         self.db.commit()
-        n, = self.db.execute("SELECT Count(*) FROM nbsignatures").fetchone()
+        c.execute("SELECT Count(*) FROM {}".format(self.db_table_name))
+        n, = c.fetchone()
         if n > self.cache_size:
             self.cull_db()
     
@@ -286,20 +361,23 @@ class NotebookNotary(LoggingConfigurable):
         by removing its signature from the trusted database, if present.
         """
         signature = self.compute_signature(nb)
-        self.db.execute("""DELETE FROM nbsignatures WHERE
-                algorithm = ? AND
-                signature = ?;
-            """,
+        self.db.execute("""DELETE FROM {0} WHERE
+                algorithm = {1} AND
+                signature = {1};
+            """.format(self.db_table_name, self.db_param),
             (self.algorithm, signature)
         )
         self.db.commit()
     
     def cull_db(self):
         """Cull oldest 25% of the trusted signatures when the size limit is reached"""
-        self.db.execute("""DELETE FROM nbsignatures WHERE id IN (
-            SELECT id FROM nbsignatures ORDER BY last_seen DESC LIMIT -1 OFFSET ?
+        c = self.db.cursor()
+        c.execute("""DELETE FROM {0} WHERE signature IN (
+            SELECT signature FROM {0} ORDER BY last_seen DESC LIMIT -1 OFFSET ?
         );
-        """, (max(int(0.75 * self.cache_size), 1),))
+        """.format(self.db_table_name),
+        (max(int(0.75 * self.cache_size), 1),))
+        self.db.commit()
     
     def mark_cells(self, nb, trusted):
         """Mark cells as trusted if the notebook's signature can be verified
