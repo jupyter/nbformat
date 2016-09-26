@@ -5,11 +5,22 @@ python:
     - 3.3
     - 2.7
 sudo: false
-env:
+services:
+  - postgres
 install:
-    - pip install . codecov
-    - pip install nbformat[test]
+  - pip install . codecov
+  - pip install nbformat[test]
+  - |
+    if [[ ! -z "$NBFORMAT_TEST_POSTGRES" ]]; then
+      psql -c 'create database travis_ci_test;' -U postgres
+      pip install psycopg2
+      cp ci/postgres_jupyter_config.py ./jupyter_config.py
+    fi
 script:
-    - nosetests --with-coverage --cover-package=nbformat nbformat
+  - nosetests --with-coverage --cover-package=nbformat nbformat
 after_success:
-    - codecov
+  - codecov
+matrix:
+  include:
+    - env: NBFORMAT_TEST_POSTGRES=1
+      python: 3.5
