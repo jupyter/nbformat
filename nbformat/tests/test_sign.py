@@ -4,15 +4,18 @@
 # Distributed under the terms of the Modified BSD License.
 
 import copy
+from io import TextIOWrapper
 import os
 import shutil
+from subprocess import Popen, PIPE
+import sys
 import time
 import tempfile
 import testpath
 
 from .base import TestsBase
 
-from nbformat import read, sign
+from nbformat import read, sign, write
 
 class TestNotary(TestsBase):
     
@@ -207,4 +210,20 @@ class TestNotary(TestsBase):
         self.assertFalse(self.notary.check_cells(nb))
         for cell in cells:
             self.assertNotIn('trusted', cell)
+    
+    def test_sign_stdin(self):
+        def sign_stdin(nb):
+            env = os.environ.copy()
+            env["JUPYTER_DATA_DIR"] = self.data_dir
+            p = Popen([sys.executable, '-m', 'nbformat.sign', '--log-level=0'], stdin=PIPE, stdout=PIPE,
+                env=env,
+            )
+            write(nb, TextIOWrapper(p.stdin, encoding='utf8'))
+            p.wait()
+            self.assertEqual(p.returncode, 0)
+            return p.stdout.read().decode('utf8', 'replace')
 
+        out = sign_stdin(self.nb3)
+        self.assertIn('Signing notebook: <stdin>', out)
+        out = sign_stdin(self.nb3)
+        self.assertIn('already signed: <stdin>', out)
