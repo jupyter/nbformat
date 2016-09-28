@@ -66,7 +66,16 @@
                 },
                 "author": {
                     "description": "The author(s) of the notebook document",
-                    "type": "string"
+                    "type": "array",
+                    "item": {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "type": "string"
+                        }
+                      },
+                      "additionalProperties": true
+                    }
                 }
             }
         },
@@ -190,7 +199,7 @@
                 }
             }
         },
-        
+
         "unrecognized_cell": {
             "description": "Unrecognized cell from a future minor-revision to the notebook format.",
             "type": "object",
@@ -214,7 +223,7 @@
                 }
             }
         },
-        
+
         "output": {
             "type": "object",
             "oneOf": [
