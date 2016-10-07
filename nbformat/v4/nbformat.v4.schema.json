@@ -64,7 +64,7 @@
                     "description": "The title of the notebook document",
                     "type": "string"
                 },
-                "author": {
+                "authors": {
                     "description": "The author(s) of the notebook document",
                     "type": "array",
                     "item": {
