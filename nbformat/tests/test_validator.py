@@ -34,6 +34,13 @@ class TestValidator(TestsBase):
         validate(nb)
         self.assertEqual(isvalid(nb), True)
 
+    def test_nb4_document_info(self):
+        """Test that a notebook with document_info passes validation"""
+        with self.fopen(u'test4docinfo.ipynb', u'r') as f:
+            nb = read(f, as_version=4)
+        validate(nb)
+        self.assertEqual(isvalid(nb), True)
+
     def test_nb4custom(self):
         """Test that a notebook with a custom JSON mimetype passes validation"""
         with self.fopen(u'test4custom.ipynb', u'r') as f:
