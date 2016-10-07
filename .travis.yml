@@ -1,6 +1,6 @@
 language: python
 python:
-    - 3.6-dev
+    - nightly
     - 3.5
     - 3.4
     - 3.3
@@ -14,3 +14,7 @@ script:
     - py.test -v --cov nbformat nbformat
 after_success:
     - codecov
+matrix:
+  allow_failures:
+    - python: "nightly"
+
