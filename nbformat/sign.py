@@ -21,7 +21,10 @@ except ImportError:
         sqlite3 = None
 
 from ipython_genutils.py3compat import unicode_type, cast_bytes, cast_unicode
-from traitlets import Instance, Bytes, Enum, Any, Unicode, Bool, Integer
+from traitlets import (
+    Instance, Bytes, Enum, Any, Unicode, Bool, Integer,
+    default, observe,
+)
 from traitlets.config import LoggingConfigurable, MultipleInstanceError
 from jupyter_core.application import JupyterApp, base_flags
 
@@ -88,6 +91,7 @@ class NotebookNotary(LoggingConfigurable):
     """A class for computing and verifying notebook signatures."""
     
     data_dir = Unicode()
+    @default('data_dir')
     def _data_dir_default(self):
         app = None
         try:
@@ -101,24 +105,27 @@ class NotebookNotary(LoggingConfigurable):
             app.initialize(argv=[])
         return app.data_dir
     
-    db_file = Unicode(config=True,
+    db_file = Unicode(
         help="""The sqlite file in which to store notebook signatures.
         By default, this will be in your Jupyter data directory.
         You can set it to ':memory:' to disable sqlite writing to the filesystem.
-        """)
+        """).tag(config=True)
+
+    @default('db_file')
     def _db_file_default(self):
         if not self.data_dir:
             return ':memory:'
         return os.path.join(self.data_dir, u'nbsignatures.db')
     
     # 64k entries ~ 12MB
-    cache_size = Integer(65535, config=True,
+    cache_size = Integer(65535,
         help="""The number of notebook signatures to cache.
         When the number of signatures exceeds this value,
         the oldest 25% of signatures will be culled.
         """
-    )
+    ).tag(config=True)
     db = Any()
+    @default('db')
     def _db_default(self):
         if sqlite3 is None:
             self.log.warn("Missing SQLite3, all notebooks will be untrusted!")
@@ -160,27 +167,31 @@ class NotebookNotary(LoggingConfigurable):
         """)
         db.commit()
     
-    algorithm = Enum(algorithms, default_value='sha256', config=True,
+    algorithm = Enum(algorithms, default_value='sha256',
         help="""The hashing algorithm used to sign notebooks."""
-    )
-    def _algorithm_changed(self, name, old, new):
-        self.digestmod = getattr(hashlib, self.algorithm)
+    ).tag(config=True)
+    @observe('algorithm')
+    def _algorithm_changed(self, change):
+        self.digestmod = getattr(hashlib, change.new)
     
     digestmod = Any()
+    @default('digestmod')
     def _digestmod_default(self):
         return getattr(hashlib, self.algorithm)
     
-    secret_file = Unicode(config=True,
+    secret_file = Unicode(
         help="""The file where the secret key is stored."""
-    )
+    ).tag(config=True)
+    @default('secret_file')
     def _secret_file_default(self):
         if not self.data_dir:
             return ''
         return os.path.join(self.data_dir, 'notebook_secret')
     
-    secret = Bytes(config=True,
+    secret = Bytes(
         help="""The secret key with which notebooks are signed."""
-    )
+    ).tag(config=True)
+    @default('secret')
     def _secret_default(self):
         # note : this assumes an Application is running
         if os.path.exists(self.secret_file):
@@ -392,13 +403,14 @@ class TrustNotebookApp(JupyterApp):
     
     flags = trust_flags
     
-    reset = Bool(False, config=True,
+    reset = Bool(False,
         help="""If True, delete the trusted signature cache.
         After reset, all previously signed notebooks will become untrusted.
         """
-    )
+    ).tag(config=True)
     
     notary = Instance(NotebookNotary)
+    @default('notary')
     def _notary_default(self):
         return NotebookNotary(parent=self, data_dir=self.data_dir)
     
