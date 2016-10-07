@@ -95,7 +95,7 @@ install_requires = setuptools_args['install_requires'] = [
 ]
 
 extras_require = setuptools_args['extras_require'] = {
-    'test': ['testpath'],
+    'test': ['testpath', 'pytest', 'pytest-cov'],
 }
 
 if 'setuptools' in sys.modules:
