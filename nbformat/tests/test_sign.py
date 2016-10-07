@@ -3,8 +3,8 @@
 # Copyright (c) IPython Development Team.
 # Distributed under the terms of the Modified BSD License.
 
+import codecs
 import copy
-from io import TextIOWrapper
 import os
 import shutil
 from subprocess import Popen, PIPE
@@ -218,7 +218,8 @@ class TestNotary(TestsBase):
             p = Popen([sys.executable, '-m', 'nbformat.sign', '--log-level=0'], stdin=PIPE, stdout=PIPE,
                 env=env,
             )
-            write(nb, TextIOWrapper(p.stdin, encoding='utf8'))
+            write(nb, codecs.getwriter("utf8")(p.stdin))
+            p.stdin.close()
             p.wait()
             self.assertEqual(p.returncode, 0)
             return p.stdout.read().decode('utf8', 'replace')
