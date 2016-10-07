@@ -316,7 +316,7 @@
 
         "misc": {
             "metadata_name": {
-                "description": "The cell's name. If present, must be a non-empty string.",
+                "description": "The cell's name. If present, must be a non-empty string. Must be unique across all the cells of a given notebook.",
                 "type": "string",
                 "pattern": "^.+$"
             },
