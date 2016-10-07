@@ -1,5 +1,6 @@
 language: python
 python:
+    - nightly
     - 3.5
     - 3.4
     - 3.3
@@ -10,6 +11,10 @@ install:
     - pip install . codecov
     - pip install nbformat[test]
 script:
-    - nosetests --with-coverage --cover-package=nbformat nbformat
+    - py.test -v --cov nbformat nbformat
 after_success:
     - codecov
+matrix:
+  allow_failures:
+    - python: "nightly"
+

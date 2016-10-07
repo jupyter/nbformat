@@ -29,6 +29,9 @@ from . import read, NO_CONVERT, __version__
 try:
     # Python 3
     algorithms = hashlib.algorithms_guaranteed
+    # shake algorithms in py36 are not compatible with hmac
+    # due to required length argument in digests
+    algorithms = [ a for a in algorithms if not a.startswith('shake_') ]
 except AttributeError:
     algorithms = hashlib.algorithms
 

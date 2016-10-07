@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 import copy
 
-import nose.tools as nt
-
 from nbformat import validate
 from .. import convert
 
@@ -40,7 +38,7 @@ def test_upgrade_heading():
         ),
     ]:
         upgraded = convert.upgrade_cell(v3cell)
-        nt.assert_equal(upgraded, expected)
+        assert upgraded == expected
 
 def test_downgrade_heading():
     v3h = v3.new_heading_cell
@@ -69,4 +67,4 @@ def test_downgrade_heading():
         ),
     ]:
         downgraded = convert.downgrade_cell(v4cell)
-        nt.assert_equal(downgraded, expected)
+        assert downgraded == expected
