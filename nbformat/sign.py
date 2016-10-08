@@ -10,6 +10,7 @@ import hashlib
 from hmac import HMAC
 import io
 import os
+import sys
 
 try:
     import sqlite3
@@ -19,12 +20,12 @@ except ImportError:
     except ImportError:
         sqlite3 = None
 
-from ipython_genutils.py3compat import unicode_type, cast_bytes
+from ipython_genutils.py3compat import unicode_type, cast_bytes, cast_unicode
 from traitlets import Instance, Bytes, Enum, Any, Unicode, Bool, Integer
 from traitlets.config import LoggingConfigurable, MultipleInstanceError
 from jupyter_core.application import JupyterApp, base_flags
 
-from . import read, NO_CONVERT, __version__
+from . import read, reads, NO_CONVERT, __version__
 
 try:
     # Python 3
@@ -404,12 +405,17 @@ class TrustNotebookApp(JupyterApp):
     def _notary_default(self):
         return NotebookNotary(parent=self, data_dir=self.data_dir)
     
-    def sign_notebook(self, notebook_path):
+    def sign_notebook_file(self, notebook_path):
+        """Sign a notebook from the filesystem"""
         if not os.path.exists(notebook_path):
             self.log.error("Notebook missing: %s" % notebook_path)
             self.exit(1)
         with io.open(notebook_path, encoding='utf8') as f:
             nb = read(f, NO_CONVERT)
+        self.sign_notebook(nb, notebook_path)
+    
+    def sign_notebook(self, nb, notebook_path='<stdin>'):
+        """Sign a notebook that's been loaded"""
         if self.notary.check_signature(nb):
             print("Notebook already signed: %s" % notebook_path)
         else:
@@ -429,9 +435,16 @@ class TrustNotebookApp(JupyterApp):
             self.generate_new_key()
             return
         if not self.extra_args:
-            self.log.critical("Specify at least one notebook to sign.")
-            self.exit(1)
-        
-        for notebook_path in self.extra_args:
-            self.sign_notebook(notebook_path)
+            self.log.debug("Reading notebook from stdin")
+            nb_s = cast_unicode(sys.stdin.read())
+            nb = reads(nb_s, NO_CONVERT)
+            self.sign_notebook(nb, '<stdin>')
+        else:
+            for notebook_path in self.extra_args:
+                self.sign_notebook_file(notebook_path)
 
+
+main = TrustNotebookApp.launch_instance
+
+if __name__ == '__main__':
+    main()
