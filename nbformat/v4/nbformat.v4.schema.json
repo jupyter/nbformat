@@ -76,6 +76,27 @@
                       },
                       "additionalProperties": true
                     }
+                },
+                "environment": {
+                    "description": "Specification of an environment in which this notebook was authored and executed",
+                    "type": "object",
+                    "anyOf": [
+                        {"required": ["type", "source"]},
+                        {"required": ["type", "spec"]}
+                    ],
+                    "properties": {
+                        "type": {
+                            "description": "The type of environment specification, preferably a mimetype including a version number (e.g., application/vnd.docker.dockerfile.v1)",
+                            "type": "string"
+                        },
+                        "source": {
+                            "description": "URI of the environment specification stored external to the notebook document",
+                            "type": "string"
+                        },
+                        "spec": {
+                            "description": "Environment specification stored internally in the notebook document"
+                        }
+                    }
                 }
             }
         },
