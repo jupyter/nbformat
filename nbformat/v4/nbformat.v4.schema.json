@@ -77,24 +77,37 @@
                       "additionalProperties": true
                     }
                 },
-                "environment": {
-                    "description": "Specification of an environment in which this notebook was authored and executed",
-                    "type": "object",
-                    "anyOf": [
-                        {"required": ["type", "source"]},
-                        {"required": ["type", "spec"]}
-                    ],
-                    "properties": {
-                        "type": {
-                            "description": "The type of environment specification, preferably a mimetype including a version number (e.g., application/vnd.docker.dockerfile.v1)",
-                            "type": "string"
-                        },
-                        "source": {
-                            "description": "URI of the environment specification stored external to the notebook document",
-                            "type": "string"
-                        },
-                        "spec": {
-                            "description": "Environment specification stored internally in the notebook document"
+                "environments": {
+                    "description": "Collection of environments in which this notebook was authored and executed",
+                    "type": "array",
+                    "item": {
+                        "description": "Specification of an environment in which this notebook was authored and executed",
+                        "type": "object",
+                        "anyOf": [
+                            {"required": ["type", "source"]},
+                            {"required": ["type", "spec"]}
+                        ],
+                        "properties": {
+                            "type": {
+                                "description": "The type of environment specification, preferably a mimetype including a version number (e.g., application/vnd.docker.dockerfile.v1)",
+                                "type": "string"
+                            },
+                            "source": {
+                                "description": "URI of the environment specification stored external to the notebook document",
+                                "type": "string"
+                            },
+                            "spec": {
+                                "description": "Environment specification stored internally in the notebook document"
+                            },
+                            "specifier": {
+                                "description": "Name of the package, library, tool, human, etc. that created this specification. Primarily for advisory purposes",
+                                "type": "string"
+                            },
+                            "extra": {
+                                "description": "A place for the specifier to store additional information about the environment that cannot be captured in a valid way in the specification itself (e.g., pip index URLs)",
+                                "type": "object",
+                                "additionalProperties": true
+                            }
                         }
                     }
                 }
