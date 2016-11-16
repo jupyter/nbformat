@@ -374,8 +374,7 @@
                 },
                 "patternProperties": {
                     "^application/([a-zA-Z0-9.]+\\+)?json$": {
-                        "description": "Mimetypes with JSON output, can be an object",
-                        "type": "object"
+                        "description": "Mimetypes with JSON output, can be any type"
                     }
                 }
             },
