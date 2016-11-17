@@ -315,9 +315,9 @@ keyed by filename that represents the files attached to the cell.
       "source" : ["Here is an *inline* image ![inline image](attachment:test.png)"],
       "attachments" : {
         "test.png": {
-            "image/png" : ["base64-encoded-png-data"],
-        },
-      },
+            "image/png" : ["base64-encoded-png-data"]
+        }
+      }
     }
 
 
