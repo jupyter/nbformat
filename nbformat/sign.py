@@ -98,8 +98,7 @@ class FilenamesHashSet(object):
         self.directory = directory
 
     def _dir_and_file(self, hexdigest):
-        dir_parts = hexdigest[0:2], hexdigest[2:4]
-        return os.path.join(self.directory, *dir_parts), hexdigest[4:]
+        return os.path.join(self.directory, hexdigest[0:2]), hexdigest[2:]
 
     def add(self, hexdigest):
         """Add a hash to the set if it's not already present."""
@@ -175,7 +174,7 @@ class NotebookNotary(LoggingConfigurable):
             return ':memory:'
         return os.path.join(self.data_dir, u'nbsignatures.db')
 
-    cache_size = Integer(256**3,
+    cache_size = Integer(256**2,
         help="""The number of notebook signatures to cache.
         When the number of signatures exceeds this value,
         the oldest 25% of signatures will be culled.
