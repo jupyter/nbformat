@@ -24,7 +24,13 @@ cells.append(new_code_cell(
 ))
 
 cells.append(new_markdown_cell(
-    source='A random array',
+    source='Cell with attachments',
+    attachments={
+        'attachment1': {
+            'text/plain': '\n'.join(['a', 'b', 'c']),
+            'application/vnd.stuff+json': ['a', 1, 'x'],
+        }
+    }
 ))
 
 cells.append(new_raw_cell(
@@ -46,6 +52,31 @@ cells.append(new_code_cell(
 cells.append(new_code_cell(
     source='a = 10\nb = 5',
     execution_count=4,
+))
+
+cells.append(new_code_cell(
+    source=u'json_outputs()',
+    execution_count=12,
+    outputs=[new_output(
+        output_type=u'display_data',
+        data={
+            'text/plain': u'<json outputs>',
+            'application/json': {
+                'key': 'value',
+                'x': 5,
+                'lis': [1, 2, 'x']
+            },
+            'application/vnd.listofstr+json': ['a', 'b', 'c'],
+            'application/vnd.numbers+json': [1, 2, 3],
+            'application/vnd.number+json': 42,
+            'application/vnd.object+json': {
+                'number': 5,
+                'array': [1,2],
+                'str': 'x'
+            },
+            'application/vnd.string+json': 'ok',
+        },
+    )]
 ))
 
 cells.append(new_code_cell(

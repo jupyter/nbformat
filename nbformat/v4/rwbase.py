@@ -5,6 +5,19 @@
 
 from ipython_genutils.py3compat import string_types, cast_unicode_py2
 
+def _is_json_mime(mime):
+    """Is a key a JSON mime-type that should be left alone?"""
+    return mime == 'application/json' or \
+        (mime.startswith('application/') and mime.endswith('+json'))
+
+def _rejoin_mimebundle(data):
+    """Rejoin the multi-line string fields in a mimebundle (in-place)"""
+    for key, value in list(data.items()):
+        if not _is_json_mime(key) \
+        and isinstance(value, list) \
+        and all(isinstance(line, string_types) for line in value):
+            data[key] = ''.join(value)
+    return data
 
 def rejoin_lines(nb):
     """rejoin multiline text into strings
@@ -19,13 +32,16 @@ def rejoin_lines(nb):
     for cell in nb.cells:
         if 'source' in cell and isinstance(cell.source, list):
             cell.source = ''.join(cell.source)
+
+        attachments = cell.get('attachments', {})
+        for key, attachment in attachments.items():
+            _rejoin_mimebundle(attachment)
+
         if cell.get('cell_type', None) == 'code':
             for output in cell.get('outputs', []):
                 output_type = output.get('output_type', '')
                 if output_type in {'execute_result', 'display_data'}:
-                    for key, value in output.get('data', {}).items():
-                        if key != 'application/json' and isinstance(value, list):
-                            output.data[key] = ''.join(value)
+                    _rejoin_mimebundle(output.get('data', {}))
                 elif output_type:
                     if isinstance(output.get('text', ''), list):
                         output.text = ''.join(output.text)
@@ -35,6 +51,15 @@ _non_text_split_mimes = {
     'application/javascript',
     'image/svg+xml',
 }
+
+def _split_mimebundle(data):
+    """Split multi-line string fields in a mimebundle (in-place)"""
+    for key, value in list(data.items()):
+        if isinstance(value, string_types) and (
+            key.startswith('text/') or key in _non_text_split_mimes
+        ):
+            data[key] = value.splitlines(True)
+    return data
 
 def split_lines(nb):
     """split likely multiline text into lists of strings
@@ -49,14 +74,14 @@ def split_lines(nb):
         if isinstance(source, string_types):
             cell['source'] = source.splitlines(True)
 
+        attachments = cell.get('attachments', {})
+        for key, attachment in attachments.items():
+            _split_mimebundle(attachment)
+
         if cell.cell_type == 'code':
             for output in cell.outputs:
                 if output.output_type in {'execute_result', 'display_data'}:
-                    for key, value in output.data.items():
-                        if isinstance(value, string_types) and (
-                            key.startswith('text/') or key in _non_text_split_mimes
-                        ):
-                            output.data[key] = value.splitlines(True)
+                    _split_mimebundle(output.get('data', {}))
                 elif output.output_type == 'stream':
                     if isinstance(output.text, string_types):
                         output.text = output.text.splitlines(True)

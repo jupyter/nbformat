@@ -128,6 +128,7 @@ def downgrade_cell(cell):
             cell.cell_type = 'heading'
             cell.source = text
             cell.level = len(prefix)
+    cell.pop('attachments', None)
     return cell
 
 _mime_map = {
@@ -150,10 +151,11 @@ def to_mime_key(d):
 
 def from_mime_key(d):
     """convert dict with mime-type keys to v3 aliases"""
+    d2 = {}
     for alias, mime in _mime_map.items():
         if mime in d:
-            d[alias] = d.pop(mime)
-    return d
+            d2[alias] = d[mime]
+    return d2
 
 def upgrade_output(output):
     """upgrade a single code cell output from v3 to v4
@@ -209,7 +211,7 @@ def downgrade_output(output):
         data = output.pop('data', {})
         if 'application/json' in data:
             data['application/json'] = json.dumps(data['application/json'])
-        from_mime_key(data)
+        data = from_mime_key(data)
         output.update(data)
         from_mime_key(output.get('metadata', {}))
     elif output['output_type'] == 'error':

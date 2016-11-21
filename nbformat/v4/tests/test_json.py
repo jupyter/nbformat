@@ -1,4 +1,5 @@
 from base64 import decodestring
+import json
 from unittest import TestCase
 
 from ipython_genutils.py3compat import unicode_type
@@ -27,6 +28,36 @@ class TestJSON(formattest.NBFormatTest, TestCase):
         # This won't differ from test_roundtrip unless the default changes
         s = writes(nb0, split_lines=True)
         self.assertEqual(nbjson.reads(s),nb0)
+    
+    def test_splitlines(self):
+        """Test splitlines in mime-bundles"""
+        s = writes(nb0, split_lines=True)
+        raw_nb = json.loads(s)
+
+        for i, ref_cell in enumerate(nb0.cells):
+            if ref_cell.source.strip() == 'Cell with attachments':
+                attach_ref = ref_cell['attachments']['attachment1']
+                attach_json = raw_nb['cells'][i]['attachments']['attachment1']
+            if ref_cell.source.strip() == 'json_outputs()':
+                output_ref = ref_cell['outputs'][0]['data']
+                output_json = raw_nb['cells'][i]['outputs'][0]['data']
+
+        for key, json_value in attach_json.items():
+            if key == 'text/plain':
+                # text should be split
+                assert json_value == attach_ref['text/plain'].splitlines(True)
+            else:
+                # JSON attachments
+                assert json_value == attach_ref[key]
+
+        # check that JSON outputs are left alone:
+        for key, json_value in output_json.items():
+            if key == 'text/plain':
+                # text should be split
+                assert json_value == output_ref['text/plain'].splitlines(True)
+            else:
+                # JSON outputs should be left alone
+                assert json_value == output_ref[key]
 
     def test_read_png(self):
         """PNG output data is b64 unicode"""
