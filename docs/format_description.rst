@@ -312,10 +312,10 @@ keyed by filename that represents the files attached to the cell.
     {
       "cell_type" : "markdown",
       "metadata" : {},
-      "source" : ["Here is an *inline* image ![inline image](attachment:test.png)"],
+      "source" : ["Here is an *inline* image ![inline image](attachment://test.png)"],
       "attachments" : {
         "test.png": {
-            "image/png" : ["base64-encoded-png-data"]
+            "image/png" : "base64-encoded-png-data"
         }
       }
     }
@@ -356,8 +356,23 @@ The following metadata keys are defined at the notebook level:
 Key         Value           Interpretation
 =========== =============== ==============
 kernelspec  dict            A :ref:`kernel specification <kernelspecs>`
+authors     list of dicts   A list of authors of the document
 =========== =============== ==============
 
+A notebook's authors is a list of dictionaries containing information about each author of the notebook.
+Currently, only the name is required.
+Additional fields may be added.
+
+.. sourcecode:: python
+
+    nb.metadata.authors = [
+        {
+            'name': 'Fernando Perez',
+        },
+        {
+            'name': 'Brian Granger',
+        },
+    ]
 
 Cell metadata
 -------------
