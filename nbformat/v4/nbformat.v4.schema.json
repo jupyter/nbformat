@@ -373,7 +373,7 @@
                   "$ref": "#/definitions/misc/multiline_string"
                 },
                 "patternProperties": {
-                    "^application/([a-zA-Z0-9.]+\\+)?json$": {
+                    "^application/(.*\\+)?json$": {
                         "description": "Mimetypes with JSON output, can be any type"
                     }
                 }
