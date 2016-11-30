@@ -44,7 +44,10 @@ except AttributeError:
 class SignatureStore(object):
     """Base class for a signature store."""
     def store_signature(self, digest, algorithm):
-        """Implement in subclass to store a signature."""
+        """Implement in subclass to store a signature.
+
+        Should not raise if the signature is already stored.
+        """
         raise NotImplementedError
 
     def check_signature(self, digest, algorithm):
@@ -80,6 +83,8 @@ class MemorySignatureStore(SignatureStore):
         self._maybe_cull()
 
     def _maybe_cull(self):
+        """If more than cache_size signatures are stored, delete the oldest 25%
+        """
         if len(self.data) < self.cache_size:
             return
 
@@ -212,8 +217,6 @@ class SQLiteSignatureStore(SignatureStore, LoggingConfigurable):
             SELECT id FROM nbsignatures ORDER BY last_seen DESC LIMIT -1 OFFSET ?
         );
         """, (max(int(0.75 * self.cache_size), 1),))
-
-
 
 
 def yield_everything(obj):
