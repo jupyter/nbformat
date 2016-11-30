@@ -4,6 +4,7 @@
 # Distributed under the terms of the Modified BSD License.
 
 import base64
+from collections import OrderedDict
 from contextlib import contextmanager
 from datetime import datetime
 import hashlib
@@ -42,19 +43,22 @@ except AttributeError:
 
 class SignatureStore(object):
     """Base class for a signature store."""
-    def store_signature(self, sig):
+    def store_signature(self, digest, algorithm):
         """Implement in subclass to store a signature."""
         raise NotImplementedError
 
-    def check_signature(self, sig):
+    def check_signature(self, digest, algorithm):
         """Implement in subclass to check if a signature is known.
 
         Return True for a known signature, False for unknown.
         """
         raise NotImplementedError
 
-    def remove_signature(self, sig):
-        """Implement in subclass to delete a signature."""
+    def remove_signature(self, digest, algorithm):
+        """Implement in subclass to delete a signature.
+
+        Should not raise if the signature is not stored.
+        """
         raise NotImplementedError
 
     # Convenience for filesystem-based stores
@@ -77,9 +81,43 @@ class SignatureStore(object):
         return self._data_dir
 
 
-class SQLiteSignatureStore(SignatureStore, LoggingConfigurable):
-    algorithm = 'sha256'  # TODO
+class MemorySignatureStore(SignatureStore):
+    """Non-persistent storage of signatures in memory.
+    """
+    cache_size = 65535
+    def __init__(self):
+        # We really only want an ordered set, but the stdlib has OrderedDict,
+        # and it's easy to use a dict as a set.
+        self.data = OrderedDict()
 
+    def store_signature(self, digest, algorithm):
+        key = (digest, algorithm)
+        # Pop it so it goes to the end when we reinsert it
+        self.data.pop(key, None)
+        self.data[key] = None
+
+        self._maybe_cull()
+
+    def _maybe_cull(self):
+        if len(self.data) < self.cache_size:
+            return
+
+        for _ in range(len(self.data) // 4):
+            self.data.popitem(last=False)
+
+    def check_signature(self, digest, algorithm):
+        key = (digest, algorithm)
+        if key in self.data:
+            # Move it to the end (.move_to_end() method is new in Py3)
+            del self.data[key]
+            self.data[key] = None
+            return True
+        return False
+
+    def remove_signature(self, digest, algorithm):
+        self.data.pop((digest, algorithm), None)
+
+class SQLiteSignatureStore(SignatureStore, LoggingConfigurable):
     # 64k entries ~ 12MB
     cache_size = Integer(65535,
         help="""The number of notebook signatures to cache.
@@ -88,34 +126,37 @@ class SQLiteSignatureStore(SignatureStore, LoggingConfigurable):
         """
     ).tag(config=True)
 
-    db = Any()
+    def __init__(self, db_file, **kwargs):
+        super(SQLiteSignatureStore, self).__init__(**kwargs)
+        self.db_file = db_file
+        self.db = self._connect_db(db_file)
 
-    @default('db')
-    def _db_default(self):
-        if sqlite3 is None:
-            self.log.warn("Missing SQLite3, all notebooks will be untrusted!")
-            return
+    def _connect_db(self, db_file):
         kwargs = dict(
             detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES)
         try:
-            db = sqlite3.connect(self.db_file, **kwargs)
+            db = sqlite3.connect(db_file, **kwargs)
             self.init_db(db)
         except (sqlite3.DatabaseError, sqlite3.OperationalError):
-            if self.db_file != ':memory:':
-                old_db_location = os.path.join(self.data_dir,
-                                               self.db_file + ".bak")
+            if db_file != ':memory:':
+                old_db_location = db_file + ".bak"
                 self.log.warn(
-                    """The signatures database cannot be opened; maybe it is corrupted or encrypted.  You may need to rerun your notebooks to ensure that they are trusted to run Javascript.  The old signatures database has been renamed to %s and a new one has been created.""",
+                    ("The signatures database cannot be opened; maybe it is corrupted or encrypted. "
+                     "You may need to rerun your notebooks to ensure that they are trusted to run Javascript. "
+                     "The old signatures database has been renamed to %s and a new one has been created."),
                     old_db_location)
                 try:
-                    os.rename(self.db_file, self.db_file + u'.bak')
-                    db = sqlite3.connect(self.db_file, **kwargs)
+                    os.rename(db_file, old_db_location)
+                    db = sqlite3.connect(db_file, **kwargs)
                     self.init_db(db)
                 except (sqlite3.DatabaseError, sqlite3.OperationalError):
                     self.log.warn(
-                        """Failed commiting signatures database to disk.  You may need to move the database file to a non-networked file system, using config option `NotebookNotary.db_file`.  Using in-memory signatures database for the remainder of this session.""")
+                        ("Failed commiting signatures database to disk. "
+                         "You may need to move the database file to a non-networked file system, "
+                         "using config option `NotebookNotary.db_file`. "
+                         "Using in-memory signatures database for the remainder of this session."))
                     self.db_file = ':memory:'
-                    db = sqlite3.connect(self.db_file, **kwargs)
+                    db = sqlite3.connect(':memory:', **kwargs)
                     self.init_db(db)
             else:
                 raise
@@ -136,48 +177,50 @@ class SQLiteSignatureStore(SignatureStore, LoggingConfigurable):
             """)
         db.commit()
 
-    def store_signature(self, sig):
+    def store_signature(self, digest, algorithm):
         if self.db is None:
             return
         self.db.execute("""INSERT OR IGNORE INTO nbsignatures
             (algorithm, signature, last_seen) VALUES (?, ?, ?)""",
-                        (self.algorithm, sig, datetime.utcnow())
+                        (algorithm, hash, datetime.utcnow())
                         )
         self.db.execute("""UPDATE nbsignatures SET last_seen = ? WHERE
             algorithm = ? AND
             signature = ?;
             """,
-                        (datetime.utcnow(), self.algorithm, sig),
+                        (datetime.utcnow(), algorithm, digest),
                         )
         self.db.commit()
+
+        # Check size and cull old entries if necessary
         n, = self.db.execute("SELECT Count(*) FROM nbsignatures").fetchone()
         if n > self.cache_size:
             self.cull_db()
 
-    def check_signature(self, sig):
+    def check_signature(self, digest, algorithm):
         if self.db is None:
             return False
         r = self.db.execute("""SELECT id FROM nbsignatures WHERE
             algorithm = ? AND
             signature = ?;
-            """, (self.algorithm, sig)).fetchone()
+            """, (algorithm, digest)).fetchone()
         if r is None:
             return False
         self.db.execute("""UPDATE nbsignatures SET last_seen = ? WHERE
             algorithm = ? AND
             signature = ?;
             """,
-                        (datetime.utcnow(), self.algorithm, sig),
+                        (datetime.utcnow(), algorithm, digest),
                         )
         self.db.commit()
         return True
 
-    def remove_signature(self, sig):
+    def remove_signature(self, digest, algorithm):
         self.db.execute("""DELETE FROM nbsignatures WHERE
                 algorithm = ? AND
                 signature = ?;
             """,
-            (self.algorithm, sig)
+            (algorithm, digest)
         )
 
         self.db.commit()
@@ -264,7 +307,10 @@ class NotebookNotary(LoggingConfigurable):
 
     @default('store')
     def _store_default(self):
-        return SQLiteSignatureStore()
+        if sqlite3 is None:
+            self.log.warn("Missing SQLite3, all notebooks will be untrusted!")
+            return MemorySignatureStore()
+        return SQLiteSignatureStore(self.db_file)
 
     db_file = Unicode(
         help="""The sqlite file in which to store notebook signatures.
