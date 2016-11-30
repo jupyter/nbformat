@@ -18,6 +18,7 @@ Changes in nbformat
 - Define basics of ``authors`` in notebook metadata.
   ``nb.metadata.authors`` shall be a list of objects with the property ``name``, a string of each author's full name.
 - Update use of traitlets API to require traitlets 4.1.
+- Support trusting notebooks on stdin with ``cat notebook | jupyter trust``
 
 
 4.1
