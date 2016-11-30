@@ -61,25 +61,6 @@ class SignatureStore(object):
         """
         raise NotImplementedError
 
-    # Convenience for filesystem-based stores
-
-    _data_dir = None
-    @property
-    def data_dir(self):
-        if self._data_dir is None:
-            app = None
-            try:
-                if JupyterApp.initialized():
-                    app = JupyterApp.instance()
-            except MultipleInstanceError:
-                pass
-            if app is None:
-                # create an app, without the global instance
-                app = JupyterApp()
-                app.initialize(argv=[])
-            self._data_dir = app.data_dir
-        return self._data_dir
-
 
 class MemorySignatureStore(SignatureStore):
     """Non-persistent storage of signatures in memory.
