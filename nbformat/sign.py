@@ -287,7 +287,10 @@ class NotebookNotary(LoggingConfigurable):
             app.initialize(argv=[])
         return app.data_dir
 
-    store = Instance(SignatureStore)
+    store = Instance(SignatureStore,
+        help="""The storage backend for notebook signatures.
+        The default uses an SQLite database.
+        """).tag(config=True)
 
     @default('store')
     def _store_default(self):
