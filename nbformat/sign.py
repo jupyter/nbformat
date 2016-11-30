@@ -182,7 +182,7 @@ class SQLiteSignatureStore(SignatureStore, LoggingConfigurable):
             return
         self.db.execute("""INSERT OR IGNORE INTO nbsignatures
             (algorithm, signature, last_seen) VALUES (?, ?, ?)""",
-                        (algorithm, hash, datetime.utcnow())
+                        (algorithm, digest, datetime.utcnow())
                         )
         self.db.execute("""UPDATE nbsignatures SET last_seen = ? WHERE
             algorithm = ? AND
@@ -404,7 +404,7 @@ class NotebookNotary(LoggingConfigurable):
         if nb.nbformat < 3:
             return False
         signature = self.compute_signature(nb)
-        return self.store.check_signature(signature)
+        return self.store.check_signature(signature, self.algorithm)
     
     def sign(self, nb):
         """Sign a notebook, indicating that its output is trusted on this machine
@@ -414,7 +414,7 @@ class NotebookNotary(LoggingConfigurable):
         if nb.nbformat < 3:
             return
         signature = self.compute_signature(nb)
-        self.store.store_signature(signature)
+        self.store.store_signature(signature, self.algorithm)
     
     def unsign(self, nb):
         """Ensure that a notebook is untrusted
@@ -422,7 +422,7 @@ class NotebookNotary(LoggingConfigurable):
         by removing its signature from the trusted database, if present.
         """
         signature = self.compute_signature(nb)
-        self.store.remove_signature(signature)
+        self.store.remove_signature(signature, self.algorithm)
     
     def mark_cells(self, nb, trusted):
         """Mark cells as trusted if the notebook's signature can be verified
