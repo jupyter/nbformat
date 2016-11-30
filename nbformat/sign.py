@@ -507,6 +507,10 @@ class TrustNotebookApp(JupyterApp):
     
     Otherwise, you will have to re-execute the notebook to see output.
     """
+    # This command line tool should use the same config file as the notebook
+    @default('config_file_name')
+    def _config_file_name_default(self):
+        return 'jupyter_notebook_config'
     
     examples = """
     jupyter trust mynotebook.ipynb and_this_one.ipynb
