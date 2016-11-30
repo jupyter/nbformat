@@ -89,9 +89,9 @@ class TestNotary(TestsBase):
         nbs = [
             copy.deepcopy(self.nb) for i in range(10)
         ]
-        for row in self.notary.db.execute("SELECT * FROM nbsignatures"):
+        for row in self.notary.store.db.execute("SELECT * FROM nbsignatures"):
             print(row)
-        self.notary.cache_size = 8
+        self.notary.store.cache_size = 8
         for i, nb in enumerate(nbs[:8]):
             nb.metadata.dirty = i
             self.notary.sign(nb)
