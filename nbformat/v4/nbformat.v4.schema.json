@@ -104,7 +104,7 @@
                                 "type": "string"
                             },
                             "extra": {
-                                "description": "A place for the specifier to store arbitrary additional information about the environment that cannot be captured in a valid way inside the environment specification format itself (e.g., pip index URLs). Allowed in combination with either the 'spec' or 'source' fields.",
+                                "description": "A place for the generator to store arbitrary additional information about the environment that cannot be captured in a valid way inside the environment specification format itself (e.g., pip index URLs). Allowed in combination with either the 'spec' or 'source' fields.",
                                 "type": "object",
                                 "additionalProperties": true
                             }
