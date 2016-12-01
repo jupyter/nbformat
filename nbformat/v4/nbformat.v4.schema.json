@@ -93,18 +93,18 @@
                                 "type": "string"
                             },
                             "source": {
-                                "description": "URI of the environment specification stored external to the notebook document",
+                                "description": "URI of an environment specification in the format defined by 'type', stored external to the notebook document. Mutually exclusive with spec.",
                                 "type": "string"
                             },
                             "spec": {
-                                "description": "Environment specification stored internally in the notebook document"
+                                "description": "Environment specification in the format defined by 'type', stored within the notebook document itself. Mutually exclusive with source."
                             },
-                            "specifier": {
-                                "description": "Name of the package, library, tool, human, etc. that created this specification. Primarily for advisory purposes",
+                            "generator": {
+                                "description": "Name of the package, library, tool, human, etc. that inserted this environment metadata into this notebook (e.g., some-jupyter-environments-extension, Jane Doe, conda-environment-grabber). Primarily for advisory purposes, such as where to file bug reports.",
                                 "type": "string"
                             },
                             "extra": {
-                                "description": "A place for the specifier to store additional information about the environment that cannot be captured in a valid way in the specification itself (e.g., pip index URLs)",
+                                "description": "A place for the specifier to store arbitrary additional information about the environment that cannot be captured in a valid way inside the environment specification format itself (e.g., pip index URLs). Allowed in combination with either the 'spec' or 'source' fields.",
                                 "type": "object",
                                 "additionalProperties": true
                             }
