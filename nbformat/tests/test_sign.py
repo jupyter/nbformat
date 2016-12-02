@@ -12,6 +12,7 @@ import sys
 import time
 import tempfile
 import testpath
+import unittest
 
 from .base import TestsBase
 
@@ -228,3 +229,20 @@ class TestNotary(TestsBase):
         self.assertIn('Signing notebook: <stdin>', out)
         out = sign_stdin(self.nb3)
         self.assertIn('already signed: <stdin>', out)
+
+class SignatureStoreTests(unittest.TestCase):
+    def setUp(self):
+        self.store = sign.MemorySignatureStore()
+
+    def test_basics(self):
+        digest = '0123457689abcef'
+        algo = 'fake_sha'
+        assert not self.store.check_signature(digest, algo)
+        self.store.store_signature(digest, algo)
+        assert self.store.check_signature(digest, algo)
+        self.store.remove_signature(digest, algo)
+        assert not self.store.check_signature(digest, algo)
+
+class SQLiteSignatureStoreTests(SignatureStoreTests):
+    def setUp(self):
+        self.store = sign.SQLiteSignatureStore(':memory:')
