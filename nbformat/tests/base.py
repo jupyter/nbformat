@@ -7,13 +7,13 @@ Contains base test class for nbformat
 
 import os
 import unittest
-
+import io
 
 class TestsBase(unittest.TestCase):
     """Base tests class."""
 
-    def fopen(self, f, mode=u'r'):
-        return open(os.path.join(self._get_files_path(), f), mode)
+    def fopen(self, f, mode=u'r',encoding='utf-8'):
+        return io.open(os.path.join(self._get_files_path(), f), mode, encoding=encoding)
 
 
     def _get_files_path(self):
