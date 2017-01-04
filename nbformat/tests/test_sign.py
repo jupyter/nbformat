@@ -33,20 +33,6 @@ class TestNotary(TestsBase):
     
     def tearDown(self):
         shutil.rmtree(self.data_dir)
-   
-    def test_invalid_db_file(self):
-        invalid_sql_file = os.path.join(self.data_dir, 'invalid_db_file.db')
-        with open(invalid_sql_file, 'w') as tempfile:
-            tempfile.write(u'[invalid data]')
-
-        invalid_notary = sign.NotebookNotary(
-            db_file=invalid_sql_file,
-            secret=b'secret',
-        )
-        invalid_notary.sign(self.nb)
-
-        testpath.assert_isfile(os.path.join(self.data_dir, invalid_sql_file))
-        testpath.assert_isfile(os.path.join(self.data_dir, invalid_sql_file + '.bak'))
     
     def test_algorithms(self):
         last_sig = ''
@@ -81,7 +67,7 @@ class TestNotary(TestsBase):
         self.assertFalse(self.notary.check_signature(self.nb))
         self.notary.unsign(self.nb)
         self.assertFalse(self.notary.check_signature(self.nb))
-    
+
     def test_cull_db(self):
         # this test has various sleeps of 2ms
         # to ensure low resolution timestamps compare as expected
@@ -89,31 +75,33 @@ class TestNotary(TestsBase):
         nbs = [
             copy.deepcopy(self.nb) for i in range(10)
         ]
-        for row in self.notary.db.execute("SELECT * FROM nbsignatures"):
-            print(row)
         self.notary.cache_size = 8
-        for i, nb in enumerate(nbs[:8]):
+        self.notary.cull_interval = 100
+        for i, nb in enumerate(nbs):
             nb.metadata.dirty = i
             self.notary.sign(nb)
-        
-        for i, nb in enumerate(nbs[:8]):
+
+        for i, nb in enumerate(nbs):
             time.sleep(dt)
-            self.assertTrue(self.notary.check_signature(nb), 'nb %i is trusted' % i)
-        
-        # signing the 9th triggers culling of first 3
-        # (75% of 8 = 6, 9 - 6 = 3 culled)
-        self.notary.sign(nbs[8])
-        self.assertFalse(self.notary.check_signature(nbs[0]))
-        self.assertFalse(self.notary.check_signature(nbs[1]))
-        self.assertFalse(self.notary.check_signature(nbs[2]))
-        self.assertTrue(self.notary.check_signature(nbs[3]))
-        # checking nb3 should keep it from being culled:
+            assert self.notary.check_signature(nb), 'nb %i should be trusted' % i
+
+        long_ago = time.time() - 1000
+        os.utime(self.notary.cull_marker, (long_ago, long_ago))
+        self.notary.cull_db()
+
+        assert not self.notary.check_signature(nbs[0])
+        assert not self.notary.check_signature(nbs[1])
+        assert self.notary.check_signature(nbs[2])
+        # checking nb 2 should keep it from being culled:
+        time.sleep(dt)
         self.notary.sign(nbs[0])
         self.notary.sign(nbs[1])
-        self.notary.sign(nbs[2])
-        self.assertTrue(self.notary.check_signature(nbs[3]))
-        self.assertFalse(self.notary.check_signature(nbs[4]))
-    
+        # Pretend cull_interval has passed again:
+        os.utime(self.notary.cull_marker, (long_ago, long_ago))
+        self.notary.cull_db()
+        assert self.notary.check_signature(nbs[2])
+        assert not self.notary.check_signature(nbs[3])
+
     def test_check_signature(self):
         nb = self.nb
         md = nb.metadata
