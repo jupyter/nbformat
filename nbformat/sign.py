@@ -23,7 +23,7 @@ except ImportError:
 
 from ipython_genutils.py3compat import unicode_type, cast_bytes, cast_unicode
 from traitlets import (
-    Instance, Bytes, Enum, Any, Unicode, Bool, Integer, Callable,
+    Instance, Bytes, Enum, Any, Unicode, Bool, Integer, TraitType,
     default, observe,
 )
 from traitlets.config import LoggingConfigurable, MultipleInstanceError
@@ -39,6 +39,25 @@ try:
     algorithms = [ a for a in algorithms if not a.startswith('shake_') ]
 except AttributeError:
     algorithms = hashlib.algorithms
+
+
+# This has been added to traitlets, but is not released as of traitlets 4.3.1,
+# so a copy is included here for now.
+class Callable(TraitType):
+    """A trait which is callable.
+
+    Notes
+    -----
+    Classes are callable, as are instances
+    with a __call__() method."""
+
+    info_text = 'a callable'
+
+    def validate(self, obj, value):
+        if callable(value):
+            return value
+        else:
+            self.error(obj, value)
 
 
 class SignatureStore(object):
