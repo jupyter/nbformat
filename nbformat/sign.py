@@ -23,7 +23,7 @@ except ImportError:
 
 from ipython_genutils.py3compat import unicode_type, cast_bytes, cast_unicode
 from traitlets import (
-    Instance, Bytes, Enum, Any, Unicode, Bool, Integer,
+    Instance, Bytes, Enum, Any, Unicode, Bool, Integer, Callable,
     default, observe,
 )
 from traitlets.config import LoggingConfigurable, MultipleInstanceError
@@ -287,17 +287,18 @@ class NotebookNotary(LoggingConfigurable):
             app.initialize(argv=[])
         return app.data_dir
 
-    store = Instance(SignatureStore,
-        help="""The storage backend for notebook signatures.
-        The default uses an SQLite database.
-        """).tag(config=True)
+    store_factory = Callable(
+         help="""A callable returning the storage backend for notebook signatures.
+         The default uses an SQLite database.""").tag(config=True)
 
-    @default('store')
-    def _store_default(self):
-        if sqlite3 is None:
-            self.log.warn("Missing SQLite3, all notebooks will be untrusted!")
-            return MemorySignatureStore()
-        return SQLiteSignatureStore(self.db_file)
+    @default('store_factory')
+    def _store_factory_default(self):
+        def factory():
+            if sqlite3 is None:
+                self.log.warn("Missing SQLite3, all notebooks will be untrusted!")
+                return MemorySignatureStore()
+            return SQLiteSignatureStore(self.db_file)
+        return factory
 
     db_file = Unicode(
         help="""The sqlite file in which to store notebook signatures.
@@ -345,6 +346,10 @@ class NotebookNotary(LoggingConfigurable):
             secret = base64.encodestring(os.urandom(1024))
             self._write_secret_file(secret)
             return secret
+
+    def __init__(self, **kwargs):
+        super(NotebookNotary, self).__init__(**kwargs)
+        self.store = self.store_factory()
     
     def _write_secret_file(self, secret):
         """write my secret to my secret_file"""

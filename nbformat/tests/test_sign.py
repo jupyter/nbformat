@@ -231,23 +231,13 @@ class TestNotary(TestsBase):
         out = sign_stdin(self.nb3)
         self.assertIn('already signed: <stdin>', out)
 
-class SampleSigStore(sign.MemorySignatureStore):
-    def __init__(self, a):
-        print("Initialising", a)
-        self._a = a
-
-
 def test_config_store():
     store = sign.MemorySignatureStore()
 
-    # traitlets.config deepcopy-s config values when applying them to the class,
-    # so checking 'notary.store is store' doesn't work. :-(
-    # We check for this attribute instead.
-    store._a = 'foo'
     c = Config()
-    c.NotebookNotary.store = store
+    c.NotebookNotary.store_factory = lambda: store
     notary = sign.NotebookNotary(config=c)
-    assert notary.store._a == 'foo'
+    assert notary.store is store
 
 class SignatureStoreTests(unittest.TestCase):
     def setUp(self):
