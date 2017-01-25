@@ -12,9 +12,11 @@ import sys
 import time
 import tempfile
 import testpath
+import unittest
 
 from .base import TestsBase
 
+from traitlets.config import Config
 from nbformat import read, sign, write
 
 class TestNotary(TestsBase):
@@ -89,9 +91,9 @@ class TestNotary(TestsBase):
         nbs = [
             copy.deepcopy(self.nb) for i in range(10)
         ]
-        for row in self.notary.db.execute("SELECT * FROM nbsignatures"):
+        for row in self.notary.store.db.execute("SELECT * FROM nbsignatures"):
             print(row)
-        self.notary.cache_size = 8
+        self.notary.store.cache_size = 8
         for i, nb in enumerate(nbs[:8]):
             nb.metadata.dirty = i
             self.notary.sign(nb)
@@ -228,3 +230,28 @@ class TestNotary(TestsBase):
         self.assertIn('Signing notebook: <stdin>', out)
         out = sign_stdin(self.nb3)
         self.assertIn('already signed: <stdin>', out)
+
+def test_config_store():
+    store = sign.MemorySignatureStore()
+
+    c = Config()
+    c.NotebookNotary.store_factory = lambda: store
+    notary = sign.NotebookNotary(config=c)
+    assert notary.store is store
+
+class SignatureStoreTests(unittest.TestCase):
+    def setUp(self):
+        self.store = sign.MemorySignatureStore()
+
+    def test_basics(self):
+        digest = '0123457689abcef'
+        algo = 'fake_sha'
+        assert not self.store.check_signature(digest, algo)
+        self.store.store_signature(digest, algo)
+        assert self.store.check_signature(digest, algo)
+        self.store.remove_signature(digest, algo)
+        assert not self.store.check_signature(digest, algo)
+
+class SQLiteSignatureStoreTests(SignatureStoreTests):
+    def setUp(self):
+        self.store = sign.SQLiteSignatureStore(':memory:')
