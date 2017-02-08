@@ -134,7 +134,7 @@ def read(fp, as_version, **kwargs):
     nb : NotebookNode
         The notebook that was read.
     """
-    if isinstance(fp, py3compat.string_types):
+    if isinstance(fp, (py3compat.unicode_type, bytes)):
         with io.open(fp, encoding='utf-8') as f:
             return read(f, as_version, **kwargs)
 
@@ -159,7 +159,7 @@ def write(nb, fp, version=NO_CONVERT, **kwargs):
         If unspecified, or specified as nbformat.NO_CONVERT,
         the notebook's own version will be used and no conversion performed.
     """
-    if isinstance(fp, py3compat.string_types):
+    if isinstance(fp, (py3compat.unicode_type, bytes)):
         with io.open(fp, 'w', encoding='utf-8') as f:
             return write(nb, f, version=version, **kwargs)
 
