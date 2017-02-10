@@ -15,9 +15,9 @@ except ImportError as e:
     verbose_msg = """
 
     Jupyter notebook format depends on the jsonschema package:
-    
+
         https://pypi.python.org/pypi/jsonschema
-    
+
     Please install it first.
     """
     raise ImportError(str(e) + verbose_msg)
@@ -57,7 +57,7 @@ def get_validator(version=None, version_minor=None):
         version = current_nbformat
 
     v = import_item("nbformat.v%s" % version)
-    current_minor = v.nbformat_minor
+    current_minor = getattr(v, 'nbformat_minor', 0)
     if version_minor is None:
         version_minor = current_minor
 
@@ -100,7 +100,7 @@ def isvalid(nbjson, ref=None, version=None, version_minor=None):
 def _format_as_index(indices):
     """
     (from jsonschema._utils.format_as_index, copied to avoid relying on private API)
-    
+
     Construct a single string containing indexing operations for the indices.
 
     For example, [1, 2, "foo"] -> [1][2]["foo"]
@@ -115,7 +115,7 @@ _STR_LIMIT = 64
 
 def _truncate_obj(obj):
     """Truncate objects for use in validation tracebacks
-    
+
     Cell and output lists are squashed, as are long strings, lists, and dicts.
     """
     if isinstance(obj, dict):
@@ -143,25 +143,25 @@ def _truncate_obj(obj):
 
 class NotebookValidationError(ValidationError):
     """Schema ValidationError with truncated representation
-    
+
     to avoid massive verbose tracebacks.
     """
     def __init__(self, original, ref=None):
         self.original = original
         self.ref = getattr(self.original, 'ref', ref)
         self.message = self.original.message
-    
+
     def __getattr__(self, key):
         return getattr(self.original, key)
-    
+
     def __unicode__(self):
         """Custom str for validation errors
-    
+
         avoids dumping full schema and notebook to logs
         """
         error = self.original
         instance = _truncate_obj(error.instance)
-    
+
         return u'\n'.join([
             error.message,
             u'',
@@ -173,7 +173,7 @@ class NotebookValidationError(ValidationError):
             u'On instance%s:' % _format_as_index(error.relative_path),
             pprint.pformat(instance, width=78),
         ])
-    
+
     if sys.version_info >= (3,):
         __str__ = __unicode__
 
