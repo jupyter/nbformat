@@ -34,6 +34,7 @@ class TestNotary(TestsBase):
             self.nb3 = read(f, as_version=3)
     
     def tearDown(self):
+        self.notary.store.close()
         shutil.rmtree(self.data_dir)
    
     def test_invalid_db_file(self):
@@ -46,9 +47,11 @@ class TestNotary(TestsBase):
             secret=b'secret',
         )
         invalid_notary.sign(self.nb)
+        invalid_notary.store.close()
 
         testpath.assert_isfile(os.path.join(self.data_dir, invalid_sql_file))
         testpath.assert_isfile(os.path.join(self.data_dir, invalid_sql_file + '.bak'))
+
     
     def test_algorithms(self):
         last_sig = ''
@@ -224,7 +227,9 @@ class TestNotary(TestsBase):
             p.stdin.close()
             p.wait()
             self.assertEqual(p.returncode, 0)
-            return p.stdout.read().decode('utf8', 'replace')
+            out = p.stdout.read().decode('utf8', 'replace')
+            p.stdout.close()
+            return out
 
         out = sign_stdin(self.nb3)
         self.assertIn('Signing notebook: <stdin>', out)
