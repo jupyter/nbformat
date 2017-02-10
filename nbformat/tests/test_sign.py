@@ -227,7 +227,9 @@ class TestNotary(TestsBase):
             p.stdin.close()
             p.wait()
             self.assertEqual(p.returncode, 0)
-            return p.stdout.read().decode('utf8', 'replace')
+            out = p.stdout.read().decode('utf8', 'replace')
+            p.stdout.close()
+            return out
 
         out = sign_stdin(self.nb3)
         self.assertIn('Signing notebook: <stdin>', out)
