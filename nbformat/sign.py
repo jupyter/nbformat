@@ -82,6 +82,14 @@ class SignatureStore(object):
         Should not raise if the signature is not stored.
         """
         raise NotImplementedError
+    
+    def close(self):
+        """Close any open connections this store may use.
+
+        If the store maintains any open connections (e.g. to a database),
+        they should be closed.
+        """
+        pass
 
 
 class MemorySignatureStore(SignatureStore):
@@ -136,10 +144,14 @@ class SQLiteSignatureStore(SignatureStore, LoggingConfigurable):
         self.db_file = db_file
         self.db = self._connect_db(db_file)
 
+    def close(self):
+        if self.db is not None:
+            self.db.close()
+
     def _connect_db(self, db_file):
-        db = None
         kwargs = dict(
             detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES)
+        db = None
         try:
             db = sqlite3.connect(db_file, **kwargs)
             self.init_db(db)
@@ -158,6 +170,8 @@ class SQLiteSignatureStore(SignatureStore, LoggingConfigurable):
                     db = sqlite3.connect(db_file, **kwargs)
                     self.init_db(db)
                 except (sqlite3.DatabaseError, sqlite3.OperationalError):
+                    if db is not None:
+                        db.close()
                     self.log.warn(
                         ("Failed commiting signatures database to disk. "
                          "You may need to move the database file to a non-networked file system, "
