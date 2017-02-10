@@ -46,8 +46,8 @@ class TestNotary(TestsBase):
             db_file=invalid_sql_file,
             secret=b'secret',
         )
-        self.addCleanup(invalid_notary.store.close)
         invalid_notary.sign(self.nb)
+        invalid_notary.store.close()
 
         testpath.assert_isfile(os.path.join(self.data_dir, invalid_sql_file))
         testpath.assert_isfile(os.path.join(self.data_dir, invalid_sql_file + '.bak'))
