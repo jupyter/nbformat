@@ -137,6 +137,7 @@ class SQLiteSignatureStore(SignatureStore, LoggingConfigurable):
         self.db = self._connect_db(db_file)
 
     def _connect_db(self, db_file):
+        db = None
         kwargs = dict(
             detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES)
         try:
@@ -145,6 +146,8 @@ class SQLiteSignatureStore(SignatureStore, LoggingConfigurable):
         except (sqlite3.DatabaseError, sqlite3.OperationalError):
             if db_file != ':memory:':
                 old_db_location = db_file + ".bak"
+                if db is not None:
+                    db.close()
                 self.log.warn(
                     ("The signatures database cannot be opened; maybe it is corrupted or encrypted. "
                      "You may need to rerun your notebooks to ensure that they are trusted to run Javascript. "
