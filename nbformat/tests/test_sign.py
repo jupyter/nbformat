@@ -34,6 +34,7 @@ class TestNotary(TestsBase):
             self.nb3 = read(f, as_version=3)
     
     def tearDown(self):
+        self.notary.store.db.close()
         shutil.rmtree(self.data_dir)
    
     def test_invalid_db_file(self):
@@ -49,6 +50,8 @@ class TestNotary(TestsBase):
 
         testpath.assert_isfile(os.path.join(self.data_dir, invalid_sql_file))
         testpath.assert_isfile(os.path.join(self.data_dir, invalid_sql_file + '.bak'))
+        invalid_notary.store.db.close()
+
     
     def test_algorithms(self):
         last_sig = ''
