@@ -160,7 +160,7 @@ class SQLiteSignatureStore(SignatureStore, LoggingConfigurable):
                 old_db_location = db_file + ".bak"
                 if db is not None:
                     db.close()
-                self.log.warn(
+                self.log.warning(
                     ("The signatures database cannot be opened; maybe it is corrupted or encrypted. "
                      "You may need to rerun your notebooks to ensure that they are trusted to run Javascript. "
                      "The old signatures database has been renamed to %s and a new one has been created."),
@@ -172,7 +172,7 @@ class SQLiteSignatureStore(SignatureStore, LoggingConfigurable):
                 except (sqlite3.DatabaseError, sqlite3.OperationalError):
                     if db is not None:
                         db.close()
-                    self.log.warn(
+                    self.log.warning(
                         ("Failed commiting signatures database to disk. "
                          "You may need to move the database file to a non-networked file system, "
                          "using config option `NotebookNotary.db_file`. "
@@ -331,7 +331,7 @@ class NotebookNotary(LoggingConfigurable):
     def _store_factory_default(self):
         def factory():
             if sqlite3 is None:
-                self.log.warn("Missing SQLite3, all notebooks will be untrusted!")
+                self.log.warning("Missing SQLite3, all notebooks will be untrusted!")
                 return MemorySignatureStore()
             return SQLiteSignatureStore(self.db_file)
         return factory
@@ -395,7 +395,7 @@ class NotebookNotary(LoggingConfigurable):
         try:
             os.chmod(self.secret_file, 0o600)
         except OSError:
-            self.log.warn(
+            self.log.warning(
                 "Could not set permissions on %s",
                 self.secret_file
             )
