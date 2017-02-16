@@ -4,6 +4,19 @@
 Changes in nbformat
 =========================
 
+4.3
+===
+
+`4.3 on GitHub <https://github.com/jupyter/nbformat/milestone/7>`__
+
+- A new pluggable ``SignatureStore`` class allows specifying different ways to
+  record the signatures of trusted notebooks. The default is still an SQLite
+  database.
+- :func:`nbformat.read` and :func:`nbformat.write` accept file paths as bytes
+  as well as unicode.
+- Fix for calling :func:`nbformat.validate` on an empty dictionary.
+- Fix for running the tests where the locale makes ASCII the default encoding.
+
 4.2
 ===
 
