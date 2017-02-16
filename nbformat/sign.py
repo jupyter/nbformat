@@ -131,6 +131,8 @@ class MemorySignatureStore(SignatureStore):
         self.data.pop((digest, algorithm), None)
 
 class SQLiteSignatureStore(SignatureStore, LoggingConfigurable):
+    """Store signatures in an SQLite database.
+    """
     # 64k entries ~ 12MB
     cache_size = Integer(65535,
         help="""The number of notebook signatures to cache.
@@ -456,7 +458,8 @@ class NotebookNotary(LoggingConfigurable):
         """Mark cells as trusted if the notebook's signature can be verified
         
         Sets ``cell.metadata.trusted = True | False`` on all code cells,
-        depending on whether the stored signature can be verified.
+        depending on the *trusted* parameter. This will typically be the return
+        value from ``self.check_signature(nb)``.
         
         This function is the inverse of check_cells
         """
@@ -500,8 +503,10 @@ class NotebookNotary(LoggingConfigurable):
         return True
     
     def check_cells(self, nb):
-        """Return whether all code cells are trusted
+        """Return whether all code cells are trusted.
         
+        A cell is trusted if the 'trusted' field in its metadata is truthy, or
+        if it has no potentially unsafe outputs.
         If there are no code cells, return True.
         
         This function is the inverse of mark_cells.

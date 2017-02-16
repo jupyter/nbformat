@@ -295,7 +295,8 @@ texinfo_documents = [
 
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {
-    'https://docs.python.org/3': None,
-    'https://jupyter_client.readthedocs.org/en/stable': None,
-    'https://nbconvert.readthedocs.org/en/stable': None,
+    'python': ('https://docs.python.org/3', None),
+    'jupyterclient': ('https://jupyter_client.readthedocs.org/en/stable', None),
+    'nbconvert': ('https://nbconvert.readthedocs.org/en/stable', None),
+    'notebook': ('https://jupyter-notebook.readthedocs.org/en/stable', None),
 }

@@ -53,3 +53,50 @@ Other functions
 .. autofunction:: validate
 
 .. autoclass:: ValidationError
+
+Notebook signatures
+-------------------
+
+.. module:: nbformat.sign
+
+This machinery is used by the notebook web application to record which notebooks
+are *trusted*, and may show dynamic output as soon as they're loaded. See
+:ref:`notebook:notebook_security` for more information.
+
+.. autoclass:: NotebookNotary
+
+   .. automethod:: sign
+
+   .. automethod:: unsign
+
+   .. automethod:: check_signature
+
+   .. automethod:: mark_cells
+
+   .. automethod:: check_cells
+
+.. _pluggable_signature_store:
+
+Signature storage
+*****************
+
+Signatures are stored using a pluggable :class:`SignatureStore` subclass. To
+implement your own, override the methods below and configure
+``NotebookNotary.store_factory``.
+
+.. autoclass:: SignatureStore
+
+   .. automethod:: store_signature
+
+   .. automethod:: remove_signature
+
+   .. automethod:: check_signature
+
+   .. automethod:: close
+
+By default, :class:`NotebookNotary` will use an SQLite based store if SQLite
+bindings are available, and an in-memory store otherwise.
+
+.. autoclass:: SQLiteSignatureStore
+
+.. autoclass:: MemorySignatureStore
