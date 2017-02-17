@@ -54,6 +54,26 @@ Other functions
 
 .. autoclass:: ValidationError
 
+Constructing notebooks programmatically
+---------------------------------------
+
+.. module:: nbformat.v4
+
+These functions return :class:`~.NotebookNode` objects with the necessary fields.
+
+.. autofunction:: new_notebook
+
+.. autofunction:: new_code_cell
+
+.. autofunction:: new_markdown_cell
+
+.. autofunction:: new_raw_cell
+
+.. autofunction:: new_output
+
+.. autofunction:: output_from_msg
+
+
 Notebook signatures
 -------------------
 
