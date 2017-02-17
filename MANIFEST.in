@@ -2,6 +2,10 @@ include COPYING.md
 include CONTRIBUTING.md
 include README.md
 
+# Javascript
+include package.json
+include index.js
+
 # Documentation
 graft docs
 exclude docs/\#*
