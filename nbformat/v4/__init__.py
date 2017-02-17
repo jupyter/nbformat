@@ -9,7 +9,7 @@ __all__ = ['nbformat', 'nbformat_minor', 'nbformat_schema', 'new_code_cell',
 
 from .nbbase import (
     nbformat, nbformat_minor, nbformat_schema,
-    new_code_cell, new_markdown_cell, new_notebook,
+    new_code_cell, new_markdown_cell, new_raw_cell, new_notebook,
     new_output, output_from_msg,
 )
 
