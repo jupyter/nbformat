@@ -9,8 +9,9 @@ Some general points about the notebook format:
 .. note::
 
     *All* metadata fields are optional.
-    While the type and values of some metadata are defined,
-    no metadata values are required to be defined.
+    While the types and values of some metadata fields are defined,
+    no metadata fields are required to be defined. Any metadata field
+    may also be ignored.
 
 
 Top-level structure
