@@ -126,6 +126,15 @@
                             "description": "Raw cell metadata format for nbconvert.",
                             "type": "string"
                         },
+                        "jupyter": {
+                          "description": "Official Jupyter Metadata for Raw Cells",
+                          "type": "object",
+                          "additionalProperties": true,
+                            "source_hidden": {
+                                "description": "Whether the source is hidden.",
+                                "type": "boolean"
+                            }
+                        },
                         "name": {"$ref": "#/definitions/misc/metadata_name"},
                         "tags": {"$ref": "#/definitions/misc/metadata_tags"}
                     }
