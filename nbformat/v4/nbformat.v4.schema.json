@@ -150,7 +150,16 @@
                     "type": "object",
                     "properties": {
                         "name": {"$ref": "#/definitions/misc/metadata_name"},
-                        "tags": {"$ref": "#/definitions/misc/metadata_tags"}
+                        "tags": {"$ref": "#/definitions/misc/metadata_tags"},
+                        "jupyter": {
+                          "description": "Official Jupyter Metadata for Markdown Cells",
+                          "type": "object",
+                          "additionalProperties": true,
+                            "source_hidden": {
+                                "description": "Whether the source is hidden.",
+                                "type": "boolean"
+                            }
+                        }
                     },
                     "additionalProperties": true
                 },
@@ -175,7 +184,7 @@
                     "additionalProperties": true,
                     "properties": {
                         "jupyter": {
-                          "description": "Official Jupyter Metadata",
+                          "description": "Official Jupyter Metadata for Code Cells",
                           "type": "object",
                           "additionalProperties": true,
                             "source_hidden": {
