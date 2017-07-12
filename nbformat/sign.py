@@ -171,7 +171,7 @@ class SQLiteSignatureStore(SignatureStore, LoggingConfigurable):
                     os.rename(db_file, old_db_location)
                     db = sqlite3.connect(db_file, **kwargs)
                     self.init_db(db)
-                except (sqlite3.DatabaseError, sqlite3.OperationalError):
+                except (sqlite3.DatabaseError, sqlite3.OperationalError, OSError):
                     if db is not None:
                         db.close()
                     self.log.warning(
