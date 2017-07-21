@@ -378,6 +378,9 @@ Additional fields may be added.
 Cell metadata
 -------------
 
+Official Jupyter metadata, as used by Jupyter frontends should be placed in the
+`metadata.jupyter` namespace, for example `metadata.jupyter.foo = "bar"`.
+
 The following metadata keys are defined at the cell level:
 
 =========== =============== ==============
@@ -390,6 +393,15 @@ format      'mime/type'     The mime-type of a :ref:`Raw NBConvert Cell <raw nbc
 name        str             A name for the cell. Should be unique
 tags        list of str     A list of string tags on the cell. Commas are not allowed in a tag
 =========== =============== ==============
+
+The following metadata keys are defined at the cell level within the `jupyter` namespace
+
+=============== =============== ==============
+Key             Value           Interpretation
+=============== =============== ==============
+source_hidden   bool            Whether the cell's source should be shown
+outputs_hidden  bool            Whether the cell's outputs should be shown
+=============== =============== ==============
 
 Output metadata
 ---------------

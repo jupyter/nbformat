@@ -48,6 +48,13 @@ class TestValidator(TestsBase):
         validate(nb)
         self.assertEqual(isvalid(nb), True)
 
+    def test_nb4jupyter_metadata(self):
+        """Test that a notebook with a jupyter metadata passes validation"""
+        with self.fopen(u'test4jupyter_metadata.ipynb', u'r') as f:
+            nb = read(f, as_version=4)
+        validate(nb)
+        self.assertEqual(isvalid(nb), True)
+
     def test_invalid(self):
         """Test than an invalid notebook does not pass validation"""
         # this notebook has a few different errors:

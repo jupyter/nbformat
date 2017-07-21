@@ -4,6 +4,14 @@
 Changes in nbformat
 =========================
 
+4.4
+===
+
+`4.4 on GitHub <https://github.com/jupyter/nbformat/milestone/9>`__
+
+- Metadata is now being specified more tightly amongst Jupyter frontends
+
+
 4.3
 ===
 
