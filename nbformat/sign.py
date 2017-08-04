@@ -204,16 +204,18 @@ class SQLiteSignatureStore(SignatureStore, LoggingConfigurable):
     def store_signature(self, digest, algorithm):
         if self.db is None:
             return
-        self.db.execute("""INSERT OR IGNORE INTO nbsignatures
-            (algorithm, signature, last_seen) VALUES (?, ?, ?)""",
-                        (algorithm, digest, datetime.utcnow())
-                        )
-        self.db.execute("""UPDATE nbsignatures SET last_seen = ? WHERE
-            algorithm = ? AND
-            signature = ?;
-            """,
-                        (datetime.utcnow(), algorithm, digest),
-                        )
+        if not self.compute_signature(digest, algorithm):
+            self.db.execute("""
+                INSERT INTO nbsignatures (algorithm, signature, last_seen) 
+                VALUES (?, ?, ?)
+                """, (algorithm, digest, datetime.utcnow())
+            )
+        else:
+            self.db.execute("""UPDATE nbsignatures SET last_seen = ? WHERE
+                algorithm = ? AND
+                signature = ?;
+                """, (datetime.utcnow(), algorithm, digest)
+            )
         self.db.commit()
 
         # Check size and cull old entries if necessary
