@@ -50,7 +50,7 @@ def _allow_undefined(schema):
     )
     return schema
 
-def get_validator(version=None, version_minor=None):
+def get_validator(version=None, version_minor=None, relax_add_props=False):
     """Load the JSON schema into a Validator"""
     if version is None:
         from .. import current_nbformat
@@ -65,13 +65,9 @@ def get_validator(version=None, version_minor=None):
 
     if version_tuple not in validators:
         try:
-            v.nbformat_schema
+            schema_json = _get_schema_json(v)
         except AttributeError:
-            # no validator
             return None
-        schema_path = os.path.join(os.path.dirname(v.__file__), v.nbformat_schema)
-        with open(schema_path) as f:
-            schema_json = json.load(f)
 
         if current_minor < version_minor:
             # notebook from the future, relax all `additionalProperties: False` requirements
@@ -80,7 +76,29 @@ def get_validator(version=None, version_minor=None):
             schema_json = _allow_undefined(schema_json)
 
         validators[version_tuple] = Validator(schema_json)
+
+    if relax_add_props:
+        try:
+            schema_json = _get_schema_json(v)
+        except AttributeError:
+            return None
+
+        # this allows properties to be added for intermediate
+        # representations while validating for all other kinds of errors
+        schema_json = _relax_additional_properties(schema_json)
+
+        validators[version_tuple] = Validator(schema_json)
     return validators[version_tuple]
+
+
+def _get_schema_json(v):
+    """
+    Gets the json schema from a given imported library a nbformat version.
+    """
+    schema_path = os.path.join(os.path.dirname(v.__file__), v.nbformat_schema)
+    with open(schema_path) as f:
+        schema_json = json.load(f)
+    return schema_json
 
 def isvalid(nbjson, ref=None, version=None, version_minor=None):
     """Checks whether the given notebook JSON conforms to the current
@@ -216,7 +234,7 @@ def better_validation_error(error, version, version_minor):
     return NotebookValidationError(error, ref)
 
 
-def validate(nbjson, ref=None, version=None, version_minor=None):
+def validate(nbjson, ref=None, version=None, version_minor=None, relax_add_props=False):
     """Checks whether the given notebook JSON conforms to the current
     notebook format schema.
 
@@ -226,7 +244,7 @@ def validate(nbjson, ref=None, version=None, version_minor=None):
         from .reader import get_version
         (version, version_minor) = get_version(nbjson)
 
-    validator = get_validator(version, version_minor)
+    validator = get_validator(version, version_minor, relax_add_props=relax_add_props)
 
     if validator is None:
         # no validator
