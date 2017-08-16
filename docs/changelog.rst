@@ -13,7 +13,7 @@ Changes in nbformat
 - Introduce official jupyter namespace inside metadata (``metadata.jupyter``)
 - Introduce ``source_hidden`` and ``outputs_hidden`` as official front-end
   metadata fields to indicate hiding source and outputs areas. **NB**: These
-  fields not be used to hide elements in exported formats.
+  fields should not be used to hide elements in exported formats.
 - Fix ending the redundant storage of signatures in the signature database
 - :func:`nbformat.validate` can be set to not raise a ValidationError if
   additional properties are included
