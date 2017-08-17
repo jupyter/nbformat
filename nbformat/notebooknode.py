@@ -10,14 +10,14 @@ class NotebookNode(Struct):
         """Set an item with check for allownew.
         Examples
         --------
-        >>> s = Struct()
-        >>> s['a'] = 10
-        >>> s.allow_new_attr(False)
-        >>> s['a'] = 10
-        >>> s['a']
+        >>> n = NotebookNode()
+        >>> n['a'] = 10
+        >>> n.allow_new_attr(False)
+        >>> n['a'] = 10
+        >>> n['a']
         10
         >>> try:
-        ...     s['b'] = 20
+        ...     n['b'] = 20
         ... except KeyError:
         ...     print('this is not allowed')
         ...
