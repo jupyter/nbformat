@@ -9,7 +9,15 @@ Changes in nbformat
 
 `4.4 on GitHub <https://github.com/jupyter/nbformat/milestone/9>`__
 
-- Metadata is now being specified more tightly amongst Jupyter frontends
+- Explicitly state that metadata fields can be ignored
+- Introduce official jupyter namespace inside metadata (``metadata.jupyter``)
+- Introduce ``source_hidden`` and ``outputs_hidden`` as official front-end
+  metadata fields to indicate hiding source and outputs areas. **NB**: These
+  fields should not be used to hide elements in exported formats.
+- Fix ending the redundant storage of signatures in the signature database
+- :func:`nbformat.validate` can be set to not raise a ValidationError if
+  additional properties are included
+- Fix for errors with connecting and backing up the signature database
 
 
 4.3
@@ -24,6 +32,8 @@ Changes in nbformat
   as well as unicode.
 - Fix for calling :func:`nbformat.validate` on an empty dictionary.
 - Fix for running the tests where the locale makes ASCII the default encoding.
+- Include nbformat-schema files (v3 and v4) in nbformat-schema npm package
+- Include configuration for appveyor's continuous integration service
 
 4.2
 ===
