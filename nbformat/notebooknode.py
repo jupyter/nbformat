@@ -8,7 +8,7 @@ class NotebookNode(Struct):
     """A dict-like node with attribute-access"""
 
     def __setitem__(self, key, value):
-        if isinstance(value, Mapping):
+        if isinstance(value, Mapping) and not isinstance(value, NotebookNode):
             value = from_dict(value)
         super(NotebookNode, self).__setitem__(key, value)
 
@@ -42,7 +42,7 @@ def from_dict(d):
     This does not check that the contents of the dictionary make a valid
     notebook or part of a notebook.
     """
-    if isinstance(d, dict) and not isinstance(d, NotebookNode):
+    if isinstance(d, dict):
         return NotebookNode({k: from_dict(v) for k, v in d.items()})
     elif isinstance(d, (tuple, list)):
         return [from_dict(i) for i in d]
