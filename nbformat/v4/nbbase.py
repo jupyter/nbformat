@@ -9,7 +9,7 @@ helpers to build the structs in the right form.
 # Copyright (c) IPython Development Team.
 # Distributed under the terms of the Modified BSD License.
 
-from ..notebooknode import from_dict, NotebookNode
+from ..notebooknode import NotebookNode
 
 # Change this when incrementing the nbformat version
 nbformat = 4
@@ -35,9 +35,9 @@ def new_output(output_type, data=None, **kwargs):
         output.metadata = NotebookNode()
         output.data = NotebookNode()
     # load from args:
-    output.update(from_dict(kwargs))
+    output.update(kwargs)
     if data is not None:
-        output.data = from_dict(data)
+        output.data = data
     # validate
     validate(output, output_type)
     return output
@@ -95,7 +95,7 @@ def new_code_cell(source='', **kwargs):
         source=source,
         outputs=[],
     )
-    cell.update(from_dict(kwargs))
+    cell.update(kwargs)
 
     validate(cell, 'code_cell')
     return cell
@@ -107,7 +107,7 @@ def new_markdown_cell(source='', **kwargs):
         source=source,
         metadata=NotebookNode(),
     )
-    cell.update(from_dict(kwargs))
+    cell.update(kwargs)
 
     validate(cell, 'markdown_cell')
     return cell
@@ -119,7 +119,7 @@ def new_raw_cell(source='', **kwargs):
         source=source,
         metadata=NotebookNode(),
     )
-    cell.update(from_dict(kwargs))
+    cell.update(kwargs)
 
     validate(cell, 'raw_cell')
     return cell
@@ -132,6 +132,6 @@ def new_notebook(**kwargs):
         metadata=NotebookNode(),
         cells=[],
     )
-    nb.update(from_dict(kwargs))
+    nb.update(kwargs)
     validate(nb)
     return nb
