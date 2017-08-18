@@ -42,7 +42,7 @@ def from_dict(d):
     This does not check that the contents of the dictionary make a valid
     notebook or part of a notebook.
     """
-    if isinstance(d, dict):
+    if isinstance(d, dict) and not isinstance(d, NotebookNode):
         return NotebookNode({k: from_dict(v) for k, v in d.items()})
     elif isinstance(d, (tuple, list)):
         return [from_dict(i) for i in d]
