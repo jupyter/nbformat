@@ -8,7 +8,7 @@ import json
 
 from ipython_genutils import py3compat
 
-from .nbbase import from_dict
+from ..notebooknode import from_dict
 from .rwbase import (
     NotebookReader, NotebookWriter, rejoin_lines, split_lines, strip_transient
 )
