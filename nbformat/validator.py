@@ -23,6 +23,7 @@ except ImportError as e:
     raise ImportError(str(e) + verbose_msg)
 
 from ipython_genutils.importstring import import_item
+from .reader import get_version
 
 
 validators = {}
@@ -240,6 +241,9 @@ def validate(nbjson, ref=None, version=None, version_minor=None, relax_add_props
 
     Raises ValidationError if not valid.
     """
+    if version is None:
+        version, version_minor = get_version(nbjson)
+
     try:
         err = next(iter_validate(nbjson, ref=ref, version=version, version_minor=version_minor, relax_add_props=relax_add_props))
         raise better_validation_error(err, version, version_minor)
@@ -254,8 +258,7 @@ def iter_validate(nbjson, ref=None, version=None, version_minor=None, relax_add_
     Returns a generator of all ValidationErrors if not valid.
     """
     if version is None:
-        from .reader import get_version
-        (version, version_minor) = get_version(nbjson)
+        version, version_minor = get_version(nbjson)
 
     validator = get_validator(version, version_minor, relax_add_props=relax_add_props)
 
@@ -263,7 +266,6 @@ def iter_validate(nbjson, ref=None, version=None, version_minor=None, relax_add_
         # no validator
         warnings.warn("No schema for validating v%s notebooks" % version, UserWarning)
         return iter(list())
-
 
     if ref:
         return validator.iter_errors(nbjson, {'$ref' : '#/definitions/%s' % ref})
