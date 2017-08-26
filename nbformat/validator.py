@@ -246,7 +246,7 @@ def validate(nbjson, ref=None, version=None, version_minor=None, relax_add_props
 
     try:
         err = next(iter_validate(nbjson, ref=ref, version=version, version_minor=version_minor, relax_add_props=relax_add_props))
-        raise better_validation_error(err, version, version_minor)
+        raise err
     except StopIteration:
         return None
 
@@ -268,6 +268,9 @@ def iter_validate(nbjson, ref=None, version=None, version_minor=None, relax_add_
         return iter(list())
 
     if ref:
-        return validator.iter_errors(nbjson, {'$ref' : '#/definitions/%s' % ref})
+        errors = validator.iter_errors(nbjson, {'$ref' : '#/definitions/%s' % ref})
     else:
-        return validator.iter_errors(nbjson)
+        errors = validator.iter_errors(nbjson)
+
+    for error in errors:
+        yield better_validation_error(error, version, version_minor)
