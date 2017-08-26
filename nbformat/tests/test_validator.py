@@ -8,7 +8,7 @@ import os
 from .base import TestsBase
 from jsonschema import ValidationError
 from nbformat import read
-from ..validator import isvalid, validate
+from ..validator import isvalid, validate, iter_validate
 
 
 class TestValidator(TestsBase):
@@ -91,3 +91,14 @@ class TestValidator(TestsBase):
         self.assertRegexpMatches(s, "source.* is a required property")
         self.assertRegexpMatches(s, r"On instance\[u?['\"].*cells['\"]\]\[0\]")
         self.assertLess(len(s.splitlines()), 10)
+
+    def test_iter_validation_error(self):
+        with self.fopen(u'invalid.ipynb', u'r') as f:
+            nb = read(f, as_version=4)
+
+        errors = list(iter_validate(nb))
+        assert len(errors) == 3
+        assert {e.ref for e in errors} == {'markdown_cell', 'heading_cell', 'bad stream'}
+
+    def test_iter_validation_empty(self):
+        assert list(iter_validate({})) == list()
