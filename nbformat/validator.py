@@ -240,6 +240,19 @@ def validate(nbjson, ref=None, version=None, version_minor=None, relax_add_props
 
     Raises ValidationError if not valid.
     """
+    try:
+        err = next(iter_validate(nbjson, ref=ref, version=version, version_minor=version_minor, relax_add_props=relax_add_props))
+        raise better_validation_error(err, version, version_minor)
+    except StopIteration:
+        return None
+
+
+def iter_validate(nbjson, ref=None, version=None, version_minor=None, relax_add_props=False):
+    """Checks whether the given notebook JSON conforms to the current
+    notebook format schema.
+
+    Returns a generator of all ValidationErrors if not valid.
+    """
     if version is None:
         from .reader import get_version
         (version, version_minor) = get_version(nbjson)
@@ -251,11 +264,8 @@ def validate(nbjson, ref=None, version=None, version_minor=None, relax_add_props
         warnings.warn("No schema for validating v%s notebooks" % version, UserWarning)
         return
 
-    try:
-        if ref:
-            return validator.validate(nbjson, {'$ref' : '#/definitions/%s' % ref})
-        else:
-            return validator.validate(nbjson)
-    except ValidationError as e:
-        raise better_validation_error(e, version, version_minor)
 
+    if ref:
+        return validator.iter_errors(nbjson, {'$ref' : '#/definitions/%s' % ref})
+    else:
+        return validator.iter_errors(nbjson)
