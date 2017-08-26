@@ -265,7 +265,7 @@ def iter_validate(nbjson, ref=None, version=None, version_minor=None, relax_add_
     if validator is None:
         # no validator
         warnings.warn("No schema for validating v%s notebooks" % version, UserWarning)
-        return iter(list())
+        raise StopIteration
 
     if ref:
         errors = validator.iter_errors(nbjson, {'$ref' : '#/definitions/%s' % ref})
