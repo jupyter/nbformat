@@ -262,7 +262,7 @@ def iter_validate(nbjson, ref=None, version=None, version_minor=None, relax_add_
     if validator is None:
         # no validator
         warnings.warn("No schema for validating v%s notebooks" % version, UserWarning)
-        return
+        return iter(list())
 
 
     if ref:
