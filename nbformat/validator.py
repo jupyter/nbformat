@@ -244,11 +244,10 @@ def validate(nbjson, ref=None, version=None, version_minor=None, relax_add_props
     if version is None:
         version, version_minor = get_version(nbjson)
 
-    try:
-        err = next(iter_validate(nbjson, ref=ref, version=version, version_minor=version_minor, relax_add_props=relax_add_props))
-        raise err
-    except StopIteration:
-        return None
+    for error in iter_validate(nbjson, ref=ref, version=version, 
+                                version_minor=version_minor, 
+                                relax_add_props=relax_add_props):
+        raise error
 
 
 def iter_validate(nbjson, ref=None, version=None, version_minor=None, relax_add_props=False):
@@ -265,7 +264,7 @@ def iter_validate(nbjson, ref=None, version=None, version_minor=None, relax_add_
     if validator is None:
         # no validator
         warnings.warn("No schema for validating v%s notebooks" % version, UserWarning)
-        raise StopIteration
+        return
 
     if ref:
         errors = validator.iter_errors(nbjson, {'$ref' : '#/definitions/%s' % ref})
