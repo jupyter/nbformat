@@ -23,6 +23,7 @@ except ImportError as e:
     raise ImportError(str(e) + verbose_msg)
 
 from ipython_genutils.importstring import import_item
+from .reader import get_version
 
 
 validators = {}
@@ -241,8 +242,22 @@ def validate(nbjson, ref=None, version=None, version_minor=None, relax_add_props
     Raises ValidationError if not valid.
     """
     if version is None:
-        from .reader import get_version
-        (version, version_minor) = get_version(nbjson)
+        version, version_minor = get_version(nbjson)
+
+    for error in iter_validate(nbjson, ref=ref, version=version, 
+                                version_minor=version_minor, 
+                                relax_add_props=relax_add_props):
+        raise error
+
+
+def iter_validate(nbjson, ref=None, version=None, version_minor=None, relax_add_props=False):
+    """Checks whether the given notebook JSON conforms to the current
+    notebook format schema.
+
+    Returns a generator of all ValidationErrors if not valid.
+    """
+    if version is None:
+        version, version_minor = get_version(nbjson)
 
     validator = get_validator(version, version_minor, relax_add_props=relax_add_props)
 
@@ -251,11 +266,10 @@ def validate(nbjson, ref=None, version=None, version_minor=None, relax_add_props
         warnings.warn("No schema for validating v%s notebooks" % version, UserWarning)
         return
 
-    try:
-        if ref:
-            return validator.validate(nbjson, {'$ref' : '#/definitions/%s' % ref})
-        else:
-            return validator.validate(nbjson)
-    except ValidationError as e:
-        raise better_validation_error(e, version, version_minor)
+    if ref:
+        errors = validator.iter_errors(nbjson, {'$ref' : '#/definitions/%s' % ref})
+    else:
+        errors = validator.iter_errors(nbjson)
 
+    for error in errors:
+        yield better_validation_error(error, version, version_minor)
