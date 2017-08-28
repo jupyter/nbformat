@@ -196,6 +196,23 @@ class NotebookValidationError(ValidationError):
     if sys.version_info >= (3,):
         __str__ = __unicode__
 
+class ValidationWarnings(ValidationError):
+    """Schema validation warnings container class.
+
+    Designed to allow enumeration of all errors"""
+    def __init__(self, errors):
+        self.errors = tuple(errors)
+
+    def __unicode__(self):
+        return u'\n'.join((
+            u"{} possible issue(s) detected during validation".format(len(self.errors)),
+            u"",
+            '\n'.join(map(str, self.errors)),
+        ))
+
+    if sys.version_info >= (3,):
+        __str__ = __unicode__
+
 def better_validation_error(error, version, version_minor):
     """Get better ValidationError on oneOf failures
 
@@ -244,10 +261,11 @@ def validate(nbjson, ref=None, version=None, version_minor=None, relax_add_props
     if version is None:
         version, version_minor = get_version(nbjson)
 
-    for error in iter_validate(nbjson, ref=ref, version=version, 
-                                version_minor=version_minor, 
-                                relax_add_props=relax_add_props):
-        raise error
+    errors = tuple(iter_validate(nbjson, ref=ref, version=version,
+                            version_minor=version_minor, relax_add_props=relax_add_props))
+    
+    if errors:
+        raise ValidationWarnings(errors)
 
 
 def iter_validate(nbjson, ref=None, version=None, version_minor=None, relax_add_props=False):
