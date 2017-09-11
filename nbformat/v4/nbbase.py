@@ -40,8 +40,8 @@ def new_output(output_type, data=None, **kwargs):
         output.execution_count = None
     elif output_type == 'error':
         output.ename = "NotImplementedError"
-        output.evalue = "The default message in nbformat new_output('error')."
-        output.traceback = ["This is not a real traceback"]
+        output.evalue = ""
+        output.traceback = []
 
     # load from args:
     output.update(kwargs)
