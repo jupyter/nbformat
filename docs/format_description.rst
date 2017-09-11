@@ -64,7 +64,7 @@ All cells have the following basic structure:
 .. sourcecode:: python
 
     {
-      "cell_type" : "name",
+      "cell_type" : "type",
       "metadata" : {},
       "source" : "single string or [list, of, strings]",
     }
@@ -390,7 +390,7 @@ collapsed   bool            Whether the cell's output container should be collap
 autoscroll  bool or 'auto'  Whether the cell's output is scrolled, unscrolled, or autoscrolled
 deletable   bool            If False, prevent deletion of the cell
 format      'mime/type'     The mime-type of a :ref:`Raw NBConvert Cell <raw nbconvert cells>`
-name        str             A name for the cell. Should be unique
+name        str             A name for the cell. Should be unique across the notebook. Uniqueness must be verified outside of the json schema. 
 tags        list of str     A list of string tags on the cell. Commas are not allowed in a tag
 =========== =============== ==============
 
