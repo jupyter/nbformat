@@ -244,13 +244,13 @@ def validate(nbdict=None, ref=None, version=None, version_minor=None,
     Raises ValidationError if not valid.
     """
 
-    if nbdict is None:  # nbjson backwards compat: trigger if nbdict is not set
-        if isinstance(nbjson, str):  # if nbjson is str, convert it
-            nbdict = reads(nbjson)
-        elif isinstance(nbjson, dict):  # if nbjson is dict-like, assign it
-            nbdict = nbjson
-        else:  # otherwise there is no nbdict, nothing to validate
-            raise ValidationError("No dict-like notebook object was given.")
+    # backwards compatibility for nbjson argument
+    if nbdict is not None:
+        pass
+    elif nbjson is not None:
+        nbdict = nbjson
+    else:
+        raise ValidationError("Object to validate was not provided.")
 
     if version is None:
         version, version_minor = get_version(nbdict)
