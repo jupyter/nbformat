@@ -31,9 +31,18 @@ def new_output(output_type, data=None, **kwargs):
     if output_type == 'stream':
         output.name = u'stdout'
         output.text = u''
-    elif output_type in {'execute_result', 'display_data'}:
+    elif output_type == 'display_data':
         output.metadata = NotebookNode()
         output.data = NotebookNode()
+    elif output_type == 'execute_result':
+        output.metadata = NotebookNode()
+        output.data = NotebookNode()
+        output.execution_count = None
+    elif output_type == 'error':
+        output.ename = "NotImplementedError"
+        output.evalue = ""
+        output.traceback = []
+
     # load from args:
     output.update(kwargs)
     if data is not None:
