@@ -250,7 +250,7 @@ def validate(nbdict=None, ref=None, version=None, version_minor=None,
     elif nbjson is not None:
         nbdict = nbjson
     else:
-        raise ValidationError("Object to validate was not provided.")
+        raise TypeError("validate() missing 1 required argument: 'nbdict'")
 
     if version is None:
         version, version_minor = get_version(nbdict)
