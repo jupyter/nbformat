@@ -261,13 +261,21 @@ def validate(nbdict=None, ref=None, version=None, version_minor=None,
         raise error
 
 
-def iter_validate(nbdict, ref=None, version=None, version_minor=None,
-                  relax_add_props=False):
+def iter_validate(nbdict=None, ref=None, version=None, version_minor=None,
+                  relax_add_props=False, nbjson=None):
     """Checks whether the given notebook dict-like object conforms to the
     current notebook format schema.
 
     Returns a generator of all ValidationErrors if not valid.
     """
+    # backwards compatibility for nbjson argument
+    if nbdict is not None:
+        pass
+    elif nbjson is not None:
+        nbdict = nbjson
+    else:
+        raise TypeError("iter_validate() missing 1 required argument: 'nbdict'")
+
     if version is None:
         version, version_minor = get_version(nbdict)
 
