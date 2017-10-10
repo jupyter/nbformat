@@ -23,7 +23,7 @@ except ImportError as e:
     raise ImportError(str(e) + verbose_msg)
 
 from ipython_genutils.importstring import import_item
-from .reader import get_version
+from .reader import get_version, reads
 
 
 validators = {}
@@ -235,29 +235,49 @@ def better_validation_error(error, version, version_minor):
     return NotebookValidationError(error, ref)
 
 
-def validate(nbjson, ref=None, version=None, version_minor=None, relax_add_props=False):
-    """Checks whether the given notebook JSON conforms to the current
-    notebook format schema.
+def validate(nbdict=None, ref=None, version=None, version_minor=None,
+             relax_add_props=False, nbjson=None):
+    """Checks whether the given notebook dict-like object
+    conforms to the current notebook format schema.
+
 
     Raises ValidationError if not valid.
     """
-    if version is None:
-        version, version_minor = get_version(nbjson)
 
-    for error in iter_validate(nbjson, ref=ref, version=version, 
-                                version_minor=version_minor, 
-                                relax_add_props=relax_add_props):
+    # backwards compatibility for nbjson argument
+    if nbdict is not None:
+        pass
+    elif nbjson is not None:
+        nbdict = nbjson
+    else:
+        raise TypeError("validate() missing 1 required argument: 'nbdict'")
+
+    if version is None:
+        version, version_minor = get_version(nbdict)
+
+    for error in iter_validate(nbdict, ref=ref, version=version,
+                               version_minor=version_minor,
+                               relax_add_props=relax_add_props):
         raise error
 
 
-def iter_validate(nbjson, ref=None, version=None, version_minor=None, relax_add_props=False):
-    """Checks whether the given notebook JSON conforms to the current
-    notebook format schema.
+def iter_validate(nbdict=None, ref=None, version=None, version_minor=None,
+                  relax_add_props=False, nbjson=None):
+    """Checks whether the given notebook dict-like object conforms to the
+    current notebook format schema.
 
     Returns a generator of all ValidationErrors if not valid.
     """
+    # backwards compatibility for nbjson argument
+    if nbdict is not None:
+        pass
+    elif nbjson is not None:
+        nbdict = nbjson
+    else:
+        raise TypeError("iter_validate() missing 1 required argument: 'nbdict'")
+
     if version is None:
-        version, version_minor = get_version(nbjson)
+        version, version_minor = get_version(nbdict)
 
     validator = get_validator(version, version_minor, relax_add_props=relax_add_props)
 
@@ -267,9 +287,9 @@ def iter_validate(nbjson, ref=None, version=None, version_minor=None, relax_add_
         return
 
     if ref:
-        errors = validator.iter_errors(nbjson, {'$ref' : '#/definitions/%s' % ref})
+        errors = validator.iter_errors(nbdict, {'$ref' : '#/definitions/%s' % ref})
     else:
-        errors = validator.iter_errors(nbjson)
+        errors = validator.iter_errors(nbdict)
 
     for error in errors:
         yield better_validation_error(error, version, version_minor)
