@@ -71,6 +71,8 @@ def reads(s, as_version, **kwargs):
     nb : NotebookNode
         The notebook that was read.
     """
+    if isinstance(s, bytes):
+        s = s.decode('utf8')
     nb = reader.reads(s, **kwargs)
     if as_version is not NO_CONVERT:
         nb = convert(nb, as_version)
