@@ -102,3 +102,8 @@ class TestValidator(TestsBase):
 
     def test_iter_validation_empty(self):
         assert list(iter_validate({})) == list()
+
+    def test_validation_no_version(self):
+        """Test that an invalid notebook with no version fails validation"""
+        with self.assertRaises(ValidationError) as e:
+            validate({'invalid': 'notebook'})
