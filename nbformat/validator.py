@@ -283,7 +283,7 @@ def iter_validate(nbdict=None, ref=None, version=None, version_minor=None,
 
     if validator is None:
         # no validator
-        warnings.warn("No schema for validating v%s notebooks" % version, UserWarning)
+        yield ValidationError("No schema for validating v%s notebooks" % version)
         return
 
     if ref:
