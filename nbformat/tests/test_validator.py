@@ -68,8 +68,9 @@ class TestValidator(TestsBase):
         self.assertEqual(isvalid(nb), False)
 
     def test_validate_empty(self):
-        """Test that an empty dict can be validated without error"""
-        validate({})
+        """Test that an empty notebook (invalid) fails validation"""
+        with self.assertRaises(ValidationError) as e:
+            validate({})
 
     def test_future(self):
         """Test than a notebook from the future with extra keys passes validation"""
@@ -101,7 +102,10 @@ class TestValidator(TestsBase):
         assert {e.ref for e in errors} == {'markdown_cell', 'heading_cell', 'bad stream'}
 
     def test_iter_validation_empty(self):
-        assert list(iter_validate({})) == list()
+        """Test that an empty notebook (invalid) fails validation via iter_validate"""
+        errors = list(iter_validate({}))
+        assert len(errors) == 1
+        assert type(errors[0]) == ValidationError
 
     def test_validation_no_version(self):
         """Test that an invalid notebook with no version fails validation"""
