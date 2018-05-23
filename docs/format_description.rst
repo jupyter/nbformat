@@ -112,7 +112,7 @@ They also have an execution_count, which must be an integer or ``null``.
       "execution_count": 1, # integer or null
       "metadata" : {
           "collapsed" : True, # whether the output of the cell is collapsed
-          "autoscroll": False, # any of true, false or "auto"
+          "scrolled": False, # any of true, false or "auto"
       },
       "source" : "[some multi-line code]",
       "outputs": [{
@@ -387,7 +387,7 @@ The following metadata keys are defined at the cell level:
 Key         Value           Interpretation
 =========== =============== ==============
 collapsed   bool            Whether the cell's output container should be collapsed
-autoscroll  bool or 'auto'  Whether the cell's output is scrolled, unscrolled, or autoscrolled
+scrolled    bool or 'auto'  Whether the cell's output is scrolled, unscrolled, or autoscrolled
 deletable   bool            If False, prevent deletion of the cell
 format      'mime/type'     The mime-type of a :ref:`Raw NBConvert Cell <raw nbconvert cells>`
 name        str             A name for the cell. Should be unique across the notebook. Uniqueness must be verified outside of the json schema. 
