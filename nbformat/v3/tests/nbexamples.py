@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
 import os
-from base64 import encodestring
 
+from ..._compat import encodebytes
 from ..nbbase import (
     NotebookNode,
     new_code_cell, new_text_cell, new_worksheet, new_notebook, new_output,
@@ -10,8 +10,8 @@ from ..nbbase import (
 )
 
 # some random base64-encoded *text*
-png = encodestring(os.urandom(5)).decode('ascii')
-jpeg = encodestring(os.urandom(6)).decode('ascii')
+png = encodebytes(os.urandom(5)).decode('ascii')
+jpeg = encodebytes(os.urandom(6)).decode('ascii')
 
 ws = new_worksheet()
 

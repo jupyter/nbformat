@@ -1,16 +1,16 @@
 # -*- coding: utf-8 -*-
 
 import os
-from base64 import encodestring
 
+from ..._compat import encodebytes
 from ..nbbase import (
     new_code_cell, new_markdown_cell, new_notebook,
     new_output, new_raw_cell
 )
 
 # some random base64-encoded *text*
-png = encodestring(os.urandom(5)).decode('ascii')
-jpeg = encodestring(os.urandom(6)).decode('ascii')
+png = encodebytes(os.urandom(5)).decode('ascii')
+jpeg = encodebytes(os.urandom(6)).decode('ascii')
 
 cells = []
 cells.append(new_markdown_cell(

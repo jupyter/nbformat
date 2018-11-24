@@ -16,11 +16,11 @@ Authors:
 # Imports
 #-----------------------------------------------------------------------------
 
-from base64 import encodestring, decodestring
 import warnings
 from xml.etree import ElementTree as ET
 
 from ipython_genutils.py3compat import unicode_type
+from .._compat import encodebytes, decodebytes
 from .rwbase import NotebookReader, NotebookWriter
 from .nbbase import (
     new_code_cell, new_text_cell, new_worksheet, new_notebook, new_output,
@@ -97,13 +97,13 @@ def _get_binary(e, tag):
     if sub_e is None:
         return None
     else:
-        return decodestring(sub_e.text)
+        return decodebytes(sub_e.text)
 
 
 def _set_binary(nbnode, attr, parent, tag):
     if attr in nbnode:
         e = ET.SubElement(parent, tag)
-        e.text = encodestring(nbnode[attr])
+        e.text = encodebytes(nbnode[attr])
 
 
 class XMLReader(NotebookReader):
