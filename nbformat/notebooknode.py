@@ -1,7 +1,10 @@
 """NotebookNode - adding attribute access to dicts"""
 
 from ipython_genutils.ipstruct import Struct
-from collections import Mapping
+try:
+    from collections.abc import Mapping
+except ImportError:
+    from collections import Mapping
 
 
 class NotebookNode(Struct):
