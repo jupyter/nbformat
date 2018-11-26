@@ -16,7 +16,6 @@ Authors:
 # Imports
 #-----------------------------------------------------------------------------
 
-from base64 import encodestring
 from .rwbase import NotebookReader, NotebookWriter
 from .nbbase import from_dict
 import json

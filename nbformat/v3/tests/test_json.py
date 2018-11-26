@@ -1,9 +1,9 @@
 import copy
 import json
-from base64 import decodestring
 from unittest import TestCase
 
 from ipython_genutils.py3compat import unicode_type
+from ..._compat import decodebytes
 from ..nbjson import reads, writes
 from ..nbbase import from_dict
 from .. import nbjson
@@ -77,7 +77,7 @@ class TestJSON(formattest.NBFormatTest, TestCase):
                     self.assertEqual(type(pngdata), unicode_type)
                     # test that it is valid b64 data
                     b64bytes = pngdata.encode('ascii')
-                    raw_bytes = decodestring(b64bytes)
+                    raw_bytes = decodebytes(b64bytes)
         assert found_png, "never found png output"
 
     def test_read_jpeg(self):
@@ -95,7 +95,7 @@ class TestJSON(formattest.NBFormatTest, TestCase):
                     self.assertEqual(type(jpegdata), unicode_type)
                     # test that it is valid b64 data
                     b64bytes = jpegdata.encode('ascii')
-                    raw_bytes = decodestring(b64bytes)
+                    raw_bytes = decodebytes(b64bytes)
         assert found_jpeg, "never found jpeg output"
 
 

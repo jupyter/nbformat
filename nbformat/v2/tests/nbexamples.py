@@ -1,6 +1,6 @@
 import os
-from base64 import encodestring
 
+from ..._compat import encodebytes
 from ..nbbase import (
     NotebookNode,
     new_code_cell, new_text_cell, new_worksheet, new_notebook, new_output,
@@ -8,8 +8,8 @@ from ..nbbase import (
 )
 
 # some random base64-encoded *bytes*
-png = encodestring(os.urandom(5))
-jpeg = encodestring(os.urandom(6))
+png = encodebytes(os.urandom(5))
+jpeg = encodebytes(os.urandom(6))
 
 ws = new_worksheet(name='worksheet1')
 

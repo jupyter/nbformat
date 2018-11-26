@@ -16,10 +16,10 @@ Authors:
 # Imports
 #-----------------------------------------------------------------------------
 
-from base64 import encodestring, decodestring
 import pprint
 
 from ipython_genutils.py3compat import str_to_bytes, unicode_type, string_types
+from .._compat import encodebytes, decodebytes
 
 #-----------------------------------------------------------------------------
 # Code
@@ -112,11 +112,11 @@ def base64_decode(nb):
                     if 'png' in output:
                         if isinstance(output.png, unicode_type):
                             output.png = output.png.encode('ascii')
-                        output.png = decodestring(output.png)
+                        output.png = decodebytes(output.png)
                     if 'jpeg' in output:
                         if isinstance(output.jpeg, unicode_type):
                             output.jpeg = output.jpeg.encode('ascii')
-                        output.jpeg = decodestring(output.jpeg)
+                        output.jpeg = decodebytes(output.jpeg)
     return nb
 
 
@@ -132,9 +132,9 @@ def base64_encode(nb):
             if cell.cell_type == 'code':
                 for output in cell.outputs:
                     if 'png' in output:
-                        output.png = encodestring(output.png).decode('ascii')
+                        output.png = encodebytes(output.png).decode('ascii')
                     if 'jpeg' in output:
-                        output.jpeg = encodestring(output.jpeg).decode('ascii')
+                        output.jpeg = encodebytes(output.jpeg).decode('ascii')
     return nb
 
 

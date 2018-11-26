@@ -3,7 +3,6 @@
 # Copyright (c) IPython Development Team.
 # Distributed under the terms of the Modified BSD License.
 
-import base64
 from collections import OrderedDict
 from contextlib import contextmanager
 from datetime import datetime
@@ -30,6 +29,7 @@ from traitlets.config import LoggingConfigurable, MultipleInstanceError
 from jupyter_core.application import JupyterApp, base_flags
 
 from . import read, reads, NO_CONVERT, __version__
+from ._compat import encodebytes
 
 try:
     # Python 3
@@ -383,7 +383,7 @@ class NotebookNotary(LoggingConfigurable):
             with io.open(self.secret_file, 'rb') as f:
                 return f.read()
         else:
-            secret = base64.encodestring(os.urandom(1024))
+            secret = encodebytes(os.urandom(1024))
             self._write_secret_file(secret)
             return secret
 
