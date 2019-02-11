@@ -28,6 +28,7 @@ from .nbjson import reads as reads_json, writes as writes_json
 from .nbjson import reads as read_json, writes as write_json
 from .nbjson import to_notebook as to_notebook_json
 
+# Implementation removed, vulnerable to DoS attacks
 from .nbxml import reads as reads_xml
 from .nbxml import reads as read_xml
 from .nbxml import to_notebook as to_notebook_xml
