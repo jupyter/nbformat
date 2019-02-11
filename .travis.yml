@@ -9,6 +9,7 @@ python:
 sudo: false
 env:
 install:
+    - pip install --upgrade pytest
     - pip install . codecov
     - pip install nbformat[test]
 script:
