@@ -69,7 +69,7 @@
                     "type": "string"
                 },
                 "tags": {
-                    "description": "The cell's tags. Tags must be unique, and must not contain commas.",
+                    "description": "Tags to classify a notebooks topics. Tags must be unique, and must not contain commas.",
                     "type": "array",
                     "uniqueItems": true,
                     "items": {
