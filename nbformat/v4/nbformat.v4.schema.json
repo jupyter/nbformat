@@ -64,6 +64,19 @@
                     "description": "The title of the notebook document",
                     "type": "string"
                 },
+                "description": {
+                    "description": "A summary of the notebook",
+                    "type": "string"
+                },
+                "tags": {
+                    "description": "The cell's tags. Tags must be unique, and must not contain commas.",
+                    "type": "array",
+                    "uniqueItems": true,
+                    "items": {
+                        "type": "string",
+                        "pattern": "^[^,]+$"
+                    }
+                },
                 "authors": {
                     "description": "The author(s) of the notebook document",
                     "type": "array",
