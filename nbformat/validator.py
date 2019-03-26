@@ -66,7 +66,7 @@ def get_validator(version=None, version_minor=None, relax_add_props=False):
 
     if version_tuple not in validators:
         try:
-            schema_json = _get_schema_json(v)
+            schema_json = _get_schema_json(v, version=version, version_minor=version_minor)
         except AttributeError:
             return None
 
@@ -80,7 +80,7 @@ def get_validator(version=None, version_minor=None, relax_add_props=False):
 
     if relax_add_props:
         try:
-            schema_json = _get_schema_json(v)
+            schema_json = _get_schema_json(v, version=version, version_minor=version_minor)
         except AttributeError:
             return None
 
@@ -92,11 +92,17 @@ def get_validator(version=None, version_minor=None, relax_add_props=False):
     return validators[version_tuple]
 
 
-def _get_schema_json(v):
+def _get_schema_json(v, version=None, version_minor=None):
     """
-    Gets the json schema from a given imported library a nbformat version.
+    Gets the json schema from a given imported library and nbformat version.
     """
-    schema_path = os.path.join(os.path.dirname(v.__file__), v.nbformat_schema)
+    if (version, version_minor) in v.nbformat_schema:
+        schema_path = os.path.join(os.path.dirname(v.__file__), v.nbformat_schema[(version, version_minor)])
+    elif version_minor > v.nbformat_minor:
+        # load the latest schema
+        schema_path = os.path.join(os.path.dirname(v.__file__), v.nbformat_schema[(None, None)])
+    else:
+        raise AttributeError('Cannot find appropriate nbformat schema file.')
     with open(schema_path) as f:
         schema_json = json.load(f)
     return schema_json
@@ -238,7 +244,7 @@ def better_validation_error(error, version, version_minor):
 def validate(nbdict=None, ref=None, version=None, version_minor=None,
              relax_add_props=False, nbjson=None):
     """Checks whether the given notebook dict-like object
-    conforms to the current notebook format schema.
+    conforms to the relevant notebook format schema.
 
 
     Raises ValidationError if not valid.
@@ -252,8 +258,18 @@ def validate(nbdict=None, ref=None, version=None, version_minor=None,
     else:
         raise TypeError("validate() missing 1 required argument: 'nbdict'")
 
-    if version is None:
-        version, version_minor = get_version(nbdict)
+
+    if ref is None:
+        # if ref is not specified, we have a whole notebook, so we can get the version
+        nbdict_version, nbdict_version_minor = get_version(nbdict)
+        if version is None:
+            version = nbdict_version
+        if version_minor is None:
+            version_minor = nbdict_version_minor
+    else:
+        # if ref is specified, and we don't have a version number, assume we're validating against 1.0
+        if version is None:
+            version, version_minor = 1, 0
 
     for error in iter_validate(nbdict, ref=ref, version=version,
                                version_minor=version_minor,
@@ -264,7 +280,7 @@ def validate(nbdict=None, ref=None, version=None, version_minor=None,
 def iter_validate(nbdict=None, ref=None, version=None, version_minor=None,
                   relax_add_props=False, nbjson=None):
     """Checks whether the given notebook dict-like object conforms to the
-    current notebook format schema.
+    relevant notebook format schema.
 
     Returns a generator of all ValidationErrors if not valid.
     """

@@ -22,7 +22,9 @@ from ipython_genutils.py3compat import cast_unicode, unicode_type
 # Change this when incrementing the nbformat version
 nbformat = 3
 nbformat_minor = 0
-nbformat_schema = 'nbformat.v3.schema.json'
+nbformat_schema = {
+    (3, 0): 'nbformat.v3.schema.json'
+}
 
 class NotebookNode(Struct):
     pass
