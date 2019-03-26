@@ -364,7 +364,7 @@
 
         "misc": {
             "metadata_name": {
-                "description": "The cell's name. If present, must be a non-empty string. Cell names are expected to be unique across all the cells in a given notebook. This criterion cannot be checked by the json schema and must be established by an additional check.",
+                "description": "The cell's name. If present, must be a non-empty string. Must be unique across all the cells of a given notebook.",
                 "type": "string",
                 "pattern": "^.+$"
             },

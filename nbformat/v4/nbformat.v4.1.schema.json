@@ -1,6 +1,6 @@
 {
     "$schema": "http://json-schema.org/draft-04/schema#",
-    "description": "Jupyter Notebook v4.4 JSON schema.",
+    "description": "IPython Notebook v4.1 JSON schema.",
     "type": "object",
     "additionalProperties": false,
     "required": ["metadata", "nbformat_minor", "nbformat", "cells"],
@@ -59,30 +59,13 @@
                     "description": "Original notebook format (major number) before converting the notebook between versions. This should never be written to a file.",
                     "type": "integer",
                     "minimum": 1
-                },
-                "title": {
-                    "description": "The title of the notebook document",
-                    "type": "string"
-                },
-                "authors": {
-                    "description": "The author(s) of the notebook document",
-                    "type": "array",
-                    "item": {
-                      "type": "object",
-                      "properties": {
-                        "name": {
-                          "type": "string"
-                        }
-                      },
-                      "additionalProperties": true
-                    }
                 }
             }
         },
         "nbformat_minor": {
             "description": "Notebook format (minor number). Incremented for backward compatible changes to the notebook format.",
             "type": "integer",
-            "minimum": 4
+            "minimum": 1
         },
         "nbformat": {
             "description": "Notebook format (major number). Incremented between backwards incompatible changes to the notebook format.",
@@ -126,15 +109,6 @@
                             "description": "Raw cell metadata format for nbconvert.",
                             "type": "string"
                         },
-                        "jupyter": {
-                          "description": "Official Jupyter Metadata for Raw Cells",
-                          "type": "object",
-                          "additionalProperties": true,
-                            "source_hidden": {
-                                "description": "Whether the source is hidden.",
-                                "type": "boolean"
-                            }
-                        },
                         "name": {"$ref": "#/definitions/misc/metadata_name"},
                         "tags": {"$ref": "#/definitions/misc/metadata_tags"}
                     }
@@ -159,16 +133,7 @@
                     "type": "object",
                     "properties": {
                         "name": {"$ref": "#/definitions/misc/metadata_name"},
-                        "tags": {"$ref": "#/definitions/misc/metadata_tags"},
-                        "jupyter": {
-                          "description": "Official Jupyter Metadata for Markdown Cells",
-                          "type": "object",
-                          "additionalProperties": true,
-                            "source_hidden": {
-                                "description": "Whether the source is hidden.",
-                                "type": "boolean"
-                            }
-                        }
+                        "tags": {"$ref": "#/definitions/misc/metadata_tags"}
                     },
                     "additionalProperties": true
                 },
@@ -192,19 +157,6 @@
                     "type": "object",
                     "additionalProperties": true,
                     "properties": {
-                        "jupyter": {
-                          "description": "Official Jupyter Metadata for Code Cells",
-                          "type": "object",
-                          "additionalProperties": true,
-                            "source_hidden": {
-                                "description": "Whether the source is hidden.",
-                                "type": "boolean"
-                            },
-                            "outputs_hidden": {
-                                "description": "Whether the outputs are hidden.",
-                                "type": "boolean"
-                            }
-                        },
                         "collapsed": {
                             "description": "Whether the cell is collapsed/expanded.",
                             "type": "boolean"
@@ -230,7 +182,7 @@
                 }
             }
         },
-
+        
         "unrecognized_cell": {
             "description": "Unrecognized cell from a future minor-revision to the notebook format.",
             "type": "object",
@@ -254,7 +206,7 @@
                 }
             }
         },
-
+        
         "output": {
             "type": "object",
             "oneOf": [
@@ -364,7 +316,7 @@
 
         "misc": {
             "metadata_name": {
-                "description": "The cell's name. If present, must be a non-empty string. Cell names are expected to be unique across all the cells in a given notebook. This criterion cannot be checked by the json schema and must be established by an additional check.",
+                "description": "The cell's name. If present, must be a non-empty string.",
                 "type": "string",
                 "pattern": "^.+$"
             },
@@ -399,13 +351,16 @@
             "mimebundle": {
                 "description": "A mime-type keyed dictionary of data",
                 "type": "object",
-                "additionalProperties": {
-                  "description": "mimetype output (e.g. text/plain), represented as either an array of strings or a string.",
-                  "$ref": "#/definitions/misc/multiline_string"
+                "additionalProperties": false,
+                "properties": {
+                    "application/json": {
+                        "type": "object"
+                    }
                 },
                 "patternProperties": {
-                    "^application/(.*\\+)?json$": {
-                        "description": "Mimetypes with JSON output, can be any type"
+                    "^(?!application/json$)[a-zA-Z0-9]+/[a-zA-Z0-9\\-\\+\\.]+$": {
+                        "description": "mimetype output (e.g. text/plain), represented as either an array of strings or a string.",
+                        "$ref": "#/definitions/misc/multiline_string"
                     }
                 }
             },
