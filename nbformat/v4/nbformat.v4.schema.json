@@ -206,7 +206,7 @@
                             }
                         },
                         "collapsed": {
-                            "description": "Whether the cell is collapsed/expanded.",
+                            "description": "Whether the cell's output is collapsed/expanded.",
                             "type": "boolean"
                         },
                         "scrolled": {
