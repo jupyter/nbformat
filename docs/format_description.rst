@@ -389,6 +389,7 @@ Key         Value           Interpretation
 collapsed   bool            Whether the cell's output container should be collapsed
 scrolled    bool or 'auto'  Whether the cell's output is scrolled, unscrolled, or autoscrolled
 deletable   bool            If False, prevent deletion of the cell
+editable    bool            If False, prevent editing of the cell (by definition, this also prevents deleting the cell)
 format      'mime/type'     The mime-type of a :ref:`Raw NBConvert Cell <raw nbconvert cells>`
 name        str             A name for the cell. Should be unique across the notebook. Uniqueness must be verified outside of the json schema. 
 tags        list of str     A list of string tags on the cell. Commas are not allowed in a tag
