@@ -205,6 +205,16 @@
                                 "type": "boolean"
                             }
                         },
+                        "timing": {
+                            "description": "Execution time for the code in the cell. This tracks time at which messages are recieved from iopub or shell channels",
+                            "type": "object",
+                            "additionalProperties": true,
+                            "patternProperties": {
+                                "^.*$": {
+                                    "type": "string"
+                                }
+                            }
+                        },
                         "collapsed": {
                             "description": "Whether the cell's output is collapsed/expanded.",
                             "type": "boolean"
