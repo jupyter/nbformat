@@ -1,16 +1,18 @@
 language: python
+dist: xenial
 python:
     - nightly
+    - 3.7
     - 3.6
     - 3.5
     - 3.4
     - 2.7
-sudo: false
-env:
 install:
+    - pip install --upgrade setuptools pip
     - pip install --upgrade pytest
     - pip install . codecov
     - pip install nbformat[test]
+    - pip freeze
 script:
     - py.test -v --cov nbformat nbformat
 after_success:
