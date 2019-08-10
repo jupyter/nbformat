@@ -77,9 +77,9 @@ class TestValidator(TestsBase):
         with self.fopen(u'test4plus.ipynb', u'r') as f:
             nb = read(f, as_version=4)
         with self.assertRaises(ValidationError):
-            validate(nb, version=4, version_minor=4)
+            validate(nb, version=4, version_minor=3)
 
-        self.assertEqual(isvalid(nb, version=4, version_minor=4), False)
+        self.assertEqual(isvalid(nb, version=4, version_minor=3), False)
         self.assertEqual(isvalid(nb), True)
 
     def test_validation_error(self):
