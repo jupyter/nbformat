@@ -126,6 +126,15 @@
                             "description": "Raw cell metadata format for nbconvert.",
                             "type": "string"
                         },
+                        "jupyter": {
+                          "description": "Official Jupyter Metadata for Raw Cells",
+                          "type": "object",
+                          "additionalProperties": true,
+                            "source_hidden": {
+                                "description": "Whether the source is hidden.",
+                                "type": "boolean"
+                            }
+                        },
                         "name": {"$ref": "#/definitions/misc/metadata_name"},
                         "tags": {"$ref": "#/definitions/misc/metadata_tags"}
                     }
@@ -150,7 +159,16 @@
                     "type": "object",
                     "properties": {
                         "name": {"$ref": "#/definitions/misc/metadata_name"},
-                        "tags": {"$ref": "#/definitions/misc/metadata_tags"}
+                        "tags": {"$ref": "#/definitions/misc/metadata_tags"},
+                        "jupyter": {
+                          "description": "Official Jupyter Metadata for Markdown Cells",
+                          "type": "object",
+                          "additionalProperties": true,
+                            "source_hidden": {
+                                "description": "Whether the source is hidden.",
+                                "type": "boolean"
+                            }
+                        }
                     },
                     "additionalProperties": true
                 },
@@ -174,6 +192,19 @@
                     "type": "object",
                     "additionalProperties": true,
                     "properties": {
+                        "jupyter": {
+                          "description": "Official Jupyter Metadata for Code Cells",
+                          "type": "object",
+                          "additionalProperties": true,
+                            "source_hidden": {
+                                "description": "Whether the source is hidden.",
+                                "type": "boolean"
+                            },
+                            "outputs_hidden": {
+                                "description": "Whether the outputs are hidden.",
+                                "type": "boolean"
+                            }
+                        },
                         "collapsed": {
                             "description": "Whether the cell is collapsed/expanded.",
                             "type": "boolean"

@@ -1,6 +1,6 @@
 {
     "$schema": "http://json-schema.org/draft-04/schema#",
-    "description": "Jupyter Notebook v4.4 JSON schema.",
+    "description": "Jupyter Notebook v4.3 JSON schema.",
     "type": "object",
     "additionalProperties": false,
     "required": ["metadata", "nbformat_minor", "nbformat", "cells"],
@@ -82,7 +82,7 @@
         "nbformat_minor": {
             "description": "Notebook format (minor number). Incremented for backward compatible changes to the notebook format.",
             "type": "integer",
-            "minimum": 4
+            "minimum": 3
         },
         "nbformat": {
             "description": "Notebook format (major number). Incremented between backwards incompatible changes to the notebook format.",
