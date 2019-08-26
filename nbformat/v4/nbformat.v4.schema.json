@@ -205,7 +205,7 @@
                                 "type": "boolean"
                             }
                         },
-                        "timing": {
+                        "execution": {
                             "description": "Execution time for the code in the cell. This tracks time at which messages are recieved from iopub or shell channels",
                             "type": "object",
                             "properties": {
