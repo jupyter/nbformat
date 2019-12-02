@@ -8,7 +8,7 @@ The official Jupyter Notebook format is defined with
 `this JSON schema <https://github.com/jupyter/nbformat/blob/master/nbformat/v4/nbformat.v4.schema.json>`_,
 which is used by Jupyter tools to validate notebooks.
 
-This page contains some general points about the notebook format.
+This page contains a human-readable description of the notebook format.
 
 .. note::
 
