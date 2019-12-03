@@ -4,7 +4,11 @@
 The Notebook file format
 ========================
 
-Some general points about the notebook format:
+The official Jupyter Notebook format is defined with
+`this JSON schema <https://github.com/jupyter/nbformat/blob/master/nbformat/v4/nbformat.v4.schema.json>`_,
+which is used by Jupyter tools to validate notebooks.
+
+This page contains a human-readable description of the notebook format.
 
 .. note::
 
@@ -391,7 +395,7 @@ scrolled    bool or 'auto'  Whether the cell's output is scrolled, unscrolled, o
 deletable   bool            If False, prevent deletion of the cell
 editable    bool            If False, prevent editing of the cell (by definition, this also prevents deleting the cell)
 format      'mime/type'     The mime-type of a :ref:`Raw NBConvert Cell <raw nbconvert cells>`
-name        str             A name for the cell. Should be unique across the notebook. Uniqueness must be verified outside of the json schema. 
+name        str             A name for the cell. Should be unique across the notebook. Uniqueness must be verified outside of the json schema.
 tags        list of str     A list of string tags on the cell. Commas are not allowed in a tag
 =========== =============== ==============
 
