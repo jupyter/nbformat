@@ -1,11 +1,26 @@
 language: python
 python:
-    - nightly
     - 3.6
     - 3.5
     - 3.4
     - 2.7
+os: linux
+arch:
+    - amd64
+    - arm64
 sudo: false
+matrix:
+  include:
+    - os: linux
+      arch: arm64
+      dist: bionic
+      python: nightly
+    - os: linux
+      arch: amd64
+      dist: bionic
+      python: nightly
+  allow_failures:
+    - python: "nightly"
 env:
 install:
     - pip install --upgrade pytest
@@ -15,7 +30,3 @@ script:
     - py.test -v --cov nbformat nbformat
 after_success:
     - codecov
-matrix:
-  allow_failures:
-    - python: "nightly"
-
