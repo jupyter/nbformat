@@ -1,5 +1,8 @@
 language: python
+dist: xenial
 python:
+    - 3.8
+    - 3.7
     - 3.6
     - 3.5
     - 3.4
@@ -23,9 +26,11 @@ matrix:
     - python: "nightly"
 env:
 install:
+    - pip install --upgrade setuptools pip
     - pip install --upgrade pytest
     - pip install . codecov
     - pip install nbformat[test]
+    - pip freeze
 script:
     - py.test -v --cov nbformat nbformat
 after_success:
