@@ -11,10 +11,24 @@ helpers to build the structs in the right form.
 
 from ..notebooknode import NotebookNode
 
-# Change this when incrementing the nbformat version
+# Change the nbformat_minor and nbformat_schema variables when incrementing the
+# nbformat version
+
+# current major version
 nbformat = 4
-nbformat_minor = 2
-nbformat_schema = 'nbformat.v4.schema.json'
+
+# current minor version
+nbformat_minor = 3
+
+# schema files for (major, minor) version tuples. (None, None) means the current version
+nbformat_schema = {
+    (None, None): 'nbformat.v4.schema.json',
+    (4, 0): 'nbformat.v4.0.schema.json',
+    (4, 1): 'nbformat.v4.1.schema.json',
+    (4, 2): 'nbformat.v4.2.schema.json',
+    (4, 3): 'nbformat.v4.3.schema.json'
+}
+
 
 
 def validate(node, ref=None):
