@@ -55,6 +55,13 @@ class TestValidator(TestsBase):
         validate(nb)
         self.assertEqual(isvalid(nb), True)
 
+    def test_nb4jupyter_metadata_timings(self):
+        """Tests that a notebook with "timing" in metadata passes validation"""
+        with self.fopen(u'test4jupyter_metadata_timings.ipynb', u'r') as f:
+            nb = read(f, as_version=4)
+        validate(nb)
+        self.assertTrue(isvalid(nb))
+
     def test_invalid(self):
         """Test than an invalid notebook does not pass validation"""
         # this notebook has a few different errors:
