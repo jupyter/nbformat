@@ -12,6 +12,7 @@ Contents:
    :maxdepth: 2
 
    format_description
+   markup
    api
    changelog
 
