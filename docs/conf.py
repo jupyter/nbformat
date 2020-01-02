@@ -146,7 +146,7 @@ todo_include_todos = False
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+# html_static_path = ['_static']
 
 # Add any extra paths that contain custom files (such as robots.txt or
 # .htaccess) here, relative to this directory. These files are copied
@@ -296,7 +296,7 @@ texinfo_documents = [
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3', None),
-    'jupyterclient': ('https://jupyter_client.readthedocs.org/en/stable', None),
+    'jupyterclient': ('https://jupyter-client.readthedocs.io/en/stable', None),
     'nbconvert': ('https://nbconvert.readthedocs.org/en/stable', None),
     'notebook': ('https://jupyter-notebook.readthedocs.org/en/stable', None),
 }
