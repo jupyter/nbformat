@@ -6,7 +6,6 @@ Use this module to read or write notebook files as particular nbformat versions.
 # Copyright (c) IPython Development Team.
 # Distributed under the terms of the Modified BSD License.
 import io
-from ipython_genutils import py3compat
 
 from traitlets.log import get_logger
 from ._version import version_info, __version__
@@ -51,7 +50,7 @@ NO_CONVERT = Sentinel('NO_CONVERT', __name__,
 
 def reads(s, as_version, **kwargs):
     """Read a notebook from a string and return the NotebookNode object as the given version.
-    
+
     The string can contain a notebook of any version.
     The notebook will be returned `as_version`, converting, if necessary.
 
@@ -134,7 +133,7 @@ def read(fp, as_version, **kwargs):
     nb : NotebookNode
         The notebook that was read.
     """
-    if isinstance(fp, (py3compat.unicode_type, bytes)):
+    if isinstance(fp, (str, bytes)):
         with io.open(fp, encoding='utf-8') as f:
             return read(f, as_version, **kwargs)
 
@@ -143,9 +142,9 @@ def read(fp, as_version, **kwargs):
 
 def write(nb, fp, version=NO_CONVERT, **kwargs):
     """Write a notebook to a file in a given nbformat version.
-    
+
     The file-like object must accept unicode input.
-    
+
     Parameters
     ----------
     nb : NotebookNode
@@ -159,7 +158,7 @@ def write(nb, fp, version=NO_CONVERT, **kwargs):
         If unspecified, or specified as nbformat.NO_CONVERT,
         the notebook's own version will be used and no conversion performed.
     """
-    if isinstance(fp, (py3compat.unicode_type, bytes)):
+    if isinstance(fp, (str, bytes)):
         with io.open(fp, 'w', encoding='utf-8') as f:
             return write(nb, f, version=version, **kwargs)
 

@@ -1,7 +1,6 @@
 import json
 from unittest import TestCase
 
-from ipython_genutils.py3compat import unicode_type
 from ..._compat import decodebytes
 from ..nbjson import reads, writes
 from .. import nbjson
@@ -28,7 +27,7 @@ class TestJSON(formattest.NBFormatTest, TestCase):
         # This won't differ from test_roundtrip unless the default changes
         s = writes(nb0, split_lines=True)
         self.assertEqual(nbjson.reads(s),nb0)
-    
+
     def test_splitlines(self):
         """Test splitlines in mime-bundles"""
         s = writes(nb0, split_lines=True)
@@ -73,7 +72,7 @@ class TestJSON(formattest.NBFormatTest, TestCase):
                 if 'image/png' in output.data:
                     found_png = True
                     pngdata = output.data['image/png']
-                    self.assertEqual(type(pngdata), unicode_type)
+                    self.assertEqual(type(pngdata), str)
                     # test that it is valid b64 data
                     b64bytes = pngdata.encode('ascii')
                     raw_bytes = decodebytes(b64bytes)
@@ -93,7 +92,7 @@ class TestJSON(formattest.NBFormatTest, TestCase):
                 if 'image/jpeg' in output.data:
                     found_jpeg = True
                     jpegdata = output.data['image/jpeg']
-                    self.assertEqual(type(jpegdata), unicode_type)
+                    self.assertEqual(type(jpegdata), str)
                     # test that it is valid b64 data
                     b64bytes = jpegdata.encode('ascii')
                     raw_bytes = decodebytes(b64bytes)
