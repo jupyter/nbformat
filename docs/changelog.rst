@@ -11,7 +11,7 @@ Changes in nbformat
 
 - ``nbformat`` is now Python 3 only (>= 3.5)
 - Add execution timings in code cell metadata for v4 spec.
-  ``"metadata": { "execution": {...}}`` should be populated with kernel specific
+  ``"metadata": { "execution": {...}}`` should be populated with kernel-specific
   timing information.
 - Documentation for how markup is used in notebooks added
 - Link to json schema docs from format page added
@@ -21,8 +21,8 @@ Changes in nbformat
 - Clarified info about :ref:`name`'s meaning for cells
 - Added a default execution_count of None for new_output_cell('execute_result')
 - Added support for handling nbjson kwargs
-- Wheels now correctly have a LICENCE file
-- Tavis builds now have a few more execution environments
+- Wheels now correctly have a LICENSE file
+- Travis builds now have a few more execution environments
 
 4.4
 ===
