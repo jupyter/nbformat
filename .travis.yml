@@ -6,6 +6,10 @@ python:
     - 3.7
     - 3.6
     - 3.5
+os: linux
+arch:
+    - amd64
+    - arm64
 sudo: false
 matrix:
   include:
