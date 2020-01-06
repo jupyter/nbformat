@@ -9,7 +9,7 @@ Changes in nbformat
 
 `5.0 on GitHub https://github.com/jupyter/nbformat/milestone/5`__
 
-- ``nbformat`` is now Python 3 only (>= 3.5)
+- Starting with 5.0, ``nbformat`` is now Python 3 only (>= 3.5)
 - Add execution timings in code cell metadata for v4 spec.
   ``"metadata": { "execution": {...}}`` should be populated with kernel-specific
   timing information.
