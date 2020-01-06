@@ -29,6 +29,14 @@ pip install dist/*
 twine upload dist/*
 ```
 
+## Push to npm
+
+```bash
+npm publish
+```
+
+Note for JavaScript developers -- `bumpversion` updates the version in `package.json`.
+
 ## Prep repo for development
 
 - `bumpversion patch # Resets the patch and dev versions`
