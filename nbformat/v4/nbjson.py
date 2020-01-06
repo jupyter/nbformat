@@ -6,8 +6,6 @@
 import copy
 import json
 
-from ipython_genutils import py3compat
-
 from ..notebooknode import from_dict
 from .rwbase import (
     NotebookReader, NotebookWriter, rejoin_lines, split_lines, strip_transient
@@ -32,7 +30,7 @@ class JSONReader(NotebookReader):
 
     def to_notebook(self, d, **kwargs):
         """Convert a disk-format notebook dict to in-memory NotebookNode
-        
+
         handles multi-line values as strings, scrubbing of transient values, etc.
         """
         nb = from_dict(d)
@@ -55,7 +53,7 @@ class JSONWriter(NotebookWriter):
         if kwargs.pop('split_lines', True):
             nb = split_lines(nb)
         nb = strip_transient(nb)
-        return py3compat.cast_unicode_py2(json.dumps(nb, **kwargs), 'utf-8')
+        return json.dumps(nb, **kwargs)
 
 
 _reader = JSONReader()

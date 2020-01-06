@@ -1,7 +1,6 @@
 import os
 from unittest import TestCase
 
-from ipython_genutils.py3compat import unicode_type
 from .. import parse_filename
 
 

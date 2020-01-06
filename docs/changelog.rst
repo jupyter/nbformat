@@ -4,6 +4,26 @@
 Changes in nbformat
 =========================
 
+5.0
+===
+
+`5.0 on GitHub https://github.com/jupyter/nbformat/milestone/5`__
+
+- ``nbformat`` is now Python 3 only (>= 3.5)
+- Add execution timings in code cell metadata for v4 spec.
+  ``"metadata": { "execution": {...}}`` should be populated with kernel-specific
+  timing information.
+- Documentation for how markup is used in notebooks added
+- Link to json schema docs from format page added
+- Documented the editable metadata flag
+- Update description for collapsed field
+- Documented nbformat versions 4.0-4.3 with accurate json schema specification files
+- Clarified info about :ref:`name`'s meaning for cells
+- Added a default execution_count of None for new_output_cell('execute_result')
+- Added support for handling nbjson kwargs
+- Wheels now correctly have a LICENSE file
+- Travis builds now have a few more execution environments
+
 4.4
 ===
 
@@ -14,9 +34,9 @@ Changes in nbformat
 - Introduce ``source_hidden`` and ``outputs_hidden`` as official front-end
   metadata fields to indicate hiding source and outputs areas. **NB**: These
   fields should not be used to hide elements in exported formats.
-- Fix ending the redundant storage of signatures in the signature database. 
+- Fix ending the redundant storage of signatures in the signature database.
 - :func:`nbformat.validate` can be set to not raise a ValidationError if
-  additional properties are included. 
+  additional properties are included.
 - Fix for errors with connecting and backing up the signature database.
 - Dict-like objects added to NotebookNode attributes are now transformed to be
   NotebookNode objects; transformation also works for `.update()`.

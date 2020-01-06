@@ -25,7 +25,6 @@ import pprint
 import uuid
 
 from ipython_genutils.ipstruct import Struct
-from ipython_genutils.py3compat import unicode_type
 
 #-----------------------------------------------------------------------------
 # Code
@@ -54,25 +53,25 @@ def new_output(output_type=None, output_text=None, output_png=None,
     """Create a new code cell with input and output"""
     output = NotebookNode()
     if output_type is not None:
-        output.output_type = unicode_type(output_type)
+        output.output_type = str(output_type)
 
     if output_type != 'pyerr':
         if output_text is not None:
-            output.text = unicode_type(output_text)
+            output.text = str(output_text)
         if output_png is not None:
             output.png = bytes(output_png)
         if output_jpeg is not None:
             output.jpeg = bytes(output_jpeg)
         if output_html is not None:
-            output.html = unicode_type(output_html)
+            output.html = str(output_html)
         if output_svg is not None:
-            output.svg = unicode_type(output_svg)
+            output.svg = str(output_svg)
         if output_latex is not None:
-            output.latex = unicode_type(output_latex)
+            output.latex = str(output_latex)
         if output_json is not None:
-            output.json = unicode_type(output_json)
+            output.json = str(output_json)
         if output_javascript is not None:
-            output.javascript = unicode_type(output_javascript)
+            output.javascript = str(output_javascript)
 
     if output_type == u'pyout':
         if prompt_number is not None:
@@ -80,11 +79,11 @@ def new_output(output_type=None, output_text=None, output_png=None,
 
     if output_type == u'pyerr':
         if etype is not None:
-            output.etype = unicode_type(etype)
+            output.etype = str(etype)
         if evalue is not None:
-            output.evalue = unicode_type(evalue)
+            output.evalue = str(evalue)
         if traceback is not None:
-            output.traceback = [unicode_type(frame) for frame in list(traceback)]
+            output.traceback = [str(frame) for frame in list(traceback)]
 
     return output
 
@@ -95,9 +94,9 @@ def new_code_cell(input=None, prompt_number=None, outputs=None,
     cell = NotebookNode()
     cell.cell_type = u'code'
     if language is not None:
-        cell.language = unicode_type(language)
+        cell.language = str(language)
     if input is not None:
-        cell.input = unicode_type(input)
+        cell.input = str(input)
     if prompt_number is not None:
         cell.prompt_number = int(prompt_number)
     if outputs is None:
@@ -113,9 +112,9 @@ def new_text_cell(cell_type, source=None, rendered=None):
     """Create a new text cell."""
     cell = NotebookNode()
     if source is not None:
-        cell.source = unicode_type(source)
+        cell.source = str(source)
     if rendered is not None:
-        cell.rendered = unicode_type(rendered)
+        cell.rendered = str(rendered)
     cell.cell_type = cell_type
     return cell
 
@@ -124,7 +123,7 @@ def new_worksheet(name=None, cells=None):
     """Create a worksheet by name with with a list of cells."""
     ws = NotebookNode()
     if name is not None:
-        ws.name = unicode_type(name)
+        ws.name = str(name)
     if cells is None:
         ws.cells = []
     else:
@@ -152,29 +151,29 @@ def new_metadata(name=None, authors=None, license=None, created=None,
     """Create a new metadata node."""
     metadata = NotebookNode()
     if name is not None:
-        metadata.name = unicode_type(name)
+        metadata.name = str(name)
     if authors is not None:
         metadata.authors = list(authors)
     if created is not None:
-        metadata.created = unicode_type(created)
+        metadata.created = str(created)
     if modified is not None:
-        metadata.modified = unicode_type(modified)
+        metadata.modified = str(modified)
     if license is not None:
-        metadata.license = unicode_type(license)
+        metadata.license = str(license)
     if gistid is not None:
-        metadata.gistid = unicode_type(gistid)
+        metadata.gistid = str(gistid)
     return metadata
 
 def new_author(name=None, email=None, affiliation=None, url=None):
     """Create a new author."""
     author = NotebookNode()
     if name is not None:
-        author.name = unicode_type(name)
+        author.name = str(name)
     if email is not None:
-        author.email = unicode_type(email)
+        author.email = str(email)
     if affiliation is not None:
-        author.affiliation = unicode_type(affiliation)
+        author.affiliation = str(affiliation)
     if url is not None:
-        author.url = unicode_type(url)
+        author.url = str(url)
     return author
 

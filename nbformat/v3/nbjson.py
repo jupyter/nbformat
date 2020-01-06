@@ -12,8 +12,6 @@ from .rwbase import (
     strip_transient,
 )
 
-from ipython_genutils import py3compat
-
 
 class BytesEncoder(json.JSONEncoder):
     """A JSON encoder that accepts b64 (and other *ascii*) bytestrings."""
@@ -46,8 +44,8 @@ class JSONWriter(NotebookWriter):
         nb = strip_transient(nb)
         if kwargs.pop('split_lines', True):
             nb = split_lines(nb)
-        return py3compat.str_to_unicode(json.dumps(nb, **kwargs), 'utf-8')
-    
+        return json.dumps(nb, **kwargs)
+
 
 _reader = JSONReader()
 _writer = JSONWriter()

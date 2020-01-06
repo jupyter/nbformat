@@ -13,7 +13,7 @@ import pprint
 import uuid
 
 from ipython_genutils.ipstruct import Struct
-from ipython_genutils.py3compat import cast_unicode, unicode_type
+from ipython_genutils.py3compat import cast_unicode
 
 #-----------------------------------------------------------------------------
 # Code
@@ -49,7 +49,7 @@ def new_output(output_type, output_text=None, output_png=None,
     """Create a new output, to go in the ``cell.outputs`` list of a code cell.
     """
     output = NotebookNode()
-    output.output_type = unicode_type(output_type)
+    output.output_type = str(output_type)
 
     if metadata is None:
         metadata = {}
@@ -92,7 +92,7 @@ def new_output(output_type, output_text=None, output_png=None,
 
     if output_type == u'stream':
         output.stream = 'stdout' if stream is None else cast_unicode(stream)
-    
+
     return output
 
 

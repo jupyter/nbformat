@@ -20,7 +20,6 @@ import pprint
 import uuid
 
 from ipython_genutils.ipstruct import Struct
-from ipython_genutils.py3compat import unicode_type
 
 #-----------------------------------------------------------------------------
 # Code
@@ -47,7 +46,7 @@ def new_code_cell(code=None, prompt_number=None):
     cell = NotebookNode()
     cell.cell_type = u'code'
     if code is not None:
-        cell.code = unicode_type(code)
+        cell.code = str(code)
     if prompt_number is not None:
         cell.prompt_number = int(prompt_number)
     return cell
@@ -57,7 +56,7 @@ def new_text_cell(text=None):
     """Create a new text cell."""
     cell = NotebookNode()
     if text is not None:
-        cell.text = unicode_type(text)
+        cell.text = str(text)
     cell.cell_type = u'text'
     return cell
 

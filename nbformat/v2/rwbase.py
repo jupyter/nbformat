@@ -18,7 +18,7 @@ Authors:
 
 import pprint
 
-from ipython_genutils.py3compat import str_to_bytes, unicode_type, string_types
+from ipython_genutils.py3compat import str_to_bytes
 from .._compat import encodebytes, decodebytes
 
 #-----------------------------------------------------------------------------
@@ -27,7 +27,7 @@ from .._compat import encodebytes, decodebytes
 
 def restore_bytes(nb):
     """Restore bytes of image data from unicode-only formats.
-    
+
     Base64 encoding is handled elsewhere.  Bytes objects in the notebook are
     always b64-encoded. We DO NOT encode/decode around file formats.
     """
@@ -46,12 +46,12 @@ _multiline_outputs = ['text', 'html', 'svg', 'latex', 'javascript', 'json']
 
 def rejoin_lines(nb):
     """rejoin multiline text into strings
-    
+
     For reversing effects of ``split_lines(nb)``.
-    
+
     This only rejoins lines that have been split, so if text objects were not split
     they will pass through unchanged.
-    
+
     Used when reading JSON files that may have been passed through split_lines.
     """
     for ws in nb.worksheets:
@@ -74,26 +74,26 @@ def rejoin_lines(nb):
 
 def split_lines(nb):
     """split likely multiline text into lists of strings
-    
+
     For file output more friendly to line-based VCS. ``rejoin_lines(nb)`` will
     reverse the effects of ``split_lines(nb)``.
-    
+
     Used when writing JSON files.
     """
     for ws in nb.worksheets:
         for cell in ws.cells:
             if cell.cell_type == 'code':
-                if 'input' in cell and isinstance(cell.input, string_types):
+                if 'input' in cell and isinstance(cell.input, str):
                     cell.input = cell.input.splitlines()
                 for output in cell.outputs:
                     for key in _multiline_outputs:
                         item = output.get(key, None)
-                        if isinstance(item, string_types):
+                        if isinstance(item, str):
                             output[key] = item.splitlines()
             else: # text cell
                 for key in ['source', 'rendered']:
                     item = cell.get(key, None)
-                    if isinstance(item, string_types):
+                    if isinstance(item, str):
                         cell[key] = item.splitlines()
     return nb
 
@@ -102,7 +102,7 @@ def split_lines(nb):
 
 def base64_decode(nb):
     """Restore all bytes objects in the notebook from base64-encoded strings.
-    
+
     Note: This is never used
     """
     for ws in nb.worksheets:
@@ -110,11 +110,11 @@ def base64_decode(nb):
             if cell.cell_type == 'code':
                 for output in cell.outputs:
                     if 'png' in output:
-                        if isinstance(output.png, unicode_type):
+                        if isinstance(output.png, str):
                             output.png = output.png.encode('ascii')
                         output.png = decodebytes(output.png)
                     if 'jpeg' in output:
-                        if isinstance(output.jpeg, unicode_type):
+                        if isinstance(output.jpeg, str):
                             output.jpeg = output.jpeg.encode('ascii')
                         output.jpeg = decodebytes(output.jpeg)
     return nb
@@ -122,9 +122,9 @@ def base64_decode(nb):
 
 def base64_encode(nb):
     """Base64 encode all bytes objects in the notebook.
-    
+
     These will be b64-encoded unicode strings
-    
+
     Note: This is never used
     """
     for ws in nb.worksheets:

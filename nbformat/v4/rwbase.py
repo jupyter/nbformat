@@ -3,8 +3,6 @@
 # Copyright (c) IPython Development Team.
 # Distributed under the terms of the Modified BSD License.
 
-from ipython_genutils.py3compat import string_types, cast_unicode_py2
-
 def _is_json_mime(mime):
     """Is a key a JSON mime-type that should be left alone?"""
     return mime == 'application/json' or \
@@ -15,7 +13,7 @@ def _rejoin_mimebundle(data):
     for key, value in list(data.items()):
         if not _is_json_mime(key) \
         and isinstance(value, list) \
-        and all(isinstance(line, string_types) for line in value):
+        and all(isinstance(line, str) for line in value):
             data[key] = ''.join(value)
     return data
 
@@ -55,7 +53,7 @@ _non_text_split_mimes = {
 def _split_mimebundle(data):
     """Split multi-line string fields in a mimebundle (in-place)"""
     for key, value in list(data.items()):
-        if isinstance(value, string_types) and (
+        if isinstance(value, str) and (
             key.startswith('text/') or key in _non_text_split_mimes
         ):
             data[key] = value.splitlines(True)
@@ -71,7 +69,7 @@ def split_lines(nb):
     """
     for cell in nb.cells:
         source = cell.get('source', None)
-        if isinstance(source, string_types):
+        if isinstance(source, str):
             cell['source'] = source.splitlines(True)
 
         attachments = cell.get('attachments', {})
@@ -83,7 +81,7 @@ def split_lines(nb):
                 if output.output_type in {'execute_result', 'display_data'}:
                     _split_mimebundle(output.get('data', {}))
                 elif output.output_type == 'stream':
-                    if isinstance(output.text, string_types):
+                    if isinstance(output.text, str):
                         output.text = output.text.splitlines(True)
     return nb
 
@@ -110,7 +108,7 @@ class NotebookReader(object):
 
     def read(self, fp, **kwargs):
         """Read a notebook from a file like object"""
-        nbs = cast_unicode_py2(fp.read())
+        nbs = fp.read()
         return self.reads(nbs, **kwargs)
 
 
@@ -123,5 +121,5 @@ class NotebookWriter(object):
 
     def write(self, nb, fp, **kwargs):
         """Write a notebook to a file like object"""
-        nbs = cast_unicode_py2(self.writes(nb, **kwargs))
+        nbs = self.writes(nb, **kwargs)
         return fp.write(nbs)
