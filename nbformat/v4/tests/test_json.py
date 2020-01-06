@@ -1,9 +1,10 @@
+import os
 import json
 from unittest import TestCase
 
 from ..._compat import decodebytes
 from ..nbjson import reads, writes
-from .. import nbjson
+from .. import nbjson, nbformat, nbformat_minor
 from .nbexamples import nb0
 
 from . import formattest
@@ -97,3 +98,25 @@ class TestJSON(formattest.NBFormatTest, TestCase):
                     b64bytes = jpegdata.encode('ascii')
                     raw_bytes = decodebytes(b64bytes)
         assert found_jpeg, "never found jpeg output"
+
+    def test_latest_schema_matches(self):
+        """Test to ensure all schema is locked to a known version"""
+        assert nbformat == 4
+        assert nbformat_minor == 4
+
+    def test_base_version_matches_latest(self):
+        """Test to ensure latest version file matches latest verison"""
+        with open(os.path.join(os.path.dirname(__file__), '..', 'nbformat.v4.schema.json'), 'r') as schema_file:
+            latest_schema = json.load(schema_file)
+            with open(os.path.join(os.path.dirname(__file__), '..', 'nbformat.v{major}.{minor}.schema.json'.format(
+                    major=nbformat, minor=nbformat_minor)), 'r') as schema_file:
+                ver_schema = json.load(schema_file)
+            assert latest_schema == ver_schema
+
+    def test_latest_matches_nbformat(self):
+        """Test to ensure that the nbformat version matches the description of the latest schema"""
+        with open(os.path.join(os.path.dirname(__file__), '..', 'nbformat.v4.schema.json'), 'r') as schema_file:
+            schema = json.load(schema_file)
+        assert schema['description'] == 'Jupyter Notebook v{major}.{minor} JSON schema.'.format(
+            major=nbformat, minor=nbformat_minor
+        )

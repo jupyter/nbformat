@@ -18,7 +18,7 @@ from ..notebooknode import NotebookNode
 nbformat = 4
 
 # current minor version
-nbformat_minor = 3
+nbformat_minor = 4
 
 # schema files for (major, minor) version tuples. (None, None) means the current version
 nbformat_schema = {
@@ -26,7 +26,8 @@ nbformat_schema = {
     (4, 0): 'nbformat.v4.0.schema.json',
     (4, 1): 'nbformat.v4.1.schema.json',
     (4, 2): 'nbformat.v4.2.schema.json',
-    (4, 3): 'nbformat.v4.3.schema.json'
+    (4, 3): 'nbformat.v4.3.schema.json',
+    (4, 4): 'nbformat.v4.4.schema.json'
 }
 
 
