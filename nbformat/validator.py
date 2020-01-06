@@ -63,12 +63,10 @@ def get_validator(version=None, version_minor=None, relax_add_props=False):
         version_minor = current_minor
 
     version_tuple = (version, version_minor)
-    print(version_tuple, validators)
 
     if version_tuple not in validators:
         try:
             schema_json = _get_schema_json(v, version=version, version_minor=version_minor)
-            print(schema_json)
         except AttributeError:
             return None
 
