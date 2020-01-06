@@ -9,10 +9,10 @@
 Change from patch to minor or major for appropriate version updates.
 
 ```bash
-bumpversion suffix  # Remove the .dev
-git commit -am "Removed dev suffix"
 # Commit, test, publish, tag release
 bumpversion patch
+git commit -am "Prepared <release-id>"
+bumpversion suffix  # Remove the .dev
 git commit -am "Generated release <release-id>"
 git push && git push --tags
 ```
