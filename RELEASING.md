@@ -10,7 +10,7 @@ Change from patch to minor or major for appropriate version updates.
 
 ```bash
 # Commit, test, publish, tag release
-bumpversion patch
+bumpversion minor # CHECK FIRST: If the patch version currently set is not sufficient
 git commit -am "Prepared <release-id>"
 bumpversion suffix  # Remove the .dev
 git commit -am "Generated release <release-id>"
@@ -23,11 +23,12 @@ git push && git push --tags
 rm -rf dist/*
 rm -rf build/*
 python setup.py sdist bdist_wheel
-# Double check the dist/* files have the right verison and install the wheel to ensure it's good
+# Double check the dist/* files have the right verison (no `.dev`) and install the wheel to ensure it's good
 pip install dist/*
 twine upload dist/*
 ```
 
 ## Prep repo for development
 
-- Change package.json version to next version (e.g. `4.4` -> `4.5`)
+- `bumpversion patch # Resets the patch and dev versions`
+- `git commit -am "Resumed patch dev"; git push`
