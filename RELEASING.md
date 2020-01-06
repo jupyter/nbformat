@@ -14,6 +14,7 @@ bumpversion minor # CHECK FIRST: If the patch version currently set is not suffi
 git commit -am "Prepared <release-id>"
 bumpversion suffix  # Remove the .dev
 git commit -am "Generated release <release-id>"
+git tag <release_version_here>
 git push && git push --tags
 ```
 
