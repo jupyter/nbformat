@@ -42,8 +42,7 @@ for d, _, _ in os.walk(pjoin(here, name)):
 package_data = {
     'nbformat' : [
         'tests/*.ipynb',
-        'v3/nbformat.v3.schema.json',
-        'v4/nbformat.v4.schema.json',
+        '**/nbformat.**.schema.json',
     ],
 }
 
