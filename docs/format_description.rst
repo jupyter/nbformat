@@ -397,6 +397,8 @@ editable    bool            If False, prevent editing of the cell (by definition
 format      'mime/type'     The mime-type of a :ref:`Raw NBConvert Cell <raw nbconvert cells>`
 name        str             A name for the cell. Should be unique across the notebook. Uniqueness must be verified outside of the json schema.
 tags        list of str     A list of string tags on the cell. Commas are not allowed in a tag
+jupyter     dict            A namespace holding jupyter specific fields. See docs below for more details
+execution   dict            A namespace holding execution specific fields. See docs below for more details
 =========== =============== ==============
 
 The following metadata keys are defined at the cell level within the `jupyter` namespace
