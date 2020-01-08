@@ -397,6 +397,8 @@ editable    bool            If False, prevent editing of the cell (by definition
 format      'mime/type'     The mime-type of a :ref:`Raw NBConvert Cell <raw nbconvert cells>`
 name        str             A name for the cell. Should be unique across the notebook. Uniqueness must be verified outside of the json schema.
 tags        list of str     A list of string tags on the cell. Commas are not allowed in a tag
+jupyter     dict            A namespace holding jupyter specific fields. See docs below for more details
+execution   dict            A namespace holding execution specific fields. See docs below for more details
 =========== =============== ==============
 
 The following metadata keys are defined at the cell level within the `jupyter` namespace
@@ -407,6 +409,19 @@ Key             Value           Interpretation
 source_hidden   bool            Whether the cell's source should be shown
 outputs_hidden  bool            Whether the cell's outputs should be shown
 =============== =============== ==============
+
+The following metadata keys are defined at the cell level within the `execution` namespace.
+These are lower level fields capturing common kernel message timestamps for better visibility
+in applications where needed. Most users will not look at these directly.
+
+==================== ================ ==============
+Key                  Value            Interpretation
+==================== ================ ==============
+iopub.execute_input  ISO 8601 format  Indicates the time at which the kernel broadcast an execute_input message. This represents the time when request for work was received by the kernel.
+iopub.status.busy    ISO 8601 format  Indicates the time at which the iopub channel's kernel status message is 'busy'. This represents the time when work was started by the kernel.
+shell.execute_reply  ISO 8601 format  Indicates the time at which the shell channel's execute_reply status message was created. This represents the time when work was completed by the kernel.
+iopub.status.idle    ISO 8601 format  Indicates the time at which the iopub channel's kernel status message is 'idle'. This represents the time when the kernel is ready to accept new work.
+==================== ================ ==============
 
 Output metadata
 ---------------
