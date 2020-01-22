@@ -4,18 +4,23 @@
 Changes in nbformat
 =========================
 
+5.0.4
+=====
+
+- Fixed issue causing python 2 to pick up 5.0.x releases.
+
 5.0.3
-===
+=====
 
 - Removed debug print statements from project.
 
 5.0.2
-===
+=====
 
 - Added schema validation files for older versions. This was breaking notebook generation.
 
 5.0.1
-===
+=====
 
 5.0
 ===
