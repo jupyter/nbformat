@@ -15,12 +15,6 @@ name = 'nbformat'
 
 import sys
 
-v = sys.version_info
-if (v[0] >= 3 and v[:2] < (3,5)):
-    error = "ERROR: %s requires Python version 3.5 or above." % name
-    print(error, file=sys.stderr)
-    sys.exit(1)
-
 #-----------------------------------------------------------------------------
 # get on with it
 #-----------------------------------------------------------------------------
@@ -67,6 +61,7 @@ setup_args = dict(
     author_email    = 'jupyter@googlegroups.com',
     url             = 'http://jupyter.org',
     license         = 'BSD',
+    python_requires = '>=3.5',
     platforms       = "Linux, Mac OS X, Windows",
     keywords        = ['Interactive', 'Interpreter', 'Shell', 'Web'],
     classifiers     = [
