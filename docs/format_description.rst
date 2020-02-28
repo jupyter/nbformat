@@ -417,7 +417,7 @@ in applications where needed. Most users will not look at these directly.
 ==================== ================ ==============
 Key                  Value            Interpretation
 ==================== ================ ==============
-iopub.execute_input  ISO 8601 format  Indicates the time at which the kernel broadcast an execute_input message. This represents the time when request for work was received by the kernel.
+iopub.execute_input  ISO 8601 format  Indicates the time at which the kernel broadcasts an execute_input message. This represents the time when request for work was received by the kernel.
 iopub.status.busy    ISO 8601 format  Indicates the time at which the iopub channel's kernel status message is 'busy'. This represents the time when work was started by the kernel.
 shell.execute_reply  ISO 8601 format  Indicates the time at which the shell channel's execute_reply status message was created. This represents the time when work was completed by the kernel.
 iopub.status.idle    ISO 8601 format  Indicates the time at which the iopub channel's kernel status message is 'idle'. This represents the time when the kernel is ready to accept new work.

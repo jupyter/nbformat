@@ -206,11 +206,11 @@
                             }
                         },
                         "execution": {
-                            "description": "Execution time for the code in the cell. This tracks time at which messages are recieved from iopub or shell channels",
+                            "description": "Execution time for the code in the cell. This tracks time at which messages are received from iopub or shell channels",
                             "type": "object",
                             "properties": {
                                 "iopub.execute_input": {
-                                    "description": "header.date (in ISO 8601 format) of iopub channel's execute_input message. It indicates the time at which the kernel broadcast an execute_input message to connected frontends",
+                                    "description": "header.date (in ISO 8601 format) of iopub channel's execute_input message. It indicates the time at which the kernel broadcasts an execute_input message to connected frontends",
                                     "type": "string"
                                 },
                                 "iopub.status.busy": {
@@ -222,7 +222,7 @@
                                     "type": "string"
                                 },
                                 "iopub.status.idle": {
-                                    "description": "header.date (in ISO 8601 format) of iopub channel's execute_input message. It indicates the time at which kernel finished processing the associated request",
+                                    "description": "header.date (in ISO 8601 format) of iopub channel's kernel status message when the status is 'idle'. It indicates the time at which kernel finished processing the associated request",
                                     "type": "string"
                                 }
                             },
