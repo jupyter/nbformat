@@ -4,6 +4,11 @@
 Changes in nbformat
 =========================
 
+In Development
+==============
+
+- Allow notebook format 4.1 to have the arbitrary JSON mimebundles from format 4.2 for pragmatic purposes.
+
 5.0.4
 =====
 
@@ -35,7 +40,7 @@ Changes in nbformat
 - Link to json schema docs from format page added
 - Documented the editable metadata flag
 - Update description for collapsed field
-- Documented nbformat versions 4.0-4.3 with accurate json schema specification files
+- Documented notebook format versions 4.0-4.3 with accurate json schema specification files
 - Clarified info about :ref:`name`'s meaning for cells
 - Added a default execution_count of None for new_output_cell('execute_result')
 - Added support for handling nbjson kwargs
