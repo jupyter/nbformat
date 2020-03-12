@@ -351,16 +351,13 @@
             "mimebundle": {
                 "description": "A mime-type keyed dictionary of data",
                 "type": "object",
-                "additionalProperties": false,
-                "properties": {
-                    "application/json": {
-                        "type": "object"
-                    }
+                "additionalProperties": {
+                  "description": "mimetype output (e.g. text/plain), represented as either an array of strings or a string.",
+                  "$ref": "#/definitions/misc/multiline_string"
                 },
                 "patternProperties": {
-                    "^(?!application/json$)[a-zA-Z0-9]+/[a-zA-Z0-9\\-\\+\\.]+$": {
-                        "description": "mimetype output (e.g. text/plain), represented as either an array of strings or a string.",
-                        "$ref": "#/definitions/misc/multiline_string"
+                    "^application/(.*\\+)?json$": {
+                        "description": "Mimetypes with JSON output, can be any type"
                     }
                 }
             },
