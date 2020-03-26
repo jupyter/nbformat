@@ -7,7 +7,8 @@ Changes in nbformat
 In Development
 ==============
 
-- Allow notebook format 4.1 to have the arbitrary JSON mimebundles from format 4.2 for pragmatic purposes.
+- Allow notebook format 4.0 and 4.1 to have the arbitrary JSON mimebundles
+  from format 4.2 for pragmatic purposes.
 
 5.0.4
 =====
