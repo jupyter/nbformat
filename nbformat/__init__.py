@@ -133,11 +133,12 @@ def read(fp, as_version, **kwargs):
     nb : NotebookNode
         The notebook that was read.
     """
-    if isinstance(fp, (str, bytes)):
-        with io.open(fp, encoding='utf-8') as f:
-            return read(f, as_version, **kwargs)
 
-    return reads(fp.read(), as_version, **kwargs)
+    try:
+        return reads(fp.read(), as_version, **kwargs)
+    except AttributeError:
+        with io.open(fp, encoding='utf-8') as f:
+            return reads(f.read(), as_version, **kwargs)
 
 
 def write(nb, fp, version=NO_CONVERT, **kwargs):
@@ -158,13 +159,16 @@ def write(nb, fp, version=NO_CONVERT, **kwargs):
         If unspecified, or specified as nbformat.NO_CONVERT,
         the notebook's own version will be used and no conversion performed.
     """
-    if isinstance(fp, (str, bytes)):
-        with io.open(fp, 'w', encoding='utf-8') as f:
-            return write(nb, f, version=version, **kwargs)
-
     s = writes(nb, version, **kwargs)
     if isinstance(s, bytes):
         s = s.decode('utf8')
-    fp.write(s)
-    if not s.endswith(u'\n'):
-        fp.write(u'\n')
+
+    try:
+        fp.write(s)
+        if not s.endswith(u'\n'):
+            fp.write(u'\n')
+    except AttributeError:
+        with io.open(fp, 'w', encoding='utf-8') as f:
+            f.write(s)
+            if not s.endswith(u'\n'):
+                f.write(u'\n')
