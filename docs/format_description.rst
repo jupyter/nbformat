@@ -98,7 +98,7 @@ as defined in `GitHub-flavored markdown`_, and implemented in marked_.
 
 .. versionchanged:: nbformat 4.0
 
-    Heading cells have been removed, in favor of simple headings in markdown.
+    Heading cells have been removed in favor of simple headings in markdown.
 
 
 Code cells
@@ -181,8 +181,16 @@ The metadata of these messages may be keyed by mime-type as well.
         "image/png": "[base64-encoded-multiline-png-data]",
         "application/json": {
           # JSON data is included as-is
-          "json": "data",
+          "key1": "data",
+          "key2": ["some", "values"],
+          "key3": {"more": "data"}
         },
+        "application/vnd.exampleorg.type+json": {
+          # JSON data, included as-is, when the mime-type key ends in +json
+          "key1": "data",
+          "key2": ["some", "values"],
+          "key3": {"more": "data"}
+        }
       },
       "metadata" : {
         "image/png": {
@@ -300,7 +308,6 @@ regardless of format.
 
 Cell attachments
 ----------------
-.. versionadded:: 4.1
 
 Markdown and raw cells can have a number of attachments, typically inline
 images that can be referenced in the markdown content of a cell. The ``attachments``
@@ -341,6 +348,19 @@ As of nbformat 4.x, backward-compatible changes include:
 
 New cell or output types will not be rendered in versions that do not recognize them,
 but they will be preserved.
+
+
+Because the nbformat python package used to be less strict about validating
+notebook files, two features have been backported from nbformat 4.x to
+nbformat 4.0. These are:
+
+* ``attachment`` top-level keys in the Markdown and raw cell types
+  (backported from nbformat 4.1)
+* Mime-bundle attributes are JSON data if the mime-type key ends in ``+json``
+  (backported from nbformat 4.2)
+
+These backports ensure that any valid nbformat 4.4 file is also a valid
+nbformat 4.0 file.
 
 Metadata
 ========
