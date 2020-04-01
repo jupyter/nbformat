@@ -137,6 +137,9 @@ def read(fp, as_version, **kwargs):
     try:
         return reads(fp.read(), as_version, **kwargs)
     except AttributeError:
+        if hasattr(fp, "read") and callable(getattr(fp, "read")):
+            raise
+
         with io.open(fp, encoding='utf-8') as f:
             return reads(f.read(), as_version, **kwargs)
 
