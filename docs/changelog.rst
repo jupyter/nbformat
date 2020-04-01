@@ -7,8 +7,12 @@ Changes in nbformat
 In Development
 ==============
 
+5.0.5
+=====
+
 - Allow notebook format 4.0 and 4.1 to have the arbitrary JSON mimebundles
   from format 4.2 for pragmatic purposes.
+- Support reading/writing path-like objects has been added to read operations.
 
 5.0.4
 =====
