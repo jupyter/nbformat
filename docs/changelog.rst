@@ -35,7 +35,7 @@ In Development
 5.0
 ===
 
-`5.0 on GitHub https://github.com/jupyter/nbformat/milestone/5`__
+`5.0 on GitHub <https://github.com/jupyter/nbformat/milestone/5>`__
 
 - Starting with 5.0, ``nbformat`` is now Python 3 only (>= 3.5)
 - Add execution timings in code cell metadata for v4 spec.
