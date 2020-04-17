@@ -95,9 +95,9 @@ class TestValidator(TestsBase):
         with self.assertRaises(ValidationError) as e:
             validate(nb)
         s = str(e.exception)
-        self.assertRegexpMatches(s, "validating.*required.* in markdown_cell")
-        self.assertRegexpMatches(s, "source.* is a required property")
-        self.assertRegexpMatches(s, r"On instance\[u?['\"].*cells['\"]\]\[0\]")
+        self.assertRegex(s, "validating.*required.* in markdown_cell")
+        self.assertRegex(s, "source.* is a required property")
+        self.assertRegex(s, r"On instance\[u?['\"].*cells['\"]\]\[0\]")
         self.assertLess(len(s.splitlines()), 10)
 
     def test_iter_validation_error(self):
