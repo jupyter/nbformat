@@ -8,7 +8,7 @@ def test_read_invalid_iowrapper(tmpdir):
     config_filepath.write("{}")
 
     with pytest.raises(AttributeError) as excinfo:
-        with open(config_filepath) as fp:
+        with config_filepath.open() as fp:
             read(fp, as_version=4)
     assert "cells" in str(excinfo.value)
 
