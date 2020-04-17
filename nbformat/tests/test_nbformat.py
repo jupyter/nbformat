@@ -40,4 +40,3 @@ def test_read_invalid_str(tmpdir):
 def test_read_invalid_type(tmpdir):
     with pytest.raises(OSError) as excinfo:
         read(123, as_version=4)
-    assert "Bad file descriptor" in str(excinfo.value)
