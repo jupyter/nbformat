@@ -4,30 +4,30 @@ from nbformat import read
 
 
 def test_read_invalid_iowrapper(tmpdir):
-    config_filepath = tmpdir.join("empty.ipynb")
-    config_filepath.write("{}")
+    ipynb_filepath = tmpdir.join("empty.ipynb")
+    ipynb_filepath.write("{}")
 
     with pytest.raises(AttributeError) as excinfo:
-        with config_filepath.open() as fp:
+        with ipynb_filepath.open() as fp:
             read(fp, as_version=4)
     assert "cells" in str(excinfo.value)
 
 
 def test_read_invalid_filepath(tmpdir):
-    config_filepath = tmpdir.join("empty.ipynb")
-    config_filepath.write("{}")
+    ipynb_filepath = tmpdir.join("empty.ipynb")
+    ipynb_filepath.write("{}")
 
     with pytest.raises(AttributeError) as excinfo:
-        read(str(config_filepath), as_version=4)
+        read(str(ipynb_filepath), as_version=4)
     assert "cells" in str(excinfo.value)
 
 
 def test_read_invalid_pathlikeobj(tmpdir):
-    config_filepath = tmpdir.join("empty.ipynb")
-    config_filepath.write("{}")
+    ipynb_filepath = tmpdir.join("empty.ipynb")
+    ipynb_filepath.write("{}")
 
     with pytest.raises(AttributeError) as excinfo:
-        read(config_filepath, as_version=4)
+        read(ipynb_filepath, as_version=4)
     assert "cells" in str(excinfo.value)
 
 
