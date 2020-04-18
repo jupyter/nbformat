@@ -1,3 +1,3 @@
 # Make sure to update package.json, too!
-version_info = (5, 0, 6)
+version_info = (5, 0, 7, 'dev')
 __version__ = '.'.join(map(str, version_info))
