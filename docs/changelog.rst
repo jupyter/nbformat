@@ -7,6 +7,12 @@ Changes in nbformat
 In Development
 ==============
 
+5.0.6
+=====
+
+- nbformat.read() function has a better duck-type interface and will raise more
+  meaningful error messages if it can't parse a notebook document.
+
 5.0.5
 =====
 
