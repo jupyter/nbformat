@@ -7,6 +7,11 @@ Changes in nbformat
 In Development
 ==============
 
+5.0.7
+=====
+
+- Fixed a bug where default values for validator.get_validator() failed with an import error
+
 5.0.6
 =====
 
