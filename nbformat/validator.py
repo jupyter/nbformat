@@ -54,7 +54,7 @@ def _allow_undefined(schema):
 def get_validator(version=None, version_minor=None, relax_add_props=False):
     """Load the JSON schema into a Validator"""
     if version is None:
-        from .. import current_nbformat
+        from . import current_nbformat
         version = current_nbformat
 
     v = import_item("nbformat.v%s" % version)
