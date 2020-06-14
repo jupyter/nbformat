@@ -12,9 +12,9 @@ def parse_json(s, **kwargs):
     """Parse a JSON string into a dict."""
     try:
         nb_dict = json.loads(s, **kwargs)
-    except ValueError:
+    except ValueError as e:
         # Limit the error message to 80 characters.  Display whatever JSON will fit.
-        raise NotJSONError(("Notebook does not appear to be JSON: %r" % s)[:77] + "...")
+        raise NotJSONError(("Notebook does not appear to be JSON: %r" % s)[:77] + "...") from e
     return nb_dict
 
 # High level API
