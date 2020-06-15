@@ -13,14 +13,13 @@ try:
     from jsonschema import Draft4Validator as Validator
 except ImportError as e:
     verbose_msg = """
-
     Jupyter notebook format depends on the jsonschema package:
 
         https://pypi.python.org/pypi/jsonschema
 
     Please install it first.
     """
-    raise ImportError(str(e) + verbose_msg)
+    raise ImportError(verbose_msg) from e
 
 from ipython_genutils.importstring import import_item
 from .reader import get_version, reads
