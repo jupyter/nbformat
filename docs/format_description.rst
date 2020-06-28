@@ -10,14 +10,6 @@ which is used by Jupyter tools to validate notebooks.
 
 This page contains a human-readable description of the notebook format.
 
-.. note::
-
-    *All* metadata fields are optional.
-    While the types and values of some metadata fields are defined,
-    no metadata fields are required to be defined. Any metadata field
-    may also be ignored.
-
-
 Top-level structure
 ===================
 
