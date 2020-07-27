@@ -45,8 +45,8 @@ def reads(s, **kwargs):
 
     Parameters
     ----------
-    s : unicode
-        The raw unicode string to read the notebook from.
+    s : unicode | bytes
+        The raw string or bytes object to read the notebook from.
 
     Returns
     -------
