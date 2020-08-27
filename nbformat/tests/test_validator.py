@@ -150,7 +150,6 @@ def test_validation_error(validator_name):
     assert re.compile(r"On instance\[u?['\"].*cells['\"]\]\[0\]").search(s)
     assert len(s.splitlines()) < 10
 
-
 # This is only a valid test for the default validator, jsonschema
 @pytest.mark.parametrize("validator_name", ["jsonschema"])
 def test_iter_validation_error(validator_name):
@@ -197,3 +196,25 @@ def test_invalid_validator_raises_value_error_after_read():
     set_validator("foobar")
     with pytest.raises(ValueError):
         validate(nb)
+
+def test_non_unique_cell_ids():
+    """Test than a non-unique cell id does not pass validation"""
+    with TestsBase.fopen(u'invalid_unique_cell_id.ipynb', u'r') as f:
+        nb = read(f, as_version=4)
+    # The read call corrects the error and only logs the validation issue, so we reapply the issue for the test after
+    nb.cells[1].id = nb.cells[0].id
+    with pytest.raises(ValidationError):
+        validate(nb)
+    # The validate call should have corrected the duplicate id entry
+    assert isvalid(nb)
+    # Reapply to id duplication issue
+    nb.cells[1].id = nb.cells[0].id
+    assert not isvalid(nb)
+
+def test_invalid_cell_id():
+    """Test than an invalid cell id does not pass validation"""
+    with TestsBase.fopen(u'invalid_cell_id.ipynb', u'r') as f:
+        nb = read(f, as_version=4)
+    with pytest.raises(ValidationError):
+        validate(nb)
+    assert not isvalid(nb)

@@ -11,6 +11,7 @@ import warnings
 from ipython_genutils.importstring import import_item
 from .json_compat import get_current_validator, ValidationError
 from .reader import get_version, reads
+from .corpus.words import generate_corpus_id
 
 validators = {}
 
@@ -257,10 +258,28 @@ def validate(nbdict=None, ref=None, version=None, version_minor=None,
         if version is None:
             version, version_minor = 1, 0
 
+    if ref is None and version >= 4 and version_minor >= 5:
+        # if we support cell ids ensure default ids are provided
+        for cell in nbdict['cells']:
+            if 'id' not in cell:
+                # Generate cell ids if any are missing
+                cell['id'] = generate_corpus_id()
+
     for error in iter_validate(nbdict, ref=ref, version=version,
                                version_minor=version_minor,
                                relax_add_props=relax_add_props):
         raise error
+
+    if ref is None and version >= 4 and version_minor >= 5:
+        # if we support cell ids check for uniqueness when validating the whole notebook
+        seen_ids = set()
+        for cell in nbdict['cells']:
+            cell_id = cell['id']
+            if cell_id in seen_ids:
+                cell['id'] = generate_corpus_id()
+                # Best effort to repair if we find a duplicate id in case the ValidationError isn't blocking
+                raise ValidationError("Non-unique cell id '{}' detected. Corrected to '{}'.".format(cell_id, cell['id']))
+            seen_ids.add(cell_id)
 
 
 def iter_validate(nbdict=None, ref=None, version=None, version_minor=None,

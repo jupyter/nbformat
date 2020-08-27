@@ -10,6 +10,7 @@ helpers to build the structs in the right form.
 # Distributed under the terms of the Modified BSD License.
 
 from ..notebooknode import NotebookNode
+from ..corpus.words import generate_corpus_id as random_cell_id
 
 # Change the nbformat_minor and nbformat_schema variables when incrementing the
 # nbformat version
@@ -18,7 +19,7 @@ from ..notebooknode import NotebookNode
 nbformat = 4
 
 # current minor version
-nbformat_minor = 4
+nbformat_minor = 5
 
 # schema files for (major, minor) version tuples. (None, None) means the current version
 nbformat_schema = {
@@ -27,9 +28,9 @@ nbformat_schema = {
     (4, 1): 'nbformat.v4.1.schema.json',
     (4, 2): 'nbformat.v4.2.schema.json',
     (4, 3): 'nbformat.v4.3.schema.json',
-    (4, 4): 'nbformat.v4.4.schema.json'
+    (4, 4): 'nbformat.v4.4.schema.json',
+    (4, 5): 'nbformat.v4.5.schema.json'
 }
-
 
 
 def validate(node, ref=None):
@@ -113,6 +114,7 @@ def output_from_msg(msg):
 def new_code_cell(source='', **kwargs):
     """Create a new code cell"""
     cell = NotebookNode(
+        id=random_cell_id(),
         cell_type='code',
         metadata=NotebookNode(),
         execution_count=None,
@@ -127,6 +129,7 @@ def new_code_cell(source='', **kwargs):
 def new_markdown_cell(source='', **kwargs):
     """Create a new markdown cell"""
     cell = NotebookNode(
+        id=random_cell_id(),
         cell_type='markdown',
         source=source,
         metadata=NotebookNode(),
@@ -139,6 +142,7 @@ def new_markdown_cell(source='', **kwargs):
 def new_raw_cell(source='', **kwargs):
     """Create a new raw cell"""
     cell = NotebookNode(
+        id=random_cell_id(),
         cell_type='raw',
         source=source,
         metadata=NotebookNode(),
