@@ -21,11 +21,20 @@ except ImportError as e:
     """
     raise ImportError(verbose_msg) from e
 
+# Use fastjsonschema if installed
+try:
+    import fastjsonschema
+    from fastjsonschema import JsonSchemaException
+except ImportError:
+    fastjsonschema = None
+    JsonSchemaException = ValidationError
+
 from ipython_genutils.importstring import import_item
 from .reader import get_version, reads
 
 
 validators = {}
+fast_validators = {}
 
 def _relax_additional_properties(obj):
     """relax any `additionalProperties`"""
@@ -50,7 +59,7 @@ def _allow_undefined(schema):
     )
     return schema
 
-def get_validator(version=None, version_minor=None, relax_add_props=False):
+def get_validator(version=None, version_minor=None, relax_add_props=False, use_fast=False):
     """Load the JSON schema into a Validator"""
     if version is None:
         from . import current_nbformat
@@ -77,6 +86,10 @@ def get_validator(version=None, version_minor=None, relax_add_props=False):
 
         validators[version_tuple] = Validator(schema_json)
 
+        # If fastjsonschema is installed use it to validate
+        if use_fast and fastjsonschema is not None and version_tuple not in fast_validators:
+            fast_validators[version_tuple] = fastjsonschema.compile(schema_json)
+
     if relax_add_props:
         try:
             schema_json = _get_schema_json(v, version=version, version_minor=version_minor)
@@ -88,7 +101,15 @@ def get_validator(version=None, version_minor=None, relax_add_props=False):
         schema_json = _relax_additional_properties(schema_json)
 
         validators[version_tuple] = Validator(schema_json)
-    return validators[version_tuple]
+
+        # If fastjsonschema is installed use it to validate
+        if use_fast and fastjsonschema is not None:
+            fast_validators[version_tuple] = fastjsonschema.compile(schema_json)
+
+    if use_fast and fastjsonschema is not None:
+        return fast_validators[version_tuple]
+    else:
+        return validators[version_tuple]
 
 
 def _get_schema_json(v, version=None, version_minor=None):
@@ -241,7 +262,7 @@ def better_validation_error(error, version, version_minor):
 
 
 def validate(nbdict=None, ref=None, version=None, version_minor=None,
-             relax_add_props=False, nbjson=None):
+             relax_add_props=False, nbjson=None, use_fast=False):
     """Checks whether the given notebook dict-like object
     conforms to the relevant notebook format schema.
 
@@ -270,10 +291,22 @@ def validate(nbdict=None, ref=None, version=None, version_minor=None,
         if version is None:
             version, version_minor = 1, 0
 
-    for error in iter_validate(nbdict, ref=ref, version=version,
-                               version_minor=version_minor,
-                               relax_add_props=relax_add_props):
-        raise error
+    validator = get_validator(version, version_minor, relax_add_props=relax_add_props,
+                              use_fast=True)
+
+    if fastjsonschema is not None and use_fast:
+        if validator is None:
+            raise ValidationError("No schema for validating v%s notebooks" % version)
+
+        try:
+            validator(nbdict)
+        except JsonSchemaException as e:
+            raise ValidationError(e.message, schema_path=e.path)
+    else:
+        for error in iter_validate(nbdict, ref=ref, version=version,
+                                   version_minor=version_minor,
+                                   relax_add_props=relax_add_props):
+            raise error
 
 
 def iter_validate(nbdict=None, ref=None, version=None, version_minor=None,
@@ -294,7 +327,8 @@ def iter_validate(nbdict=None, ref=None, version=None, version_minor=None,
     if version is None:
         version, version_minor = get_version(nbdict)
 
-    validator = get_validator(version, version_minor, relax_add_props=relax_add_props)
+    validator = get_validator(version, version_minor, relax_add_props=relax_add_props,
+                              use_fast=False)
 
     if validator is None:
         # no validator

@@ -4,11 +4,17 @@
 # Distributed under the terms of the Modified BSD License.
 
 import os
+import time
 
 from .base import TestsBase
 from jsonschema import ValidationError
 from nbformat import read
 from ..validator import isvalid, validate, iter_validate
+
+try:
+    import fastjsonschema
+except ImportError:
+    fastjsonschema = None
 
 
 class TestValidator(TestsBase):
@@ -118,3 +124,27 @@ class TestValidator(TestsBase):
         """Test that an invalid notebook with no version fails validation"""
         with self.assertRaises(ValidationError) as e:
             validate({'invalid': 'notebook'})
+
+    def test_fast_validation(self):
+        """
+        Test that valid notebook with too many outputs is parsed ~12 times
+        faster with fastjsonschema.
+        """
+        if fastjsonschema:
+            with self.fopen(u'many_tracebacks.ipynb', u'r') as f:
+                nb = read(f, as_version=4)
+
+            # Multiply output
+            base_output = nb["cells"][0]["outputs"][0]
+            for i in range(50000):
+                nb["cells"][0]["outputs"].append(base_output)
+
+            start_time = time.time()
+            validate(nb, use_fast=True)
+            fast_time = time.time() - start_time
+
+            start_time = time.time()
+            validate(nb)
+            slow_time = time.time() - start_time
+
+            self.assertGreater(slow_time / fast_time, 12)
