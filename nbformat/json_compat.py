@@ -38,8 +38,6 @@ class FastJsonSchemaValidator(JsonSchemaValidator):
     name = "fastjsonschema"
 
     def __init__(self, schema):
-        super().__init__(schema)
-
         self._validator = fastjsonschema.compile(schema)
 
     def validate(self, data):
@@ -47,6 +45,16 @@ class FastJsonSchemaValidator(JsonSchemaValidator):
             self._validator(data)
         except _JsonSchemaException as error:
             raise ValidationError(error.message, schema_path=error.path)
+
+    def iter_errors(self, data, schema=None):
+        errors = []
+        validate_func = self._validator if schema is None else fastjsonschema.compile(schema)
+        try:
+            validate_func(data)
+        except _JsonSchemaException as error:
+            errors = [ValidationError(error.message, schema_path=error.path)]
+
+        return errors
 
 
 _VALIDATOR_MAP = [
@@ -68,7 +76,7 @@ def _validator_for_name(validator_name):
 
 def get_current_validator():
     """
-    Return the current validator based on the value of an environment variable.
+    Return the default validator based on the value of an environment variable.
     """
     validator_name = os.environ.get("NBFORMAT_VALIDATOR", "jsonschema")
     return _validator_for_name(validator_name)

@@ -229,7 +229,7 @@ def better_validation_error(error, version, version_minor):
 
 
 def validate(nbdict=None, ref=None, version=None, version_minor=None,
-             relax_add_props=False, nbjson=None, use_fast=False):
+             relax_add_props=False, nbjson=None):
     """Checks whether the given notebook dict-like object
     conforms to the relevant notebook format schema.
 
@@ -245,7 +245,6 @@ def validate(nbdict=None, ref=None, version=None, version_minor=None,
     else:
         raise TypeError("validate() missing 1 required argument: 'nbdict'")
 
-
     if ref is None:
         # if ref is not specified, we have a whole notebook, so we can get the version
         nbdict_version, nbdict_version_minor = get_version(nbdict)
@@ -258,20 +257,10 @@ def validate(nbdict=None, ref=None, version=None, version_minor=None,
         if version is None:
             version, version_minor = 1, 0
 
-    validator = get_validator(version, version_minor, relax_add_props=relax_add_props)
-    if validator is None:
-        raise ValidationError("No schema for validating v%s notebooks" % version)
-    elif validator.name != "jsonschema":
-        # If not using default validator then, skip iter_validate, and provide
-        # less legible errors
-        validator.validate(nbdict)
-    else:
-        # If using default validator then use iter_validate, and provide
-        # more readable errors
-        for error in iter_validate(nbdict, ref=ref, version=version,
-                                    version_minor=version_minor,
-                                    relax_add_props=relax_add_props):
-            raise error
+    for error in iter_validate(nbdict, ref=ref, version=version,
+                               version_minor=version_minor,
+                               relax_add_props=relax_add_props):
+        raise error
 
 
 def iter_validate(nbdict=None, ref=None, version=None, version_minor=None,
