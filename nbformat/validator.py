@@ -8,33 +8,12 @@ import pprint
 import sys
 import warnings
 
-try:
-    from jsonschema import ValidationError
-    from jsonschema import Draft4Validator as Validator
-except ImportError as e:
-    verbose_msg = """
-    Jupyter notebook format depends on the jsonschema package:
-
-        https://pypi.python.org/pypi/jsonschema
-
-    Please install it first.
-    """
-    raise ImportError(verbose_msg) from e
-
-# Use fastjsonschema if installed
-try:
-    import fastjsonschema
-    from fastjsonschema import JsonSchemaException
-except ImportError:
-    fastjsonschema = None
-    JsonSchemaException = ValidationError
-
 from ipython_genutils.importstring import import_item
+from .json_compat import Validator, ValidationError
 from .reader import get_version, reads
 
 
 validators = {}
-fast_validators = {}
 
 def _relax_additional_properties(obj):
     """relax any `additionalProperties`"""
@@ -59,7 +38,7 @@ def _allow_undefined(schema):
     )
     return schema
 
-def get_validator(version=None, version_minor=None, relax_add_props=False, use_fast=False):
+def get_validator(version=None, version_minor=None, relax_add_props=False):
     """Load the JSON schema into a Validator"""
     if version is None:
         from . import current_nbformat
@@ -86,10 +65,6 @@ def get_validator(version=None, version_minor=None, relax_add_props=False, use_f
 
         validators[version_tuple] = Validator(schema_json)
 
-        # If fastjsonschema is installed use it to validate
-        if use_fast and fastjsonschema is not None and version_tuple not in fast_validators:
-            fast_validators[version_tuple] = fastjsonschema.compile(schema_json)
-
     if relax_add_props:
         try:
             schema_json = _get_schema_json(v, version=version, version_minor=version_minor)
@@ -99,17 +74,8 @@ def get_validator(version=None, version_minor=None, relax_add_props=False, use_f
         # this allows properties to be added for intermediate
         # representations while validating for all other kinds of errors
         schema_json = _relax_additional_properties(schema_json)
-
         validators[version_tuple] = Validator(schema_json)
-
-        # If fastjsonschema is installed use it to validate
-        if use_fast and fastjsonschema is not None:
-            fast_validators[version_tuple] = fastjsonschema.compile(schema_json)
-
-    if use_fast and fastjsonschema is not None:
-        return fast_validators[version_tuple]
-    else:
-        return validators[version_tuple]
+    return validators[version_tuple]
 
 
 def _get_schema_json(v, version=None, version_minor=None):
@@ -291,17 +257,11 @@ def validate(nbdict=None, ref=None, version=None, version_minor=None,
         if version is None:
             version, version_minor = 1, 0
 
-    validator = get_validator(version, version_minor, relax_add_props=relax_add_props,
-                              use_fast=True)
-
-    if fastjsonschema is not None and use_fast:
-        if validator is None:
-            raise ValidationError("No schema for validating v%s notebooks" % version)
-
-        try:
-            validator(nbdict)
-        except JsonSchemaException as e:
-            raise ValidationError(e.message, schema_path=e.path)
+    validator = get_validator(version, version_minor, relax_add_props=relax_add_props)
+    if validator is None:
+        raise ValidationError("No schema for validating v%s notebooks" % version)
+    elif use_fast:
+        validator.validate(nbdict)
     else:
         for error in iter_validate(nbdict, ref=ref, version=version,
                                    version_minor=version_minor,
@@ -327,8 +287,7 @@ def iter_validate(nbdict=None, ref=None, version=None, version_minor=None,
     if version is None:
         version, version_minor = get_version(nbdict)
 
-    validator = get_validator(version, version_minor, relax_add_props=relax_add_props,
-                              use_fast=False)
+    validator = get_validator(version, version_minor, relax_add_props=relax_add_props)
 
     if validator is None:
         # no validator
