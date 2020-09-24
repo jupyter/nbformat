@@ -12,9 +12,10 @@ import io
 class TestsBase(unittest.TestCase):
     """Base tests class."""
 
-    def fopen(self, f, mode=u'r',encoding='utf-8'):
-        return io.open(os.path.join(self._get_files_path(), f), mode, encoding=encoding)
+    @classmethod
+    def fopen(cls, f, mode=u'r',encoding='utf-8'):
+        return io.open(os.path.join(cls._get_files_path(), f), mode, encoding=encoding)
 
-
-    def _get_files_path(self):
+    @classmethod
+    def _get_files_path(cls):
         return os.path.dirname(__file__)

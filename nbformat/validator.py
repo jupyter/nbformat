@@ -9,9 +9,8 @@ import sys
 import warnings
 
 from ipython_genutils.importstring import import_item
-from .json_compat import Validator, ValidationError
+from .json_compat import get_current_validator, ValidationError
 from .reader import get_version, reads
-
 
 validators = {}
 
@@ -49,7 +48,8 @@ def get_validator(version=None, version_minor=None, relax_add_props=False):
     if version_minor is None:
         version_minor = current_minor
 
-    version_tuple = (version, version_minor)
+    current_validator = get_current_validator()
+    version_tuple = (current_validator.name, version, version_minor)
 
     if version_tuple not in validators:
         try:
@@ -63,7 +63,7 @@ def get_validator(version=None, version_minor=None, relax_add_props=False):
             # and allow undefined cell types and outputs
             schema_json = _allow_undefined(schema_json)
 
-        validators[version_tuple] = Validator(schema_json)
+        validators[version_tuple] = current_validator(schema_json)
 
     if relax_add_props:
         try:
@@ -74,7 +74,8 @@ def get_validator(version=None, version_minor=None, relax_add_props=False):
         # this allows properties to be added for intermediate
         # representations while validating for all other kinds of errors
         schema_json = _relax_additional_properties(schema_json)
-        validators[version_tuple] = Validator(schema_json)
+        validators[version_tuple] = current_validator(schema_json)
+
     return validators[version_tuple]
 
 
@@ -260,12 +261,16 @@ def validate(nbdict=None, ref=None, version=None, version_minor=None,
     validator = get_validator(version, version_minor, relax_add_props=relax_add_props)
     if validator is None:
         raise ValidationError("No schema for validating v%s notebooks" % version)
-    elif use_fast:
+    elif validator.name != "jsonschema":
+        # If not using default validator then, skip iter_validate, and provide
+        # less legible errors
         validator.validate(nbdict)
     else:
+        # If using default validator then use iter_validate, and provide
+        # more readable errors
         for error in iter_validate(nbdict, ref=ref, version=version,
-                                   version_minor=version_minor,
-                                   relax_add_props=relax_add_props):
+                                    version_minor=version_minor,
+                                    relax_add_props=relax_add_props):
             raise error
 
 
