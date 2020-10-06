@@ -22,7 +22,7 @@ jobs:
     - name: Install test dependencies
       run: |
         pip install --upgrade pip setuptools
-        pip install nbformat[test]
+        pip install .[test]
         pip install codecov
     - name: Install nbformat
       run: |
