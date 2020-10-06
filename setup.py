@@ -91,7 +91,7 @@ install_requires = setuptools_args['install_requires'] = [
 
 extras_require = setuptools_args['extras_require'] = {
     'fast': ['fastjsonschema'],
-    'test': ['testpath', 'pytest', 'pytest-cov'],
+    'test': ['fastjsonschema', 'testpath', 'pytest', 'pytest-cov'],
 }
 
 if 'setuptools' in sys.modules:

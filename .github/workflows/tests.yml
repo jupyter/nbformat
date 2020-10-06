@@ -23,7 +23,6 @@ jobs:
       run: |
         pip install --upgrade pip setuptools
         pip install .[test]
-        pip install .[fast]
         pip install codecov
     - name: Install nbformat
       run: |
