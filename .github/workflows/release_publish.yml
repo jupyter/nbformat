@@ -1,0 +1,51 @@
+name: Create Release and publish package
+
+on:
+  push:
+    tags:
+    - 'v*'
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python
+      uses: actions/setup-python@v1
+      with:
+        python-version: '3.8'
+    - name: Install dependencies
+      run: |
+        pip install --upgrade pip setuptools
+        pip install bump2version check-manifest twine wheel
+    - name: Build release
+      run: |
+        check-manifest -v
+        python setup.py sdist bdist_wheel
+        python -m twine check dist/*
+    - name: Create Release
+      id: create_release
+      uses: ncipollo/release-action@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag: ${{ github.event.release.tag_name }}
+        name: Release ${{ github.event.release.tag_name }}
+        artifacts: ${{ env.CURRENT_LOCALE_DIR }}/dist/*
+        body: Release ${{ github.event.release.tag_name }}
+        token: ${{ secrets.GITHUB_TOKEN }}
+    - name: Publish PyPI Package
+      env:
+        TWINE_USERNAME: __token__
+        TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
+      run: |
+        python -m twine upload dist/*
+        ls
+    - name: Publish NPM Package
+      env:
+        TWINE_USERNAME: __token__
+        TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
+      # Handle token for NPM?
+      # https://docs.npmjs.com/using-private-packages-in-a-ci-cd-workflow
+      run: |
+        npm publish

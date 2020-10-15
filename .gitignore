@@ -11,7 +11,7 @@ __pycache__
 *.bak
 .ipynb_checkpoints
 .tox
-.DS_Store
+**.DS_Store
 \#*#
 .#*
 .coverage
