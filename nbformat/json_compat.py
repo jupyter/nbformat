@@ -38,6 +38,7 @@ class FastJsonSchemaValidator(JsonSchemaValidator):
     name = "fastjsonschema"
 
     def __init__(self, schema):
+        super().__init__(schema)
         self._validator = fastjsonschema.compile(schema)
 
     def validate(self, data):
@@ -47,6 +48,9 @@ class FastJsonSchemaValidator(JsonSchemaValidator):
             raise ValidationError(error.message, schema_path=error.path)
 
     def iter_errors(self, data, schema=None):
+        if schema is not None:
+            return self._default_validator.iter_errors(data, schema)
+
         errors = []
         validate_func = self._validator if schema is None else fastjsonschema.compile(schema)
         try:
