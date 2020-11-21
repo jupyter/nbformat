@@ -197,3 +197,15 @@ def test_invalid_validator_raises_value_error_after_read():
     set_validator("foobar")
     with pytest.raises(ValueError):
         validate(nb)
+
+
+def test_fallback_validator_with_iter_errors_using_ref():
+    """
+    Test that when creating a standalone object (code_cell etc)
+    the default validator is used as fallback.
+    """
+    import nbformat
+    set_validator("fastjsonschema")
+    nbformat.v4.new_code_cell()
+    nbformat.v4.new_markdown_cell()
+    nbformat.v4.new_raw_cell()
