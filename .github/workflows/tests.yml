@@ -29,14 +29,10 @@ jobs:
         pip install .
         pip freeze
     - name: List dependencies
-      run: |
-        pip list
+      run: pip list
     - name: Run tests
-      run: |
-        py.test nbformat/tests -v --cov=nbformat
+      run: py.test nbformat/tests -v --cov=nbformat
     - name: Check manfest
-      run: |
-        check-manifest -v
+      run: check-manifest -v
     - name: Coverage
-      run: |
-        codecov
+      run: codecov
