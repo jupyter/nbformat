@@ -23,29 +23,27 @@ jobs:
         check-manifest -v
         python setup.py sdist bdist_wheel
         python -m twine check dist/*
+    - name: Parse tag
+      run: python .github/scripts/parse_ref.py
     - name: Create Release
       id: create_release
       uses: ncipollo/release-action@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag: ${{ github.event.release.tag_name }}
-        name: Release ${{ github.event.release.tag_name }}
+        tag: ${{ env.RELEASE_TAG }}
+        name: Release ${{ env.RELEASE_TAG }}
         artifacts: ${{ env.CURRENT_LOCALE_DIR }}/dist/*
-        body: Release ${{ github.event.release.tag_name }}
+        body: Release ${{ env.RELEASE_TAG }}
         token: ${{ secrets.GITHUB_TOKEN }}
     - name: Publish PyPI Package
       env:
         TWINE_USERNAME: __token__
         TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
-      run: |
-        python -m twine upload dist/*
-        ls
+      run: python -m twine upload dist/*
+    - name: Create NPM configuration
+      run: python .github/scripts/create_npmrc.py
     - name: Publish NPM Package
       env:
-        TWINE_USERNAME: __token__
-        TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
-      # Handle token for NPM?
-      # https://docs.npmjs.com/using-private-packages-in-a-ci-cd-workflow
-      run: |
-        npm publish
+        NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+      run: npm publish
