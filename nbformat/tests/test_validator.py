@@ -197,6 +197,19 @@ def test_invalid_validator_raises_value_error_after_read():
     with pytest.raises(ValueError):
         validate(nb)
 
+
+def test_fallback_validator_with_iter_errors_using_ref():
+    """
+    Test that when creating a standalone object (code_cell etc)
+    the default validator is used as fallback.
+    """
+    import nbformat
+    set_validator("fastjsonschema")
+    nbformat.v4.new_code_cell()
+    nbformat.v4.new_markdown_cell()
+    nbformat.v4.new_raw_cell()
+
+
 def test_non_unique_cell_ids():
     """Test than a non-unique cell id does not pass validation"""
     with TestsBase.fopen(u'invalid_unique_cell_id.ipynb', u'r') as f:
@@ -210,6 +223,7 @@ def test_non_unique_cell_ids():
     # Reapply to id duplication issue
     nb.cells[1].id = nb.cells[0].id
     assert not isvalid(nb)
+
 
 def test_invalid_cell_id():
     """Test than an invalid cell id does not pass validation"""

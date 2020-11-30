@@ -7,6 +7,9 @@ Changes in nbformat
 In Development
 ==============
 
+5.0.8
+=====
+
 - Add optional support for using `fastjsonschema` as the JSON validation library.
   To enable fast validation, install `fastjsonschema` and set the environment
   variable `NBFORMAT_VALIDATOR` to the value `fastjsonschema`.
