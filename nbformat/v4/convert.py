@@ -7,6 +7,7 @@ import json
 import re
 
 from .nbbase import (
+    random_cell_id,
     nbformat, nbformat_minor,
     NotebookNode,
 )
@@ -85,6 +86,7 @@ def upgrade_cell(cell):
         - update outputs
     """
     cell.setdefault('metadata', NotebookNode())
+    cell.id = random_cell_id()
     if cell.cell_type == 'code':
         cell.pop('language', '')
         if 'collapsed' in cell:
@@ -128,6 +130,7 @@ def downgrade_cell(cell):
             cell.cell_type = 'heading'
             cell.source = text
             cell.level = len(prefix)
+    cell.pop('id', None)
     cell.pop('attachments', None)
     return cell
 

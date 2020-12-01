@@ -102,7 +102,7 @@ class TestJSON(formattest.NBFormatTest, TestCase):
     def test_latest_schema_matches(self):
         """Test to ensure all schema is locked to a known version"""
         assert nbformat == 4
-        assert nbformat_minor == 4
+        assert nbformat_minor == 5
 
     def test_base_version_matches_latest(self):
         """Test to ensure latest version file matches latest verison"""

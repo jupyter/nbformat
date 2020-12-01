@@ -333,6 +333,20 @@ keyed by filename that represents the files attached to the cell.
     }
 
 
+Cell ids
+--------
+
+Since the 4.5 schema release, all cells have an ``id`` field which must be a string of length
+1-64 with alphanumeric, `-`, and `_` as legal characters to use. These ids must be unique to
+any given Notebook following the nbformat spec.
+
+The full rules and guidelines for using cells ids is captured in the corresponding
+`JEP Proposal <https://github.com/jupyter/enhancement-proposals/blob/master/62-cell-id/cell-id.md>`_.
+
+If attempting to add similiar support to other languages supporting notebooks specs, this
+`Example PR <https://github.com/jupyter/nbformat/pull/189>`_ can be used as a reference to follow.
+
+
 Backward-compatible changes
 ===========================
 
