@@ -7,24 +7,24 @@
     First copy `nbformat/v4/nbformat/.v4.schema.json` to `nbformat/v4/nbformat/.v4.<new_minor_version_here>schema.json`.
     Then edit the top of `nbformat/v4/nbbase.py`:
 
-```
-# Change the nbformat_minor and nbformat_schema variables when incrementing the
-# nbformat version
+    ```python
+    # Change the nbformat_minor and nbformat_schema variables when incrementing the
+    # nbformat version
 
-# current major version
-nbformat = 4
+    # current major version
+    nbformat = 4
 
-# current minor version
-nbformat_minor = <new_minor_version_here>
+    # current minor version
+    nbformat_minor = <new_minor_version_here>
 
-# schema files for (major, minor) version tuples. (None, None) means the current version
-nbformat_schema = {
-    (None, None): 'nbformat.v4.schema.json',
-    (4, 0): 'nbformat.v4.0.schema.json',
-    ...
-    (4, <new_minor_version_here>): 'nbformat.v4.<new_minor_version_here>.schema.json'
-}
-```
+    # schema files for (major, minor) version tuples. (None, None) means the current version
+    nbformat_schema = {
+        (None, None): 'nbformat.v4.schema.json',
+        (4, 0): 'nbformat.v4.0.schema.json',
+        ...
+        (4, <new_minor_version_here>): 'nbformat.v4.<new_minor_version_here>.schema.json'
+    }
+    ```
 
     If you do one of these steps but not the others it will fail many tests.
 
@@ -34,15 +34,20 @@ Change from patch to minor or major for appropriate version updates.
 
 ```bash
 # Commit, test, publish, tag release
-bumpversion minor # CHECK FIRST: If the patch version currently set is not sufficient
-git commit -am "Prepared <release-id>"
-bumpversion suffix  # Remove the .dev
-git commit -am "Generated release <release-id>"
-git tag <release_version_here>
-git push && git push --tags
+bump2version release --tag
+bump2version patch
+
+git push upstream master
+git push upstream --tags
 ```
 
-## Push to PyPI
+## Publish packages
+
+PyPI and NPM packages will be built and published on CI when a tag is pushed.
+
+## Manual publish procedure
+
+### Push to PyPI
 
 ```bash
 rm -rf dist/*
@@ -53,15 +58,10 @@ pip install dist/*
 twine upload dist/*
 ```
 
-## Push to npm
+### Push to npm
 
 ```bash
 npm publish
 ```
 
-Note for JavaScript developers -- `bumpversion` updates the version in `package.json`.
-
-## Prep repo for development
-
-- `bumpversion patch # Resets the patch and dev versions`
-- `git commit -am "Resumed patch dev"; git push`
+Note for JavaScript developers -- `bump2version` updates the version in `package.json`.
