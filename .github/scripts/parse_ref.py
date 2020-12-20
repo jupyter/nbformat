@@ -23,13 +23,10 @@ def parse_ref(current_ref):
     current_ref: str
         The github reference string.
     """
-    if not current_ref.startswith("ref/tags/"):
+    if not current_ref.startswith("refs/tags/"):
         raise Exception(f"Invalid ref `{current_ref}`!")
 
-    tag_name = current_ref.replace("ref/tags/", "")
-    if not tag_name.startswith("v"):
-        raise Exception(f"Invalid tag `{tag_name}`!")
-
+    tag_name = current_ref.replace("refs/tags/", "")
     print(f"::set-env name=RELEASE_TAG::{tag_name}")
 
 
