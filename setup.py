@@ -53,6 +53,7 @@ setup_args = dict(
     scripts         = glob(pjoin('scripts', '*')),
     packages        = packages,
     package_data    = package_data,
+    include_package_data = True,
     description     = "The Jupyter Notebook format",
     long_description= """
     This package contains the base implementation of the Jupyter Notebook format,
