@@ -28,14 +28,44 @@
 
     If you do one of these steps but not the others it will fail many tests.
 
-## Push to GitHub
+## Update version
 
-Change from patch to minor or major for appropriate version updates.
+We use [bump2version](https://github.com/c4urself/bump2version) to manage versions.
+
+To bump versions we use the `bump2version <VERSION-COMPONENT>` command, where the
+version component can take any of the following values:
+
+- `major`: Bump the major component. `5.0.9b0 -> 6.0.0b0`
+- `minor`: Bump the minor component. `5.0.9b0 -> 5.1.0b0`
+- `patch`: Bump the patch component. `5.0.9b0 -> 5.0.10b0`
+- `release`: Bump the release component. `5.0.9b0 -> 5.0.9`
+- `build`: Bump the build component. `5.0.9b0 -> 5.0.9b1`
+
+Configuration of bump2version is stored on the [.bumpversion.cfg](https://github.com/jupyter/nbformat/blob/master/.bumpversion.cfg) file and it currently tracks and updates the following files:
+
+- [nbformat/_version.py](https://github.com/jupyter/nbformat/blob/master/nbformat/_version.py)
+- [docs/conf.py](https://github.com/jupyter/nbformat/blob/master/docs/conf.py)
+- [package.json](https://github.com/jupyter/nbformat/blob/master/package.json)
+
+### To make a beta release
+
+```bash
+# Commit, test, publish, beta tag
+bump2version build --tag
+
+git push upstream master
+git push upstream --tags
+```
+
+### To make a release
+
+Change `<VERSION-COMPONENT>` to `major`, `minor` or `patch` for the corresponding
+version updates depending on the release type that will follow.
 
 ```bash
 # Commit, test, publish, tag release
 bump2version release --tag
-bump2version patch
+bump2version <VERSION-COMPONENT>
 
 git push upstream master
 git push upstream --tags

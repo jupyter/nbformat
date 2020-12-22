@@ -24,9 +24,8 @@ jobs:
         python setup.py sdist bdist_wheel
         python -m twine check dist/*
     - name: Parse tag
-      env:
-        ACTIONS_ALLOW_UNSECURE_COMMANDS: "true"
-      run: python .github/scripts/parse_ref.py
+      run: |
+        echo "RELEASE_TAG=$(python .github/scripts/parse_ref.py)" >> $GITHUB_ENV
     - name: Create Release
       id: create_release
       uses: ncipollo/release-action@v1

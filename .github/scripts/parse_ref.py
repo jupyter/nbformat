@@ -27,7 +27,7 @@ def parse_ref(current_ref):
         raise Exception(f"Invalid ref `{current_ref}`!")
 
     tag_name = current_ref.replace("refs/tags/", "")
-    print(f"::set-env name=RELEASE_TAG::{tag_name}")
+    print(tag_name)
 
 
 if __name__ == "__main__":
