@@ -312,7 +312,10 @@ def signature_removed(nb):
 class NotebookNotary(LoggingConfigurable):
     """A class for computing and verifying notebook signatures."""
 
-    data_dir = Unicode()
+    data_dir = Unicode(
+        help="""The storage directory for notary secret and database."""
+    ).tag(config=True)
+    
     @default('data_dir')
     def _data_dir_default(self):
         app = None
