@@ -7,6 +7,15 @@ Changes in nbformat
 In Development
 ==============
 
+5.1.0
+=====
+
+- Implemented CellIds from JEP-62
+- Fixed a regression introduced when using fastjsonschema,
+  which does not directly support to validate a "reference"/"subschema"
+- Removed unreachable/unneeded code
+- Added CI workflow for package release on tag push
+
 5.0.8
 =====
 
