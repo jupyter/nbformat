@@ -6,6 +6,7 @@ include README.md
 include RELEASING.md
 include MANIFEST.in
 recursive-include nbformat *.txt
+recursive-include nbformat *.json
 recursive-exclude nbformat/tests *.*
 
 # Javascript
