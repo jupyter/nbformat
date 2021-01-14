@@ -23,8 +23,8 @@ def _warn_if_invalid(nb, version):
     except ValidationError as e:
         get_logger().error("Notebook JSON is not valid v%i: %s", version, e)
 
-def upgrade(nb, from_version=3, from_minor=0):
-    """Convert a notebook to v4.
+def upgrade(nb, from_version=None, from_minor=None):
+    """Convert a notebook to latest v4.
 
     Parameters
     ----------
@@ -35,6 +35,11 @@ def upgrade(nb, from_version=3, from_minor=0):
     from_minor : int
         The original minor version of the notebook to convert (only relevant for v >= 3).
     """
+    if not from_version:
+        from_version = nb['nbformat']
+    if not from_minor:
+        from_minor = nb['nbformat_minor']
+
     if from_version == 3:
         # Validate the notebook before conversion
         _warn_if_invalid(nb, from_version)
@@ -64,9 +69,18 @@ def upgrade(nb, from_version=3, from_minor=0):
         _warn_if_invalid(nb, nbformat)
         return nb
     elif from_version == 4:
-        # nothing to do
-        if from_minor != nbformat_minor:
-            nb.metadata.orig_nbformat_minor = from_minor
+        if from_minor == nbformat_minor:
+            return
+
+        # other versions migration code e.g.
+        # if from_minor < 3:
+        # if from_minor < 4:
+
+        if from_minor < 5:
+            for cell in nb.cells:
+                cell.id = random_cell_id()
+
+        nb.metadata.orig_nbformat_minor = from_minor
         nb.nbformat_minor = nbformat_minor
 
         return nb

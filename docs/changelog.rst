@@ -7,6 +7,11 @@ Changes in nbformat
 In Development
 ==============
 
+5.1.1
+=====
+
+- Changes convert.upgrade to upgrade minor 4.x versions to 4.5
+
 5.1.0
 =====
 
