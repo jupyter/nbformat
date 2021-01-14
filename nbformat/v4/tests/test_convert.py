@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
+import os
+import io
 import copy
 
 from unittest import mock
 from nbformat import validate
 from .. import convert
+from ..nbjson import reads
 
 from . import nbexamples
 from nbformat.v3.tests import nbexamples as v3examples
@@ -73,3 +76,16 @@ def test_downgrade_heading():
     ]:
         downgraded = convert.downgrade_cell(v4cell)
         assert downgraded == expected
+
+def test_upgrade_v4_to_4_dot_5():
+    here = os.path.dirname(__file__)
+    with io.open(os.path.join(here, os.pardir, os.pardir, 'tests', "test4.ipynb"), encoding='utf-8') as f:
+        nb = reads(f.read())
+    assert nb['nbformat_minor'] == 0
+    validate(nb)
+    assert nb.cells[0].get('id') is None
+
+    nb_up = convert.upgrade(nb)
+    assert nb_up['nbformat_minor'] == 5
+    validate(nb_up)
+    assert nb_up.cells[0]['id'] is not None
