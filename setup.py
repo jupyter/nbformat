@@ -34,11 +34,17 @@ for d, _, _ in os.walk(pjoin(here, name)):
         packages.append(d[len(here)+1:].replace(os.path.sep, '.'))
 
 package_data = {
-    'nbformat' : [
-        'corpus/*.txt'
-        'tests/*.ipynb',
-        'v3/nbformat.v3*.schema.json',
-        'v4/nbformat.v4*.schema.json',
+    'nbformat.corpus' : [
+        '*.txt',
+    ],
+    'nbformat.tests' : [
+        '*.ipynb',
+    ],
+    'nbformat.v3' : [
+        'nbformat.v3*.schema.json',
+    ],
+    'nbformat.v4' : [
+        'nbformat.v4*.schema.json',
     ],
 }
 
