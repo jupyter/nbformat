@@ -7,6 +7,11 @@ Changes in nbformat
 In Development
 ==============
 
+5.1.2
+=====
+
+- Change id generation to be hash based to avoid problematic word combinations
+
 5.1.1
 =====
 

@@ -9,25 +9,9 @@ import random
 from .. import words
 
 
-def test_acceptable_nouns_set():
-    assert len(words.acceptable_nouns()) > 1000
-    assert len(words.acceptable_nouns()) == len(set(words.acceptable_nouns())), "There are duplicated nouns"
-    for word in words.acceptable_nouns():
-        assert len(word) > 3, word
-        assert word == word.strip()
-
-
-def test_acceptable_adjectives_set():
-    assert len(words.acceptable_adjectives()) > 1000
-    assert len(words.acceptable_adjectives()) == len(set(words.acceptable_adjectives())), "There are duplicated nouns"
-    for word in words.acceptable_adjectives():
-        assert len(word) > 3, word
-        assert word == word.strip()
-
-
 def test_generate_corpus_id():
     with pytest.warns(None) as record:
         assert len(words.generate_corpus_id()) > 7
-        # 1 in 5073324 (3714 x 1366) times this will fail
+        # 1 in 4294967296 (2^32) times this will fail
         assert words.generate_corpus_id() != words.generate_corpus_id()
     assert len(record) == 0
