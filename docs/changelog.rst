@@ -7,10 +7,17 @@ Changes in nbformat
 In Development
 ==============
 
-5.1.2
+5.1.3
 =====
 
 - Change id generation to be hash based to avoid problematic word combinations
+- Added tests for python 3.9
+- Fixed setup.py build operations to include package data
+
+5.1.2
+=====
+
+- Fixed missing file in manifest
 
 5.1.1
 =====
