@@ -1,6 +1,6 @@
 {
   "name": "nbformat-schema",
-  "version": "5.1.3",
+  "version": "5.1.4-beta.0",
   "description": "JSON schemata for Jupyter notebook formats",
   "main": "index.js",
   "files": [
