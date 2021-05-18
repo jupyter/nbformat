@@ -70,7 +70,7 @@ def upgrade(nb, from_version=None, from_minor=None):
         return nb
     elif from_version == 4:
         if from_minor == nbformat_minor:
-            return
+            return nb
 
         # other versions migration code e.g.
         # if from_minor < 3:
