@@ -6,6 +6,9 @@
 import os
 import re
 
+from nbformat.warnings import MissingIDFieldWarning
+from copy import deepcopy
+
 from .base import TestsBase
 from jsonschema import ValidationError
 from nbformat import read
@@ -13,6 +16,8 @@ from ..validator import isvalid, validate, iter_validate
 from ..json_compat import VALIDATORS
 
 import pytest
+
+nb4 = ("test4.ipynb", "test4.5.ipynb")
 
 
 # Fixtures
@@ -27,6 +32,49 @@ def clean_env_before_and_after_tests():
 # Helpers
 def set_validator(validator_name):
     os.environ["NBFORMAT_VALIDATOR"] = validator_name
+
+
+@pytest.mark.parametrize("validator_name", VALIDATORS)
+def test_should_warn(validator_name):
+    """Test that a v4 notebook witout id emit a warning"""
+    set_validator(validator_name)
+    with TestsBase.fopen(u"test4.5.ipynb", u"r") as f:
+        nb = read(f, as_version=4)
+
+    del nb.cells[3]["id"]
+    assert nb.cells[3].get("id") is None
+    assert nb.cells[3]["cell_type"] == "code"
+
+    nb_copy = deepcopy(nb)
+
+    with pytest.warns(MissingIDFieldWarning):
+        validate(nb)
+    assert isvalid(nb) == True
+
+
+@pytest.mark.xfail(reason="In the future we want to stop warning, and raise an error")
+@pytest.mark.parametrize("validator_name", VALIDATORS)
+def test_should_not_mutate(validator_name):
+    """Test that a v4 notebook without id raise an error and does/not mutate
+
+    Probably should be 2 test. To enable in the future.
+    """
+    set_validator(validator_name)
+    with TestsBase.fopen(u"test4.5.ipynb", u"r") as f:
+        nb = read(f, as_version=4)
+
+    del nb.cells[3]["id"]
+    assert nb.cells[3].get("id") is None
+    assert nb.cells[3]["cell_type"] == "code"
+
+    nb_deep_copy = deepcopy(nb)
+
+    with (pytest.raises(MissingIDFieldWarning), pytest.warns(None)):
+        validate(nb)
+
+    assert nb == nb_deep_copy
+
+    assert isvalid(nb) == True
 
 
 @pytest.mark.parametrize("validator_name", VALIDATORS)
@@ -50,10 +98,11 @@ def test_nb3(validator_name):
 
 
 @pytest.mark.parametrize("validator_name", VALIDATORS)
-def test_nb4(validator_name):
+@pytest.mark.parametrize("nbfile", nb4)
+def test_nb4(validator_name, nbfile):
     """Test that a v4 notebook passes validation"""
     set_validator(validator_name)
-    with TestsBase.fopen(u'test4.ipynb', u'r') as f:
+    with TestsBase.fopen(nbfile, u"r") as f:
         nb = read(f, as_version=4)
     validate(nb)
     assert isvalid(nb) == True

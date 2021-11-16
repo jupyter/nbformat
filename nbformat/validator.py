@@ -7,11 +7,13 @@ import os
 import pprint
 import sys
 import warnings
+from copy import deepcopy
 
 from ipython_genutils.importstring import import_item
 from .json_compat import get_current_validator, ValidationError
 from .reader import get_version, reads
 from .corpus.words import generate_corpus_id
+from .warnings import MissingIDFieldWarning
 
 validators = {}
 
@@ -229,15 +231,71 @@ def better_validation_error(error, version, version_minor):
     return NotebookValidationError(error, ref)
 
 
-def validate(nbdict=None, ref=None, version=None, version_minor=None,
-             relax_add_props=False, nbjson=None):
+def normalize(nbdict, version, version_minor):
+    """
+    EXPERIMENTAL
+
+    normalise a notebook prior to validation.
+
+    This tries to implement a couple of normalisation steps to standardise
+    notebooks and make validation easier.
+
+    You should in general not rely on this function and make sure the notebooks
+    that reach nbformat are already in a normal form.
+
+    Parameters
+    ----------
+    nbdict : dict
+        notebook document
+    version : int
+    version_minor : int
+
+    Returns
+    -------
+    changes : int
+        number of changes in the notebooks
+    notebook : dict
+        deep-copy of the original object with relevant changes.
+
+    """
+    nbdict = deepcopy(nbdict)
+    return _normalize(nbdict)
+
+def _normalize(nbdict, version, version_minor):
+    changes = 0
+
+    if version >= 4 and version_minor >= 5:
+        # if we support cell ids ensure default ids are provided
+        for cell in nbdict["cells"]:
+            if "id" not in cell:
+                changes +=1
+                warnings.warn(
+                    "Code cell is missing an id field, this will become"
+                    " a hard error in future nbformat versions. You may want"
+                    " to use `normalize()` on your notebooks before validations"
+                    " (available since nbformat 5.1.4). Previous of nbformat"
+                    " are also mutating their arguments, and will stop to do so"
+                    " in the future.",
+                    MissingIDFieldWarning,
+                    stacklevel=3,
+                )
+                # Generate cell ids if any are missing
+                cell['id'] = generate_corpus_id()
+    return changes, nbdict
+
+def validate(nbdict=None, ref:str=None, version=None, version_minor=None,
+             relax_add_props=False, nbjson=None) -> None:
     """Checks whether the given notebook dict-like object
     conforms to the relevant notebook format schema.
 
-
+    Parameters
+    ----------
+    ref : optional, str
+        reference to the subset of the schema we want to validate against.
+        for example ``"markdown_cell"``, `"code_cell"` ....
     Raises ValidationError if not valid.
     """
-
+    assert isinstance(ref, str) or ref is None
     # backwards compatibility for nbjson argument
     if nbdict is not None:
         pass
@@ -257,13 +315,8 @@ def validate(nbdict=None, ref=None, version=None, version_minor=None,
         # if ref is specified, and we don't have a version number, assume we're validating against 1.0
         if version is None:
             version, version_minor = 1, 0
-
-    if ref is None and version >= 4 and version_minor >= 5:
-        # if we support cell ids ensure default ids are provided
-        for cell in nbdict['cells']:
-            if 'id' not in cell:
-                # Generate cell ids if any are missing
-                cell['id'] = generate_corpus_id()
+    if ref is None:
+        _normalize(nbdict, version, version_minor)
 
     for error in iter_validate(nbdict, ref=ref, version=version,
                                version_minor=version_minor,
