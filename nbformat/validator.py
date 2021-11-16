@@ -5,6 +5,9 @@
 import json
 import os
 import pprint
+import sys
+import warnings
+from copy import deepcopy
 
 from traitlets.log import get_logger
 
@@ -12,6 +15,7 @@ from ._imports import import_item
 from .corpus.words import generate_corpus_id
 from .json_compat import ValidationError, _validator_for_name, get_current_validator
 from .reader import get_version
+from .warnings import DuplicateCellId, MissingIDFieldWarning
 
 validators = {}
 
@@ -246,6 +250,82 @@ def better_validation_error(error, version, version_minor):
     return NotebookValidationError(error, ref)
 
 
+def normalize(nbdict, version, version_minor):
+    """
+    EXPERIMENTAL
+
+    normalise a notebook prior to validation.
+
+    This tries to implement a couple of normalisation steps to standardise
+    notebooks and make validation easier.
+
+    You should in general not rely on this function and make sure the notebooks
+    that reach nbformat are already in a normal form.
+
+    Parameters
+    ----------
+    nbdict : dict
+        notebook document
+    version : int
+    version_minor : int
+
+    Returns
+    -------
+    changes : int
+        number of changes in the notebooks
+    notebook : dict
+        deep-copy of the original object with relevant changes.
+
+    """
+    nbdict = deepcopy(nbdict)
+    return _normalize(nbdict)
+
+
+def _normalize(nbdict, version, version_minor, repair_duplicate_cell_ids):
+    changes = 0
+
+    if version >= 4 and version_minor >= 5:
+        # if we support cell ids ensure default ids are provided
+        for cell in nbdict["cells"]:
+            if "id" not in cell:
+                warnings.warn(
+                    "Code cell is missing an id field, this will become"
+                    " a hard error in future nbformat versions. You may want"
+                    " to use `normalize()` on your notebooks before validations"
+                    " (available since nbformat 5.1.4). Previous of nbformat"
+                    " are also mutating their arguments, and will stop to do so"
+                    " in the future.",
+                    MissingIDFieldWarning,
+                    stacklevel=3,
+                )
+                # Generate cell ids if any are missing
+                if repair_duplicate_cell_ids:
+                    cell["id"] = generate_corpus_id()
+                    changes += 1
+
+        # if we support cell ids check for uniqueness when validating the whole notebook
+        seen_ids = set()
+        for cell in nbdict["cells"]:
+            if "id" not in cell:
+                continue
+            cell_id = cell["id"]
+            if cell_id in seen_ids:
+                # Best effort to repair if we find a duplicate id
+                if repair_duplicate_cell_ids:
+                    new_id = generate_corpus_id()
+                    cell["id"] = new_id
+                    changes += 1
+                    warnings.warn(
+                        f"Non-unique cell id {cell_id!r} detected. Corrected to {new_id!r}.",
+                        DuplicateCellId,
+                        stacklevel=3,
+                    )
+                else:
+                    raise ValidationError(f"Non-unique cell id '{cell_id}' detected.")
+            seen_ids.add(cell_id)
+    return changes, nbdict
+
+
 def validate(
     nbdict=None,
     ref=None,
@@ -256,13 +336,18 @@ def validate(
     repair_duplicate_cell_ids=True,
     strip_invalid_metadata=False,
 ):
+
     """Checks whether the given notebook dict-like object
     conforms to the relevant notebook format schema.
 
-
+    Parameters
+    ----------
+    ref : optional, str
+        reference to the subset of the schema we want to validate against.
+        for example ``"markdown_cell"``, `"code_cell"` ....
     Raises ValidationError if not valid.
     """
-
+    assert isinstance(ref, str) or ref is None
     # backwards compatibility for nbjson argument
     if nbdict is not None:
         pass
@@ -283,13 +368,8 @@ def validate(
         if version is None:
             version, version_minor = 1, 0
 
-    notebook_supports_cell_ids = ref is None and version >= 4 and version_minor >= 5
-    if notebook_supports_cell_ids and repair_duplicate_cell_ids:
-        # Auto-generate cell ids for cells that are missing them.
-        for cell in nbdict["cells"]:
-            if "id" not in cell:
-                # Generate cell ids if any are missing
-                cell["id"] = generate_corpus_id()
+    if ref is None:
+        _normalize(nbdict, version, version_minor, repair_duplicate_cell_ids)
 
     for error in iter_validate(
         nbdict,
@@ -299,25 +379,8 @@ def validate(
         relax_add_props=relax_add_props,
         strip_invalid_metadata=strip_invalid_metadata,
     ):
-        raise error
 
-    if notebook_supports_cell_ids:
-        # if we support cell ids check for uniqueness when validating the whole notebook
-        seen_ids = set()
-        for cell in nbdict["cells"]:
-            cell_id = cell["id"]
-            if cell_id in seen_ids:
-                if repair_duplicate_cell_ids:
-                    # Best effort to repair if we find a duplicate id
-                    cell["id"] = generate_corpus_id()
-                    get_logger().warning(
-                        "Non-unique cell id '{}' detected. Corrected to '{}'.".format(
-                            cell_id, cell["id"]
-                        )
-                    )
-                else:
-                    raise ValidationError(f"Non-unique cell id '{cell_id}' detected.")
-            seen_ids.add(cell_id)
+        raise error
 
 
 def iter_validate(

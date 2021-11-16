@@ -6,6 +6,7 @@
 import json
 import os
 import re
+from copy import deepcopy
 
 import pytest
 from jsonschema import ValidationError
@@ -14,8 +15,11 @@ import nbformat
 from nbformat import read
 from nbformat.json_compat import VALIDATORS
 from nbformat.validator import isvalid, iter_validate, validate
+from nbformat.warnings import DuplicateCellId, MissingIDFieldWarning
 
 from .base import TestsBase
+
+nb4 = ("test4.ipynb", "test4.5.ipynb")
 
 
 # Fixtures
@@ -30,6 +34,49 @@ def clean_env_before_and_after_tests():
 # Helpers
 def set_validator(validator_name):
     os.environ["NBFORMAT_VALIDATOR"] = validator_name
+
+
+@pytest.mark.parametrize("validator_name", VALIDATORS)
+def test_should_warn(validator_name):
+    """Test that a v4 notebook witout id emit a warning"""
+    set_validator(validator_name)
+    with TestsBase.fopen("test4.5.ipynb", "r") as f:
+        nb = read(f, as_version=4)
+
+    del nb.cells[3]["id"]
+    assert nb.cells[3].get("id") is None
+    assert nb.cells[3]["cell_type"] == "code"
+
+    nb_copy = deepcopy(nb)
+
+    with pytest.warns(MissingIDFieldWarning):
+        validate(nb)
+    assert isvalid(nb) == True
+
+
+@pytest.mark.xfail(reason="In the future we want to stop warning, and raise an error")
+@pytest.mark.parametrize("validator_name", VALIDATORS)
+def test_should_not_mutate(validator_name):
+    """Test that a v4 notebook without id raise an error and does/not mutate
+
+    Probably should be 2 test. To enable in the future.
+    """
+    set_validator(validator_name)
+    with TestsBase.fopen("test4.5.ipynb", "r") as f:
+        nb = read(f, as_version=4)
+
+    del nb.cells[3]["id"]
+    assert nb.cells[3].get("id") is None
+    assert nb.cells[3]["cell_type"] == "code"
+
+    nb_deep_copy = deepcopy(nb)
+
+    with (pytest.raises(MissingIDFieldWarning), pytest.warns(None)):
+        validate(nb)
+
+    assert nb == nb_deep_copy
+
+    assert isvalid(nb) == True
 
 
 @pytest.mark.parametrize("validator_name", VALIDATORS)
@@ -53,10 +100,11 @@ def test_nb3(validator_name):
 
 
 @pytest.mark.parametrize("validator_name", VALIDATORS)
-def test_nb4(validator_name):
+@pytest.mark.parametrize("nbfile", nb4)
+def test_nb4(validator_name, nbfile):
     """Test that a v4 notebook passes validation"""
     set_validator(validator_name)
-    with TestsBase.fopen("test4.ipynb", "r") as f:
+    with TestsBase.fopen(nbfile, "r") as f:
         nb = read(f, as_version=4)
     validate(nb)
     assert isvalid(nb)
@@ -237,10 +285,12 @@ def test_repair_non_unique_cell_ids():
     with TestsBase.fopen("invalid_unique_cell_id.ipynb", "r") as f:
         # Avoids validate call from `.read`
         nb = nbformat.from_dict(json.load(f))
-    validate(nb)
+    with pytest.warns(DuplicateCellId):
+        validate(nb)
     assert isvalid(nb)
 
 
+@pytest.mark.filterwarnings(MissingIDFieldWarning)
 def test_no_cell_ids():
     """Test that a cell without a cell ID does not pass validation"""
     import nbformat
@@ -255,6 +305,7 @@ def test_no_cell_ids():
         validate(nb, repair_duplicate_cell_ids=False)
 
 
+@pytest.mark.filterwarnings(MissingIDFieldWarning)
 def test_repair_no_cell_ids():
     """Test that we will repair cells without ids if asked during validation"""
     import nbformat

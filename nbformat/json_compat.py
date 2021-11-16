@@ -88,6 +88,8 @@ def _validator_for_name(validator_name):
     for (name, module, validator_cls) in _VALIDATOR_MAP:
         if module and validator_name == name:
             return validator_cls
+    # we always return something.
+    raise ValueError(f"Missing validator for {repr(validator_name)}")
 
 
 def get_current_validator():
