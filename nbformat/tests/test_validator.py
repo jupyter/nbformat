@@ -232,3 +232,12 @@ def test_invalid_cell_id():
     with pytest.raises(ValidationError):
         validate(nb)
     assert not isvalid(nb)
+
+def test_notebook_invalid_without_min_version():
+    with TestsBase.fopen(u'no_min_version.ipynb', u'r') as f:
+        nb = read(f)
+    #with pytest.raises(ValidationError):
+    validate(nb)
+
+def test_notebook_invalid_without_main_version():
+    pass
