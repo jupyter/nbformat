@@ -1,8 +1,8 @@
 """The basic dict based notebook format.
 
 The Python representation of a notebook is a nested structure of
-dictionary subclasses that support attribute access
-(ipython_genutils.ipstruct.Struct). The functions in this module are merely
+dictionary subclasses that support attribute access.
+The functions in this module are merely
 helpers to build the structs in the right form.
 
 Authors:
@@ -24,7 +24,7 @@ Authors:
 import pprint
 import uuid
 
-from ipython_genutils.ipstruct import Struct
+from .._struct import Struct
 
 #-----------------------------------------------------------------------------
 # Code

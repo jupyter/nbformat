@@ -88,7 +88,6 @@ if 'develop' in sys.argv or any(a.startswith('bdist') for a in sys.argv):
 
 setuptools_args = {}
 install_requires = setuptools_args['install_requires'] = [
-    'ipython_genutils',
     'traitlets>=4.1',
     'jsonschema>=2.4,!=2.5.0',
     'jupyter_core',
