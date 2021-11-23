@@ -5,17 +5,17 @@
 
 import os
 import re
-
-from nbformat.warnings import MissingIDFieldWarning
 from copy import deepcopy
 
-from .base import TestsBase
-from jsonschema import ValidationError
-from nbformat import read
-from ..validator import isvalid, validate, iter_validate
-from ..json_compat import VALIDATORS
-
 import pytest
+from jsonschema import ValidationError
+
+from nbformat import read
+from nbformat.warnings import MissingIDFieldWarning
+
+from ..json_compat import VALIDATORS
+from ..validator import isvalid, iter_validate, validate
+from .base import TestsBase
 
 nb4 = ("test4.ipynb", "test4.5.ipynb")
 

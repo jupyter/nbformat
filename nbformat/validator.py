@@ -2,6 +2,7 @@
 # Distributed under the terms of the Modified BSD License.
 
 from __future__ import print_function
+
 import json
 import os
 import pprint
@@ -10,9 +11,10 @@ import warnings
 from copy import deepcopy
 
 from ipython_genutils.importstring import import_item
-from .json_compat import get_current_validator, ValidationError
-from .reader import get_version, reads
+
 from .corpus.words import generate_corpus_id
+from .json_compat import ValidationError, get_current_validator
+from .reader import get_version, reads
 from .warnings import MissingIDFieldWarning
 
 validators = {}
