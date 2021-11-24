@@ -4,7 +4,7 @@
 # Distributed under the terms of the Modified BSD License.
 
 from ipython_genutils.py3compat import str_to_bytes
-
+from .. import validator
 from .._compat import encodebytes, decodebytes
 
 
@@ -16,14 +16,17 @@ def restore_bytes(nb):
 
     Note: this is never used
     """
-    for ws in nb.worksheets:
-        for cell in ws.cells:
-            if cell.cell_type == 'code':
-                for output in cell.outputs:
-                    if 'png' in output:
-                        output.png = str_to_bytes(output.png, 'ascii')
-                    if 'jpeg' in output:
-                        output.jpeg = str_to_bytes(output.jpeg, 'ascii')
+    try:
+        for ws in nb.worksheets:
+            for cell in ws.cells:
+                if cell.cell_type == 'code':
+                    for output in cell.outputs:
+                        if 'png' in output:
+                            output.png = str_to_bytes(output.png, 'ascii')
+                        if 'jpeg' in output:
+                            output.jpeg = str_to_bytes(output.jpeg, 'ascii')
+    except KeyError as e:
+        validator.ValidationError(f"The notebook was invalid missing the key: {e.message}")
     return nb
 
 # output keys that are likely to have multiline values
