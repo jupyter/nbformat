@@ -4,6 +4,7 @@
 # Distributed under the terms of the Modified BSD License.
 
 import json
+from .validator import ValidationError
 
 class NotJSONError(ValueError):
     pass
@@ -52,13 +53,21 @@ def reads(s, **kwargs):
     -------
     nb : NotebookNode
         The notebook that was read.
+    
+    Raises
+    ------
+
+    ValidationError : Notebook JSON for a given version is missing an expected key and cannot be read
     """
     from . import versions, NBFormatError
     
     nb_dict = parse_json(s, **kwargs)
     (major, minor) = get_version(nb_dict)
     if major in versions:
-        return versions[major].to_notebook_json(nb_dict, minor=minor)
+        try:
+            return versions[major].to_notebook_json(nb_dict, minor=minor)
+        except AttributeError as e:
+            raise ValidationError(f"The notebook is invalid and is missing an expected key: {e}")
     else:
         raise NBFormatError('Unsupported nbformat version %s' % major)
 
