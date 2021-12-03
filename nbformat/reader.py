@@ -56,8 +56,11 @@ def reads(s, **kwargs):
     
     Raises
     ------
-
-    ValidationError : Notebook JSON for a given version is missing an expected key and cannot be read
+    ValidationError 
+        Notebook JSON for a given version is missing an expected key and cannot be read.
+    
+    NBFormatError
+        Specified major version is invalid or unsupported.
     """
     from . import versions, NBFormatError
     
@@ -89,3 +92,4 @@ def read(fp, **kwargs):
         The notebook that was read.
     """
     return reads(fp.read(), **kwargs)
+
