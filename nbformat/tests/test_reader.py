@@ -47,3 +47,4 @@ class TestReader(TestsBase):
         with self.fopen(u'test3_worksheet_with_no_cells.ipynb', u'r') as f:
             with self.assertRaisesRegex(ValidationError, r'cells'):
                 nb = read(f)
+    
