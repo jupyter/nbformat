@@ -50,11 +50,12 @@ class TestConvert(TestsBase):
         nb = convert(nb, 4)
         self.assertEqual(isvalid(nb), True)
 
+
     def test_upgrade_3_4__missing_metadata(self):
         with self.fopen(u'test3_no_metadata.ipynb', u'r') as f:
             nb = read(f)
 
-        with self.assertRaisesRegex(ValidationError, r'metadata'):
+        with self.assertRaisesRegex(ValidationError, r'could not be converted.+metadata'):
             convert(nb, 4)
 
 
