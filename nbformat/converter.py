@@ -5,7 +5,6 @@
 
 from . import versions
 from .reader import get_version
-from .validator import ValidationError
 
 
 def convert(nb, to_version):
@@ -21,17 +20,6 @@ def convert(nb, to_version):
     to_version : int
         Major revision to convert the notebook to.  Can either be an upgrade or
         a downgrade.
-
-    Raises
-    ------
-    ValueError
-        Notebook failed to convert.
-
-    ValueError
-        The version specified is invalid or doesn't exist.
-
-    ValidationError
-        Conversion failed due to missing expected attributes.
     """
 
     # Get input notebook version.
@@ -54,13 +42,10 @@ def convert(nb, to_version):
             step_version = version - 1
             convert_function = versions[version].downgrade
 
-        try:
-            # Convert and make sure version changed during conversion.
-            converted = convert_function(nb)
-            if converted.get('nbformat', 1) == version:
-                raise ValueError("Failed to convert notebook from v%d to v%d." % (version, step_version))
-        except AttributeError as e:
-            raise ValidationError(f"Notebook could not be converted from version {version} to version {step_version}: {e}")
+        # Convert and make sure version changed during conversion.
+        converted = convert_function(nb)
+        if converted.get('nbformat', 1) == version:
+            raise ValueError("Failed to convert notebook from v%d to v%d." % (version, step_version))
 
         # Recursively convert until target version is reached.
         return convert(converted, to_version)
