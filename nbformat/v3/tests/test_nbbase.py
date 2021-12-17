@@ -137,12 +137,14 @@ class TestOutputs(TestCase):
         out = new_output(output_png=b'\x89PNG\r\n\x1a\n', output_type='display_data')
 
     def test_b64b6tes_png(self):
+        # really those tests are wrong, this is not b64, if prefixed by b
         out = new_output(output_png=b'iVBORw0KG', output_type='display_data')
     
     def test_binary_jpeg(self):
         out = new_output(output_jpeg=b'\xff\xd8', output_type='display_data')
 
     def test_b64b6tes_jpeg(self):
+        # really those tests are wrong, this is not b64, if prefixed by b
         out = new_output(output_jpeg=b'/9', output_type='display_data')
         
 

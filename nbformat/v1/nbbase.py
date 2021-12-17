@@ -19,7 +19,7 @@ Authors:
 import pprint
 import uuid
 
-from ipython_genutils.ipstruct import Struct
+from .._struct import Struct
 
 #-----------------------------------------------------------------------------
 # Code

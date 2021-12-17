@@ -7,6 +7,8 @@ from unittest import mock
 from nbformat import validate
 from .. import convert
 from ..nbjson import reads
+import pytest
+from nbformat import ValidationError
 
 from . import nbexamples
 from nbformat.v3.tests import nbexamples as v3examples
@@ -89,3 +91,11 @@ def test_upgrade_v4_to_4_dot_5():
     assert nb_up['nbformat_minor'] == 5
     validate(nb_up)
     assert nb_up.cells[0]['id'] is not None
+
+def test_upgrade_without_nbminor_version():
+    here = os.path.dirname(__file__)
+    with io.open(os.path.join(here, os.pardir, os.pardir, 'tests', "no_min_version.ipynb"), encoding='utf-8') as f:
+        nb = reads(f.read())
+    
+    with pytest.raises(ValidationError):
+        convert.upgrade(nb) 

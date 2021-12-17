@@ -1,8 +1,8 @@
 """The basic dict based notebook format.
 
 The Python representation of a notebook is a nested structure of
-dictionary subclasses that support attribute access
-(ipython_genutils.ipstruct.Struct). The functions in this module are merely
+dictionary subclasses that support attribute access.
+The functions in this module are merely
 helpers to build the structs in the right form.
 """
 
@@ -11,9 +11,9 @@ helpers to build the structs in the right form.
 
 import pprint
 import uuid
+import warnings
 
-from ipython_genutils.ipstruct import Struct
-from ipython_genutils.py3compat import cast_unicode
+from .._struct import Struct
 
 #-----------------------------------------------------------------------------
 # Code
@@ -42,6 +42,30 @@ def from_dict(d):
         return d
 
 
+def str_passthrough(obj):
+    """
+    Used to be cast_unicode, add this temporarily to make sure no further breakage.
+    """
+    assert isinstance(obj, str)
+    return obj
+
+
+def cast_str(obj):
+    if isinstance(obj, bytes):
+        # really this should never happend, it should
+        # have been base64 encoded before.
+        warnings.warn(
+            "A notebook got bytes instead of likely base64 encoded values."
+            "The content will likely be corrupted.",
+            UserWarning,
+            stacklevel=3,
+        )
+        dec = obj.decode("ascii", "replace")
+    else:
+        assert isinstance(obj, str)
+        return obj
+
+
 def new_output(output_type, output_text=None, output_png=None,
     output_html=None, output_svg=None, output_latex=None, output_json=None,
     output_javascript=None, output_jpeg=None, prompt_number=None,
@@ -62,21 +86,21 @@ def new_output(output_type, output_text=None, output_png=None,
 
     if output_type != 'pyerr':
         if output_text is not None:
-            output.text = cast_unicode(output_text)
+            output.text = str_passthrough(output_text)
         if output_png is not None:
-            output.png = cast_unicode(output_png)
+            output.png = cast_str(output_png)
         if output_jpeg is not None:
-            output.jpeg = cast_unicode(output_jpeg)
+            output.jpeg = cast_str(output_jpeg)
         if output_html is not None:
-            output.html = cast_unicode(output_html)
+            output.html = str_passthrough(output_html)
         if output_svg is not None:
-            output.svg = cast_unicode(output_svg)
+            output.svg = str_passthrough(output_svg)
         if output_latex is not None:
-            output.latex = cast_unicode(output_latex)
+            output.latex = str_passthrough(output_latex)
         if output_json is not None:
-            output.json = cast_unicode(output_json)
+            output.json = str_passthrough(output_json)
         if output_javascript is not None:
-            output.javascript = cast_unicode(output_javascript)
+            output.javascript = str_passthrough(output_javascript)
 
     if output_type == u'pyout':
         if prompt_number is not None:
@@ -84,14 +108,14 @@ def new_output(output_type, output_text=None, output_png=None,
 
     if output_type == u'pyerr':
         if ename is not None:
-            output.ename = cast_unicode(ename)
+            output.ename = str_passthrough(ename)
         if evalue is not None:
-            output.evalue = cast_unicode(evalue)
+            output.evalue = str_passthrough(evalue)
         if traceback is not None:
-            output.traceback = [cast_unicode(frame) for frame in list(traceback)]
+            output.traceback = [str_passthrough(frame) for frame in list(traceback)]
 
-    if output_type == u'stream':
-        output.stream = 'stdout' if stream is None else cast_unicode(stream)
+    if output_type == u"stream":
+        output.stream = "stdout" if stream is None else str_passthrough(stream)
 
     return output
 
@@ -102,9 +126,9 @@ def new_code_cell(input=None, prompt_number=None, outputs=None,
     cell = NotebookNode()
     cell.cell_type = u'code'
     if language is not None:
-        cell.language = cast_unicode(language)
+        cell.language = str_passthrough(language)
     if input is not None:
-        cell.input = cast_unicode(input)
+        cell.input = str_passthrough(input)
     if prompt_number is not None:
         cell.prompt_number = int(prompt_number)
     if outputs is None:
@@ -125,7 +149,7 @@ def new_text_cell(cell_type, source=None, rendered=None, metadata=None):
     if cell_type == 'plaintext':
         cell_type = 'raw'
     if source is not None:
-        cell.source = cast_unicode(source)
+        cell.source = str_passthrough(source)
     cell.metadata = NotebookNode(metadata or {})
     cell.cell_type = cell_type
     return cell
@@ -136,7 +160,7 @@ def new_heading_cell(source=None, level=1, rendered=None, metadata=None):
     cell = NotebookNode()
     cell.cell_type = u'heading'
     if source is not None:
-        cell.source = cast_unicode(source)
+        cell.source = str_passthrough(source)
     cell.level = int(level)
     cell.metadata = NotebookNode(metadata or {})
     return cell
@@ -167,7 +191,7 @@ def new_notebook(name=None, metadata=None, worksheets=None):
     else:
         nb.metadata = NotebookNode(metadata)
     if name is not None:
-        nb.metadata.name = cast_unicode(name)
+        nb.metadata.name = str_passthrough(name)
     return nb
 
 
@@ -176,29 +200,29 @@ def new_metadata(name=None, authors=None, license=None, created=None,
     """Create a new metadata node."""
     metadata = NotebookNode()
     if name is not None:
-        metadata.name = cast_unicode(name)
+        metadata.name = str_passthrough(name)
     if authors is not None:
         metadata.authors = list(authors)
     if created is not None:
-        metadata.created = cast_unicode(created)
+        metadata.created = str_passthrough(created)
     if modified is not None:
-        metadata.modified = cast_unicode(modified)
+        metadata.modified = str_passthrough(modified)
     if license is not None:
-        metadata.license = cast_unicode(license)
+        metadata.license = str_passthrough(license)
     if gistid is not None:
-        metadata.gistid = cast_unicode(gistid)
+        metadata.gistid = str_passthrough(gistid)
     return metadata
 
 def new_author(name=None, email=None, affiliation=None, url=None):
     """Create a new author."""
     author = NotebookNode()
     if name is not None:
-        author.name = cast_unicode(name)
+        author.name = str_passthrough(name)
     if email is not None:
-        author.email = cast_unicode(email)
+        author.email = str_passthrough(email)
     if affiliation is not None:
-        author.affiliation = cast_unicode(affiliation)
+        author.affiliation = str_passthrough(affiliation)
     if url is not None:
-        author.url = cast_unicode(url)
+        author.url = str_passthrough(url)
     return author
 

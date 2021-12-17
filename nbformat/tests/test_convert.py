@@ -7,7 +7,7 @@ from .base import TestsBase
 
 from ..converter import convert
 from ..reader import read, get_version
-from ..validator import isvalid, validate
+from ..validator import isvalid, validate, ValidationError
 from .. import current_nbformat
 
 
@@ -49,6 +49,14 @@ class TestConvert(TestsBase):
         validate(nb)
         nb = convert(nb, 4)
         self.assertEqual(isvalid(nb), True)
+
+
+    def test_upgrade_3_4__missing_metadata(self):
+        with self.fopen(u'test3_no_metadata.ipynb', u'r') as f:
+            nb = read(f)
+
+        with self.assertRaisesRegex(ValidationError, r'could not be converted.+metadata'):
+            convert(nb, 4)
 
 
     def test_open_current(self):

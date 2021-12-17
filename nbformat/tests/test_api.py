@@ -11,7 +11,7 @@ import unittest
 
 from .base import TestsBase
 
-from ipython_genutils.tempdir import TemporaryDirectory
+from tempfile import TemporaryDirectory
 from ..reader import get_version
 from nbformat import read, current_nbformat, writes, write
 
