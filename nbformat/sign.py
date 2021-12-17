@@ -20,7 +20,6 @@ except ImportError:
     except ImportError:
         sqlite3 = None
 
-from ipython_genutils.py3compat import cast_bytes, cast_unicode
 from traitlets import (
     Instance, Bytes, Enum, Any, Unicode, Bool, Integer, TraitType,
     default, observe,
@@ -268,7 +267,8 @@ def yield_everything(obj):
     if isinstance(obj, dict):
         for key in sorted(obj):
             value = obj[key]
-            yield cast_bytes(key)
+            assert isinstance(key, str)
+            yield key.encode()
             for b in yield_everything(value):
                 yield b
     elif isinstance(obj, (list, tuple)):
@@ -598,7 +598,8 @@ class TrustNotebookApp(JupyterApp):
             return
         if not self.extra_args:
             self.log.debug("Reading notebook from stdin")
-            nb_s = cast_unicode(sys.stdin.read())
+            nb_s = sys.stdin.read()
+            assert isinstance(nb_s, str)
             nb = reads(nb_s, NO_CONVERT)
             self.sign_notebook(nb, '<stdin>')
         else:

@@ -8,7 +8,7 @@ import pprint
 import sys
 import warnings
 
-from ipython_genutils.importstring import import_item
+from ._imports import import_item
 from .json_compat import get_current_validator, ValidationError
 from .reader import get_version, reads
 from .corpus.words import generate_corpus_id
