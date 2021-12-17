@@ -5,6 +5,7 @@
 
 import json
 import re
+from .. import validator
 
 from .nbbase import (
     random_cell_id,
@@ -38,6 +39,8 @@ def upgrade(nb, from_version=None, from_minor=None):
     if not from_version:
         from_version = nb['nbformat']
     if not from_minor:
+        if not 'nbformat_minor' in nb:
+            raise validator.ValidationError('The notebook does not include the nbformat minor which is needed')
         from_minor = nb['nbformat_minor']
 
     if from_version == 3:
