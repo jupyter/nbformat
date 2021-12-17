@@ -25,7 +25,7 @@ def restore_bytes(nb):
                         if "jpeg" in output:
                             output.jpeg = output.jpeg.encode("ascii", "replace")
     except KeyError as e:
-        validator.ValidationError(f"The notebook was invalid missing the key: {e.message}")
+        raise validator.ValidationError(f"The notebook was invalid missing the key: {e.message}")
     return nb
 
 # output keys that are likely to have multiline values
