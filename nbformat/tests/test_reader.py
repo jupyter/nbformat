@@ -15,6 +15,7 @@ Contains tests class for reader.py
 from .base import TestsBase
 
 from ..reader import read, get_version
+from ..validator import ValidationError
 
 #-----------------------------------------------------------------------------
 # Classes and functions
@@ -36,3 +37,14 @@ class TestReader(TestsBase):
             nb = read(f)
         (major, minor) = get_version(nb)
         self.assertEqual(major, 2)
+
+    def test_read_fails_on_missing_worksheets(self):
+        with self.fopen(u'test3_no_worksheets.ipynb', u'r') as f:
+            with self.assertRaisesRegex(ValidationError, r'worksheets'):
+                nb = read(f)
+
+    def test_read_fails_on_missing_worksheet_cells(self):
+        with self.fopen(u'test3_worksheet_with_no_cells.ipynb', u'r') as f:
+            with self.assertRaisesRegex(ValidationError, r'cells'):
+                nb = read(f)
+    
