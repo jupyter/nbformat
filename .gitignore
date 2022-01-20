@@ -16,3 +16,4 @@ __pycache__
 .#*
 .coverage
 .cache
+.python-version

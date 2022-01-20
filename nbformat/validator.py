@@ -230,7 +230,7 @@ def better_validation_error(error, version, version_minor):
 
 
 def validate(nbdict=None, ref=None, version=None, version_minor=None,
-             relax_add_props=False, nbjson=None):
+             relax_add_props=False, nbjson=None, repair=False):
     """Checks whether the given notebook dict-like object
     conforms to the relevant notebook format schema.
 
@@ -258,8 +258,9 @@ def validate(nbdict=None, ref=None, version=None, version_minor=None,
         if version is None:
             version, version_minor = 1, 0
 
-    if ref is None and version >= 4 and version_minor >= 5:
-        # if we support cell ids ensure default ids are provided
+    notebook_supports_cell_ids = ref is None and version >= 4 and version_minor >= 5
+    if notebook_supports_cell_ids and repair:
+        # Auto-generate cell ids for cells that are missing them.
         for cell in nbdict['cells']:
             if 'id' not in cell:
                 # Generate cell ids if any are missing
@@ -270,15 +271,17 @@ def validate(nbdict=None, ref=None, version=None, version_minor=None,
                                relax_add_props=relax_add_props):
         raise error
 
-    if ref is None and version >= 4 and version_minor >= 5:
+    if notebook_supports_cell_ids:
         # if we support cell ids check for uniqueness when validating the whole notebook
         seen_ids = set()
         for cell in nbdict['cells']:
             cell_id = cell['id']
             if cell_id in seen_ids:
-                cell['id'] = generate_corpus_id()
-                # Best effort to repair if we find a duplicate id in case the ValidationError isn't blocking
-                raise ValidationError("Non-unique cell id '{}' detected. Corrected to '{}'.".format(cell_id, cell['id']))
+                if repair:
+                    # Best effort to repair if we find a duplicate id
+                    cell['id'] = generate_corpus_id()
+                else:
+                    raise ValidationError("Non-unique cell id '{}' detected.".format(cell_id))
             seen_ids.add(cell_id)
 
 
