@@ -3,6 +3,7 @@
 # Copyright (c) IPython Development Team.
 # Distributed under the terms of the Modified BSD License.
 
+import json
 import os
 import re
 
@@ -212,17 +213,48 @@ def test_fallback_validator_with_iter_errors_using_ref():
 
 def test_non_unique_cell_ids():
     """Test than a non-unique cell id does not pass validation"""
+    import nbformat
     with TestsBase.fopen(u'invalid_unique_cell_id.ipynb', u'r') as f:
-        nb = read(f, as_version=4)
-    # The read call corrects the error and only logs the validation issue, so we reapply the issue for the test after
-    nb.cells[1].id = nb.cells[0].id
+        # Avoids validate call from `.read`
+        nb = nbformat.from_dict(json.load(f))
     with pytest.raises(ValidationError):
-        validate(nb)
-    # The validate call should have corrected the duplicate id entry
+        validate(nb, repair_duplicate_cell_ids=False)
+    # try again to verify that we didn't modify the content
+    with pytest.raises(ValidationError):
+        validate(nb, repair_duplicate_cell_ids=False)
+
+
+def test_repair_non_unique_cell_ids():
+    """Test that we will repair non-unique cell ids if asked during validation"""
+    import nbformat
+    with TestsBase.fopen(u'invalid_unique_cell_id.ipynb', u'r') as f:
+        # Avoids validate call from `.read`
+        nb = nbformat.from_dict(json.load(f))
+    validate(nb)
     assert isvalid(nb)
-    # Reapply to id duplication issue
-    nb.cells[1].id = nb.cells[0].id
-    assert not isvalid(nb)
+
+
+def test_no_cell_ids():
+    """Test that a cell without a cell ID does not pass validation"""
+    import nbformat
+    with TestsBase.fopen(u'v4_5_no_cell_id.ipynb', u'r') as f:
+        # Avoids validate call from `.read`
+        nb = nbformat.from_dict(json.load(f))
+    with pytest.raises(ValidationError):
+        validate(nb, repair_duplicate_cell_ids=False)
+    # try again to verify that we didn't modify the content
+    with pytest.raises(ValidationError):
+        validate(nb, repair_duplicate_cell_ids=False)
+
+
+def test_repair_no_cell_ids():
+    """Test that we will repair cells without ids if asked during validation"""
+    import nbformat
+    with TestsBase.fopen(u'v4_5_no_cell_id.ipynb', u'r') as f:
+        # Avoids validate call from `.read`
+        nb = nbformat.from_dict(json.load(f))
+    validate(nb)
+    assert isvalid(nb)
 
 
 def test_invalid_cell_id():
@@ -233,11 +265,13 @@ def test_invalid_cell_id():
         validate(nb)
     assert not isvalid(nb)
 
+
 def test_notebook_invalid_without_min_version():
     with TestsBase.fopen(u'no_min_version.ipynb', u'r') as f:
         nb = read(f, as_version=4)
     with pytest.raises(ValidationError):
         validate(nb)
+
 
 def test_notebook_invalid_without_main_version():
     pass
