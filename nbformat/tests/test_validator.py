@@ -218,10 +218,10 @@ def test_non_unique_cell_ids():
         # Avoids validate call from `.read`
         nb = nbformat.from_dict(json.load(f))
     with pytest.raises(ValidationError):
-        validate(nb, repair_invalid_cell_ids=False)
+        validate(nb, repair_duplicate_cell_ids=False)
     # try again to verify that we didn't modify the content
     with pytest.raises(ValidationError):
-        validate(nb, repair_invalid_cell_ids=False)
+        validate(nb, repair_duplicate_cell_ids=False)
 
 
 def test_repair_non_unique_cell_ids():
@@ -241,10 +241,10 @@ def test_no_cell_ids():
         # Avoids validate call from `.read`
         nb = nbformat.from_dict(json.load(f))
     with pytest.raises(ValidationError):
-        validate(nb, repair_invalid_cell_ids=False)
+        validate(nb, repair_duplicate_cell_ids=False)
     # try again to verify that we didn't modify the content
     with pytest.raises(ValidationError):
-        validate(nb, repair_invalid_cell_ids=False)
+        validate(nb, repair_duplicate_cell_ids=False)
 
 
 def test_repair_no_cell_ids():

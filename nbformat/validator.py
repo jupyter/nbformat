@@ -233,7 +233,7 @@ def better_validation_error(error, version, version_minor):
 
 
 def validate(nbdict=None, ref=None, version=None, version_minor=None,
-             relax_add_props=False, nbjson=None, repair_invalid_cell_ids=True):
+             relax_add_props=False, nbjson=None, repair_duplicate_cell_ids=True):
     """Checks whether the given notebook dict-like object
     conforms to the relevant notebook format schema.
 
@@ -262,7 +262,7 @@ def validate(nbdict=None, ref=None, version=None, version_minor=None,
             version, version_minor = 1, 0
 
     notebook_supports_cell_ids = ref is None and version >= 4 and version_minor >= 5
-    if notebook_supports_cell_ids and repair_invalid_cell_ids:
+    if notebook_supports_cell_ids and repair_duplicate_cell_ids:
         # Auto-generate cell ids for cells that are missing them.
         for cell in nbdict['cells']:
             if 'id' not in cell:
@@ -280,7 +280,7 @@ def validate(nbdict=None, ref=None, version=None, version_minor=None,
         for cell in nbdict['cells']:
             cell_id = cell['id']
             if cell_id in seen_ids:
-                if repair_invalid_cell_ids:
+                if repair_duplicate_cell_ids:
                     # Best effort to repair if we find a duplicate id
                     cell['id'] = generate_corpus_id()
                     get_logger().warn("Non-unique cell id '{}' detected. Corrected to '{}'.".format(cell_id, cell['id']))
