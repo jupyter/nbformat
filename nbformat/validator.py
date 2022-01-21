@@ -324,7 +324,7 @@ def iter_validate(nbdict=None, ref=None, version=None, version_minor=None,
             error_tree = validator.error_tree(errors)
             if "metadata" in error_tree:
                 for key in error_tree["metadata"]:
-                    del nbdict["metadata"][key]
+                    nbdict["metadata"].pop(key, None)
 
             if "cells" in error_tree:
                 number_of_cells = len(nbdict.get("cells", 0))
