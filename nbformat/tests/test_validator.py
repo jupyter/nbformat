@@ -3,6 +3,7 @@
 # Copyright (c) IPython Development Team.
 # Distributed under the terms of the Modified BSD License.
 
+import json
 import os
 import re
 
@@ -212,37 +213,47 @@ def test_fallback_validator_with_iter_errors_using_ref():
 
 def test_non_unique_cell_ids():
     """Test than a non-unique cell id does not pass validation"""
+    import nbformat
     with TestsBase.fopen(u'invalid_unique_cell_id.ipynb', u'r') as f:
-        nb = read(f, as_version=4)
+        # Avoids validate call from `.read`
+        nb = nbformat.from_dict(json.load(f))
     with pytest.raises(ValidationError):
-        validate(nb)
-    assert not isvalid(nb)
+        validate(nb, repair_invalid_cell_ids=False)
+    # try again to verify that we didn't modify the content
+    with pytest.raises(ValidationError):
+        validate(nb, repair_invalid_cell_ids=False)
 
 
 def test_repair_non_unique_cell_ids():
     """Test that we will repair non-unique cell ids if asked during validation"""
+    import nbformat
     with TestsBase.fopen(u'invalid_unique_cell_id.ipynb', u'r') as f:
-        nb = read(f, as_version=4)
-    assert not isvalid(nb)
-    validate(nb, repair=True)
+        # Avoids validate call from `.read`
+        nb = nbformat.from_dict(json.load(f))
+    validate(nb)
     assert isvalid(nb)
 
 
 def test_no_cell_ids():
     """Test that a cell without a cell ID does not pass validation"""
+    import nbformat
     with TestsBase.fopen(u'v4_5_no_cell_id.ipynb', u'r') as f:
-        nb = read(f, as_version=4)
+        # Avoids validate call from `.read`
+        nb = nbformat.from_dict(json.load(f))
     with pytest.raises(ValidationError):
-        validate(nb)
-    assert not isvalid(nb)
+        validate(nb, repair_invalid_cell_ids=False)
+    # try again to verify that we didn't modify the content
+    with pytest.raises(ValidationError):
+        validate(nb, repair_invalid_cell_ids=False)
 
 
 def test_repair_no_cell_ids():
     """Test that we will repair cells without ids if asked during validation"""
+    import nbformat
     with TestsBase.fopen(u'v4_5_no_cell_id.ipynb', u'r') as f:
-        nb = read(f, as_version=4)
-    assert not isvalid(nb)
-    validate(nb, repair=True)
+        # Avoids validate call from `.read`
+        nb = nbformat.from_dict(json.load(f))
+    validate(nb)
     assert isvalid(nb)
 
 
