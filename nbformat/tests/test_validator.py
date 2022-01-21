@@ -7,6 +7,8 @@ import json
 import os
 import re
 
+import nbformat
+
 from .base import TestsBase
 from jsonschema import ValidationError
 from nbformat import read
@@ -275,3 +277,11 @@ def test_notebook_invalid_without_min_version():
 
 def test_notebook_invalid_without_main_version():
     pass
+
+
+def test_strip_invalid_metadata():
+    with TestsBase.fopen(u'v4_5_invalid_metadata.ipynb', u'r') as f:
+        nb = nbformat.from_dict(json.load(f))
+    assert not isvalid(nb)
+    validate(nb, strip_invalid_metadata=True)
+    assert isvalid(nb)
