@@ -348,6 +348,8 @@ def iter_validate(nbdict=None, ref=None, version=None, version_minor=None,
 
             # Validate one more time to ensure that us removing metadata
             # didn't cause another complex validation issue in the schema.
+            # Also to ensure that higher-level errors produced by individual metadata validation
+            # failures are removed.
             errors = validator.iter_errors(nbdict)
 
     for error in errors:
