@@ -10,6 +10,7 @@ import os
 import jsonschema
 from jsonschema import Draft4Validator as _JsonSchemaValidator
 from jsonschema import ValidationError
+from jsonschema import ErrorTree
 
 try:
     import fastjsonschema
@@ -32,6 +33,9 @@ class JsonSchemaValidator:
 
     def iter_errors(self, data, schema=None):
         return self._default_validator.iter_errors(data, schema)
+
+    def error_tree(self, errors):
+        return ErrorTree(errors)
 
 
 class FastJsonSchemaValidator(JsonSchemaValidator):
@@ -59,6 +63,15 @@ class FastJsonSchemaValidator(JsonSchemaValidator):
             errors = [ValidationError(error.message, schema_path=error.path)]
 
         return errors
+
+    def error_tree(self, errors):
+        # fastjsonschema's exceptions don't contain the same information that the jsonschema ValidationErrors
+        # do. This method is primarily used for introspecting metadata schema failures so that we can strip
+        # them if asked to do so in `nbformat.validate`.
+        # Another way forward for compatibility: we could distill both validator errors into a custom collection
+        # for this data. Since implementation details of ValidationError is used elsewhere, we would probably
+        # just use this data for schema introspection.
+        raise NotImplementedError("JSON schema error introspection not enabled for fastjsonschema")
 
 
 _VALIDATOR_MAP = [
