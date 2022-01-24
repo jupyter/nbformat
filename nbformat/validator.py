@@ -336,13 +336,15 @@ def iter_validate(nbdict=None, ref=None, version=None, version_minor=None,
                     if "oneOf" in error_tree["cells"][cell_idx].errors:
                         intended_cell_type = nbdict["cells"][cell_idx]["cell_type"]
                         schemas_by_index = [ref["$ref"] for ref in error_tree["cells"][cell_idx].errors["oneOf"].schema["oneOf"]]
-                        schema_index = schemas_by_index.index(f"#/definitions/{intended_cell_type}_cell")
-                        for error in error_tree["cells"][cell_idx].errors["oneOf"].context:
-                            rel_path = error.relative_path
-                            error_for_intended_schema = error.schema_path[0] == schema_index
-                            is_top_level_metadata_key = len(rel_path) == 2 and rel_path[0] == "metadata"
-                            if error_for_intended_schema and is_top_level_metadata_key:
-                                nbdict["cells"][cell_idx]["metadata"].pop(rel_path[1], None)
+                        cell_type_definition_name = f"#/definitions/{intended_cell_type}_cell"
+                        if cell_type_definition_name in schemas_by_index:
+                            schema_index = schemas_by_index.index(cell_type_definition_name)
+                            for error in error_tree["cells"][cell_idx].errors["oneOf"].context:
+                                rel_path = error.relative_path
+                                error_for_intended_schema = error.schema_path[0] == schema_index
+                                is_top_level_metadata_key = len(rel_path) == 2 and rel_path[0] == "metadata"
+                                if error_for_intended_schema and is_top_level_metadata_key:
+                                    nbdict["cells"][cell_idx]["metadata"].pop(rel_path[1], None)
 
             # Validate one more time to ensure that us removing metadata
             # didn't cause another complex validation issue in the schema.
