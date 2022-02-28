@@ -10,9 +10,11 @@ import sys
 import unittest
 
 from .base import TestsBase
+from jsonschema import ValidationError
 
 from tempfile import TemporaryDirectory
 from ..reader import get_version
+from ..validator import isvalid
 from nbformat import read, current_nbformat, writes, write
 
 
@@ -64,3 +66,34 @@ class TestAPI(TestsBase):
             dest = pathlib.Path(td) / 'echidna.ipynb'
             write(nb, dest)
             assert os.path.isfile(dest)
+
+    def test_capture_validation_error(self):
+        """Test that validation error can be captured on read() and write()"""
+        validation_error = {}
+        path = os.path.join(self._get_files_path(), u'invalid.ipynb')
+        nb = read(path, as_version=4, capture_validation_error=validation_error)
+        assert not isvalid(nb)
+        assert 'ValidationError' in validation_error
+        assert isinstance(validation_error['ValidationError'], ValidationError)
+
+        validation_error = {}
+        with TemporaryDirectory() as td:
+            dest = os.path.join(td, 'invalid.ipynb')
+            write(nb, dest, capture_validation_error=validation_error)
+            assert os.path.isfile(dest)
+            assert 'ValidationError' in validation_error
+            assert isinstance(validation_error['ValidationError'], ValidationError)
+
+        # Repeat with a valid notebook file
+        validation_error = {}
+        path = os.path.join(self._get_files_path(), u'test4.ipynb')
+        nb = read(path, as_version=4, capture_validation_error=validation_error)
+        assert isvalid(nb)
+        assert 'ValidationError' not in validation_error
+
+        validation_error = {}
+        with TemporaryDirectory() as td:
+            dest = os.path.join(td, 'test4.ipynb')
+            write(nb, dest, capture_validation_error=validation_error)
+            assert os.path.isfile(dest)
+            assert 'ValidationError' not in validation_error
