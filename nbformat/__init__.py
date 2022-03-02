@@ -48,7 +48,7 @@ NO_CONVERT = Sentinel('NO_CONVERT', __name__,
     """)
 
 
-def reads(s, as_version, **kwargs):
+def reads(s, as_version, capture_validation_error=None, **kwargs):
     """Read a notebook from a string and return the NotebookNode object as the given version.
 
     The string can contain a notebook of any version.
@@ -64,6 +64,10 @@ def reads(s, as_version, **kwargs):
         The version of the notebook format to return.
         The notebook will be converted, if necessary.
         Pass nbformat.NO_CONVERT to prevent conversion.
+    capture_validation_error : dict, optional
+        If provided, a key of "ValidationError" with a
+        value of the ValidationError instance will be added
+        to the dictionary.
 
     Returns
     -------
@@ -77,10 +81,12 @@ def reads(s, as_version, **kwargs):
         validate(nb)
     except ValidationError as e:
         get_logger().error("Notebook JSON is invalid: %s", e)
+        if isinstance(capture_validation_error, dict):
+            capture_validation_error['ValidationError'] = e
     return nb
 
 
-def writes(nb, version=NO_CONVERT, **kwargs):
+def writes(nb, version=NO_CONVERT, capture_validation_error=None, **kwargs):
     """Write a notebook to a string in a given format in the given nbformat version.
 
     Any notebook format errors will be logged.
@@ -93,6 +99,10 @@ def writes(nb, version=NO_CONVERT, **kwargs):
         The nbformat version to write.
         If unspecified, or specified as nbformat.NO_CONVERT,
         the notebook's own version will be used and no conversion performed.
+    capture_validation_error : dict, optional
+        If provided, a key of "ValidationError" with a
+        value of the ValidationError instance will be added
+        to the dictionary.
 
     Returns
     -------
@@ -107,10 +117,12 @@ def writes(nb, version=NO_CONVERT, **kwargs):
         validate(nb)
     except ValidationError as e:
         get_logger().error("Notebook JSON is invalid: %s", e)
+        if isinstance(capture_validation_error, dict):
+            capture_validation_error['ValidationError'] = e
     return versions[version].writes_json(nb, **kwargs)
 
 
-def read(fp, as_version, **kwargs):
+def read(fp, as_version, capture_validation_error=None, **kwargs):
     """Read a notebook from a file as a NotebookNode of the given version.
 
     The string can contain a notebook of any version.
@@ -127,6 +139,10 @@ def read(fp, as_version, **kwargs):
         The version of the notebook format to return.
         The notebook will be converted, if necessary.
         Pass nbformat.NO_CONVERT to prevent conversion.
+    capture_validation_error : dict, optional
+        If provided, a key of "ValidationError" with a
+        value of the ValidationError instance will be added
+        to the dictionary.
 
     Returns
     -------
@@ -138,12 +154,12 @@ def read(fp, as_version, **kwargs):
         buf = fp.read()
     except AttributeError:
         with io.open(fp, encoding='utf-8') as f:
-            return reads(f.read(), as_version, **kwargs)
+            return reads(f.read(), as_version, capture_validation_error, **kwargs)
 
-    return reads(buf, as_version, **kwargs)
+    return reads(buf, as_version, capture_validation_error, **kwargs)
 
 
-def write(nb, fp, version=NO_CONVERT, **kwargs):
+def write(nb, fp, version=NO_CONVERT, capture_validation_error=None, **kwargs):
     """Write a notebook to a file in a given nbformat version.
 
     The file-like object must accept unicode input.
@@ -160,8 +176,12 @@ def write(nb, fp, version=NO_CONVERT, **kwargs):
         If nb is not this version, it will be converted.
         If unspecified, or specified as nbformat.NO_CONVERT,
         the notebook's own version will be used and no conversion performed.
+    capture_validation_error : dict, optional
+        If provided, a key of "ValidationError" with a
+        value of the ValidationError instance will be added
+        to the dictionary.
     """
-    s = writes(nb, version, **kwargs)
+    s = writes(nb, version, capture_validation_error, **kwargs)
     if isinstance(s, bytes):
         s = s.decode('utf8')
 
