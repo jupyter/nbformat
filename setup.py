@@ -66,7 +66,7 @@ setup_args = dict(
     author_email    = 'jupyter@googlegroups.com',
     url             = 'http://jupyter.org',
     license         = 'BSD',
-    python_requires = '>=3.5',
+    python_requires = '>=3.7',
     platforms       = "Linux, Mac OS X, Windows",
     keywords        = ['Interactive', 'Interpreter', 'Shell', 'Web'],
     classifiers     = [
@@ -76,10 +76,10 @@ setup_args = dict(
         'License :: OSI Approved :: BSD License',
         'Programming Language :: Python',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.5',
-        'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.10',
     ],
 )
 
