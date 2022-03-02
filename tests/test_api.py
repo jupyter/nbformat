@@ -13,8 +13,8 @@ from .base import TestsBase
 from jsonschema import ValidationError
 
 from tempfile import TemporaryDirectory
-from ..reader import get_version
-from ..validator import isvalid
+from nbformat.reader import get_version
+from nbformat.validator import isvalid
 from nbformat import read, current_nbformat, writes, write
 
 

@@ -1,7 +1,7 @@
 import os
 from unittest import TestCase
 
-from .. import parse_filename
+from nbformat.v3 import parse_filename
 
 
 class MiscTests(TestCase):

@@ -12,8 +12,8 @@ import nbformat
 from .base import TestsBase
 from jsonschema import ValidationError
 from nbformat import read
-from ..validator import isvalid, validate, iter_validate
-from ..json_compat import VALIDATORS
+from nbformat.validator import isvalid, validate, iter_validate
+from nbformat.json_compat import VALIDATORS
 
 import pytest
 

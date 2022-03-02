@@ -14,8 +14,8 @@ Contains tests class for reader.py
 
 from .base import TestsBase
 
-from ..reader import read, get_version
-from ..validator import ValidationError
+from nbformat.reader import read, get_version
+from nbformat.validator import ValidationError
 
 #-----------------------------------------------------------------------------
 # Classes and functions

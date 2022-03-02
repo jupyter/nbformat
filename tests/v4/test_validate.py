@@ -9,8 +9,8 @@ import os
 import pytest
 
 from nbformat.validator import validate, ValidationError
-from ..nbjson import reads
-from ..nbbase import (
+from nbformat.v4.nbjson import reads
+from nbformat.v4.nbbase import (
     nbformat,
     new_code_cell, new_markdown_cell, new_notebook,
     new_output, new_raw_cell,

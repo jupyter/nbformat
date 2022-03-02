@@ -34,9 +34,6 @@ for d, _, _ in os.walk(pjoin(here, name)):
         packages.append(d[len(here)+1:].replace(os.path.sep, '.'))
 
 package_data = {
-    'nbformat.tests' : [
-        '*.ipynb',
-    ],
     'nbformat.v3' : [
         'nbformat.v3*.schema.json',
     ],

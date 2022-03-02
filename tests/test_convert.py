@@ -5,10 +5,10 @@
 
 from .base import TestsBase
 
-from ..converter import convert
-from ..reader import read, get_version
-from ..validator import isvalid, validate, ValidationError
-from .. import current_nbformat
+from nbformat.converter import convert
+from nbformat.reader import read, get_version
+from nbformat.validator import isvalid, validate, ValidationError
+from nbformat import current_nbformat
 
 
 class TestConvert(TestsBase):

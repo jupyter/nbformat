@@ -4,7 +4,7 @@ from unittest import TestCase
 
 from . import formattest
 
-from .. import nbpy
+from nbformat.v3 import nbpy
 from .nbexamples import nb0, nb0_py
 
 

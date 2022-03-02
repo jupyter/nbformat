@@ -5,13 +5,13 @@ import copy
 
 from unittest import mock
 from nbformat import validate
-from .. import convert
-from ..nbjson import reads
+from nbformat.v4 import convert
+from nbformat.v4.nbjson import reads
 import pytest
 from nbformat import ValidationError
 
 from . import nbexamples
-from nbformat.v3.tests import nbexamples as v3examples
+from ..v3 import nbexamples as v3examples
 from nbformat import v3, v4
 
 def test_upgrade_notebook():
@@ -81,8 +81,9 @@ def test_downgrade_heading():
 
 def test_upgrade_v4_to_4_dot_5():
     here = os.path.dirname(__file__)
-    with io.open(os.path.join(here, os.pardir, os.pardir, 'tests', "test4.ipynb"), encoding='utf-8') as f:
+    with io.open(os.path.join(here, os.pardir, "test4.ipynb"), encoding='utf-8') as f:
         nb = reads(f.read())
+
     assert nb['nbformat_minor'] == 0
     validate(nb)
     assert nb.cells[0].get('id') is None
@@ -94,7 +95,7 @@ def test_upgrade_v4_to_4_dot_5():
 
 def test_upgrade_without_nbminor_version():
     here = os.path.dirname(__file__)
-    with io.open(os.path.join(here, os.pardir, os.pardir, 'tests', "no_min_version.ipynb"), encoding='utf-8') as f:
+    with io.open(os.path.join(here, os.pardir, "no_min_version.ipynb"), encoding='utf-8') as f:
         nb = reads(f.read())
     
     with pytest.raises(ValidationError):

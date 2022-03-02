@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from ..nbbase import (
+from nbformat.v2.nbbase import (
     NotebookNode,
     new_code_cell, new_text_cell, new_worksheet, new_notebook, new_output,
     new_author, new_metadata

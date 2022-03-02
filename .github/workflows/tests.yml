@@ -31,7 +31,7 @@ jobs:
     - name: List dependencies
       run: pip list
     - name: Run tests
-      run: py.test nbformat/tests -v --cov=nbformat
+      run: pytest -v --cov=nbformat
     - name: Check manfest
       run: check-manifest -v
     - name: Coverage

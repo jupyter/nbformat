@@ -2,7 +2,7 @@
 """Tests for the Python API for composing notebook elements"""
 
 from nbformat.validator import isvalid, validate, ValidationError
-from ..nbbase import (
+from nbformat.v4.nbbase import (
     NotebookNode, nbformat,
     new_code_cell, new_markdown_cell, new_notebook,
     new_output, new_raw_cell,

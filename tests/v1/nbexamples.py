@@ -1,4 +1,4 @@
-from ..nbbase import (
+from nbformat.v1.nbbase import (
     NotebookNode,
     new_code_cell, new_text_cell, new_notebook
 )

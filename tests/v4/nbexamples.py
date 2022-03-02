@@ -2,8 +2,8 @@
 
 import os
 
-from ..._compat import encodebytes
-from ..nbbase import (
+from nbformat._compat import encodebytes
+from nbformat.v4.nbbase import (
     new_code_cell, new_markdown_cell, new_notebook,
     new_output, new_raw_cell
 )
