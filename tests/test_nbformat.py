@@ -1,7 +1,7 @@
 import pytest
 
 from nbformat import read
-from ..validator import ValidationError
+from nbformat.validator import ValidationError
 
 
 def test_read_invalid_iowrapper(tmpdir):

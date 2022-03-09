@@ -31,7 +31,7 @@ To enable fast validation with `fastjsonschema`, set the environment variable `N
 
 ## Python Version Support
 
-This library supported python 2.7 and python 3.5+ for `4.x.x` releases. With python 2's end-of-life nbformat `5.x.x` is now python 3.5+ only. Support for 3.5 will be dropped when it's officially sunset by the python organization.
+This library supported Python 2.7 and Python 3.5+ for `4.x.x` releases. With Python 2's end-of-life nbformat `5.x.x` supported Python 3 only. Support for Python 3.x versions will be dropped when they are officially sunset by the python organization.
 
 ## Contributing
 

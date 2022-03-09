@@ -1,7 +1,7 @@
 import pprint
 from unittest import TestCase
 
-from ..nbjson import reads, writes
+from nbformat.v2.nbjson import reads, writes
 from .nbexamples import nb0
 
 

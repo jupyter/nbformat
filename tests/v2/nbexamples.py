@@ -1,23 +1,22 @@
-# -*- coding: utf-8 -*-
-
 import os
 
-from ..._compat import encodebytes
-from ..nbbase import (
+from nbformat._compat import encodebytes
+from nbformat.v2.nbbase import (
     NotebookNode,
     new_code_cell, new_text_cell, new_worksheet, new_notebook, new_output,
-    new_metadata, new_author, new_heading_cell, nbformat, nbformat_minor
+    new_metadata, new_author
 )
 
-# some random base64-encoded *text*
-png = encodebytes(os.urandom(5)).decode('ascii')
-jpeg = encodebytes(os.urandom(6)).decode('ascii')
+# some random base64-encoded *bytes*
+png = encodebytes(os.urandom(5))
+jpeg = encodebytes(os.urandom(6))
 
-ws = new_worksheet()
+ws = new_worksheet(name='worksheet1')
 
 ws.cells.append(new_text_cell(
     u'html',
     source='Some NumPy Examples',
+    rendered='Some NumPy Examples'
 ))
 
 
@@ -30,16 +29,7 @@ ws.cells.append(new_code_cell(
 ws.cells.append(new_text_cell(
     u'markdown',
     source='A random array',
-))
-
-ws.cells.append(new_text_cell(
-    u'raw',
-    source='A random array',
-))
-
-ws.cells.append(new_heading_cell(
-    u'My Heading',
-    level=2
+    rendered='A random array'
 ))
 
 ws.cells.append(new_code_cell(
@@ -47,17 +37,9 @@ ws.cells.append(new_code_cell(
     prompt_number=2,
     collapsed=True
 ))
-ws.cells.append(new_code_cell(
-    input='a = 10\nb = 5\n',
-    prompt_number=3,
-))
-ws.cells.append(new_code_cell(
-    input='a = 10\nb = 5',
-    prompt_number=4,
-))
 
 ws.cells.append(new_code_cell(
-    input=u'print "ünîcødé"',
+    input='print a',
     prompt_number=3,
     collapsed=False,
     outputs=[new_output(
@@ -68,7 +50,7 @@ ws.cells.append(new_code_cell(
         output_png=png,
         output_jpeg=jpeg,
         output_svg=u'<svg>',
-        output_json=u'{"json": "data"}',
+        output_json=u'json data',
         output_javascript=u'var i=0;',
         prompt_number=3
     ),new_output(
@@ -79,20 +61,13 @@ ws.cells.append(new_code_cell(
         output_png=png,
         output_jpeg=jpeg,
         output_svg=u'<svg>',
-        output_json=u'{"json": "data"}',
+        output_json=u'json data',
         output_javascript=u'var i=0;'
     ),new_output(
         output_type=u'pyerr',
-        ename=u'NameError',
+        etype=u'NameError',
         evalue=u'NameError was here',
         traceback=[u'frame 0', u'frame 1', u'frame 2']
-    ),new_output(
-        output_type=u'stream',
-        output_text='foo\rbar\r\n'
-    ),new_output(
-        output_type=u'stream',
-        stream='stderr',
-        output_text='\rfoo\rbar\n'
     )]
 ))
 
@@ -102,12 +77,12 @@ md = new_metadata(name=u'My Notebook',license=u'BSD',created=u'8601_goes_here',
     modified=u'8601_goes_here',gistid=u'21341231',authors=authors)
 
 nb0 = new_notebook(
-    worksheets=[ws, new_worksheet()],
+    worksheets=[ws, new_worksheet(name='worksheet2')],
     metadata=md
 )
 
-nb0_py = u"""# -*- coding: utf-8 -*-
-# <nbformat>%i.%i</nbformat>
+nb0_py = """# -*- coding: utf-8 -*-
+# <nbformat>2</nbformat>
 
 # <htmlcell>
 
@@ -121,32 +96,14 @@ import numpy
 
 # A random array
 
-# <rawcell>
-
-# A random array
-
-# <headingcell level=2>
-
-# My Heading
-
 # <codecell>
 
 a = numpy.random.rand(100)
 
 # <codecell>
 
-a = 10
-b = 5
+print a
 
-# <codecell>
-
-a = 10
-b = 5
-
-# <codecell>
-
-print "ünîcødé"
-
-""" % (nbformat, nbformat_minor)
+"""
 
 

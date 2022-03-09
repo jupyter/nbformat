@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from ..nbjson import reads, writes
+from nbformat.v1.nbjson import reads, writes
 from .nbexamples import nb0
 
 

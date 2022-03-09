@@ -2,10 +2,10 @@ import copy
 import json
 from unittest import TestCase
 
-from ..._compat import decodebytes
-from ..nbjson import reads, writes
-from ..nbbase import from_dict
-from .. import nbjson
+from nbformat._compat import decodebytes
+from nbformat.v3.nbjson import reads, writes
+from nbformat.v3.nbbase import from_dict
+from nbformat.v3 import nbjson
 from .nbexamples import nb0
 
 from . import formattest

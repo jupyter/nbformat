@@ -7,7 +7,7 @@ include RELEASING.md
 include MANIFEST.in
 recursive-include nbformat *.txt
 recursive-include nbformat *.json
-recursive-exclude nbformat/tests *.*
+recursive-include tests *.*
 exclude scripts/jupyter-trust
 
 # Javascript
