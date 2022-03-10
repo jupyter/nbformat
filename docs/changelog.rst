@@ -7,6 +7,18 @@ Changes in nbformat
 In Development
 ==============
 
+5.2.0
+=====
+- Add ability to capture validation errors
+- Update supported python versions
+- Ensure nbformat minor version is present when upgrading
+- Only fix cell ID validation issues if asked
+- Return the notebook when no conversion is needed
+- Catch AttributeErrors stemming from ipython_genutils as ValidationErrors on read
+- Don't list pytest-cov as a test dependency
+- Remove dependency on IPython genutils
+- Include tests in sdist but not wheel
+
 5.1.3
 =====
 
