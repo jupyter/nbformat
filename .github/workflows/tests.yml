@@ -19,7 +19,7 @@ jobs:
           - PYTHON_VERSION: '3.10'
             EXTRA_DEPS: ''
           - PYTHON_VERSION: 'pypy-3.8'
-            EXTRA_DEPS: ''
+            EXTRA_DEPS: '"jsonschema<4"'
         exclude:
           - PYTHON_VERSION: 'pypy-3.8'
             OS: 'windows-latest'
