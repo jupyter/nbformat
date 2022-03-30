@@ -33,7 +33,7 @@ jobs:
         python-version: ${{ matrix.PYTHON_VERSION }}
     - name: Install test dependencies
       run: |
-        pip install --upgrade pip setuptools
+        pip install --upgrade pip setuptools wheel
         pip install .[test]
         pip install codecov pytest-cov
     - name: Install nbformat
