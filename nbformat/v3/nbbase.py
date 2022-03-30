@@ -54,7 +54,7 @@ def cast_str(obj):
     if isinstance(obj, bytes):
         # really this should never happend, it should
         # have been base64 encoded before.
-        warnings.warning(
+        warnings.warn(
             "A notebook got bytes instead of likely base64 encoded values."
             "The content will likely be corrupted.",
             UserWarning,

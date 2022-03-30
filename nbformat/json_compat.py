@@ -35,7 +35,7 @@ class JsonSchemaValidator:
         return self._default_validator.iter_errors(data, schema)
 
     def error_tree(self, errors):
-        return ErrorTree(errors)
+        return ErrorTree(errors=errors)
 
 
 class FastJsonSchemaValidator(JsonSchemaValidator):

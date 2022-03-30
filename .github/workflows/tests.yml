@@ -15,7 +15,7 @@ jobs:
         PYTHON_VERSION: ['3.7', '3.10', 'pypy-3.8']
         include:
           - PYTHON_VERSION: '3.7'
-            EXTRA_DEPS: '"jsonschema<2.5"'
+            EXTRA_DEPS: '"jsonschema<2.7"'
           - PYTHON_VERSION: '3.10'
             EXTRA_DEPS: ''
           - PYTHON_VERSION: 'pypy-3.8'
@@ -43,7 +43,7 @@ jobs:
     - name: List dependencies
       run: pip list
     - name: Run tests
-      run: pytest -v --cov=nbformat
+      run: pytest -v --cov=nbformat --cov-report term-missing:skip-covered --no-cov-on-fail
     - name: Check manfest
       run: check-manifest -v
     - name: Coverage
