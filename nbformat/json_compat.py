@@ -20,6 +20,7 @@ except ImportError:
     _JsonSchemaException = ValidationError
 
 
+
 class JsonSchemaValidator:
     name = "jsonschema"
 
@@ -32,6 +33,10 @@ class JsonSchemaValidator:
         self._default_validator.validate(data)
 
     def iter_errors(self, data, schema=None):
+        if schema is None:
+            return self._default_validator.iter_errors(data)
+        if hasattr(self._default_validator, "evolve"):
+            return self._default_validator.evolve(schema=schema).iter_errors(data)
         return self._default_validator.iter_errors(data, schema)
 
     def error_tree(self, errors):
