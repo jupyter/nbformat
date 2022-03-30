@@ -9,14 +9,26 @@ jobs:
     name: ${{ matrix.OS }} - Py${{ matrix.PYTHON_VERSION }}
     runs-on: ${{ matrix.OS }}
     strategy:
-      fail-fast: false 
+      fail-fast: false
       matrix:
-        OS: ['ubuntu-latest', 'windows-latest']
-        PYTHON_VERSION: ['3.7', '3.8', '3.9', '3.10']
+        OS: ['ubuntu-latest', 'windows-latest', 'macos-latest']
+        PYTHON_VERSION: ['3.7', '3.10', 'pypy-3.8']
+        include:
+          - PYTHON_VERSION: '3.7'
+            EXTRA_DEPS: '"jsonschema<2.5"'
+          - PYTHON_VERSION: '3.10'
+            EXTRA_DEPS: ''
+          - PYTHON_VERSION: 'pypy-3.8'
+            EXTRA_DEPS: ''
+        exclude:
+          - PYTHON_VERSION: 'pypy-3.8'
+            OS: 'windows-latest'
+          - PYTHON_VERSION: 'pypy-3.8'
+            OS: 'macos-latest'
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Set up Python
-      uses: actions/setup-python@v1
+      uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.PYTHON_VERSION }}
     - name: Install test dependencies
@@ -26,7 +38,7 @@ jobs:
         pip install codecov pytest-cov
     - name: Install nbformat
       run: |
-        pip install .
+        pip install . ${{ matrix.EXTRA_DEPS }}
         pip freeze
     - name: List dependencies
       run: pip list
