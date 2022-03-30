@@ -284,7 +284,12 @@ def validate(nbdict=None, ref=None, version=None, version_minor=None,
                 if repair_duplicate_cell_ids:
                     # Best effort to repair if we find a duplicate id
                     cell['id'] = generate_corpus_id()
-                    get_logger().warn("Non-unique cell id '{}' detected. Corrected to '{}'.".format(cell_id, cell['id']))
+                    get_logger().warning(
+                        "Non-unique cell id '{}' detected. Corrected to '{}'.".format(
+                            cell_id,
+                            cell['id']
+                        )
+                    )
                 else:
                     raise ValidationError("Non-unique cell id '{}' detected.".format(cell_id))
             seen_ids.add(cell_id)
