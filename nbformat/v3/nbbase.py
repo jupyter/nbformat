@@ -54,7 +54,7 @@ def cast_str(obj):
     if isinstance(obj, bytes):
         # really this should never happend, it should
         # have been base64 encoded before.
-        warnings.warn(
+        warnings.warning(
             "A notebook got bytes instead of likely base64 encoded values."
             "The content will likely be corrupted.",
             UserWarning,
@@ -225,4 +225,3 @@ def new_author(name=None, email=None, affiliation=None, url=None):
     if url is not None:
         author.url = str_passthrough(url)
     return author
-
