@@ -201,7 +201,7 @@ def test_invalid_validator_raises_value_error_after_read():
         validate(nb)
 
 
-def test_fallback_validator_with_iter_errors_using_ref():
+def test_fallback_validator_with_iter_errors_using_ref(recwarn):
     """
     Test that when creating a standalone object (code_cell etc)
     the default validator is used as fallback.
@@ -211,6 +211,8 @@ def test_fallback_validator_with_iter_errors_using_ref():
     nbformat.v4.new_code_cell()
     nbformat.v4.new_markdown_cell()
     nbformat.v4.new_raw_cell()
+    assert len(recwarn) == 0
+
 
 
 def test_non_unique_cell_ids():

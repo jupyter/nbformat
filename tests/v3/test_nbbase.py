@@ -1,5 +1,7 @@
 from unittest import TestCase
 
+import pytest
+
 from nbformat.v3.nbbase import (
     NotebookNode,
     new_code_cell, new_text_cell, new_worksheet, new_notebook, new_output,
@@ -134,17 +136,19 @@ class TestMetadata(TestCase):
 
 class TestOutputs(TestCase):
     def test_binary_png(self):
-        out = new_output(output_png=b'\x89PNG\r\n\x1a\n', output_type='display_data')
+        with pytest.warns(UserWarning, match='bytes instead of likely base64'):
+            out = new_output(output_png=b'\x89PNG\r\n\x1a\n', output_type='display_data')
 
     def test_b64b6tes_png(self):
         # really those tests are wrong, this is not b64, if prefixed by b
-        out = new_output(output_png=b'iVBORw0KG', output_type='display_data')
-    
+        with pytest.warns(UserWarning, match='bytes instead of likely base64'):
+            out = new_output(output_png=b'iVBORw0KG', output_type='display_data')
+
     def test_binary_jpeg(self):
-        out = new_output(output_jpeg=b'\xff\xd8', output_type='display_data')
+        with pytest.warns(UserWarning, match='bytes instead of likely base64'):
+            out = new_output(output_jpeg=b'\xff\xd8', output_type='display_data')
 
     def test_b64b6tes_jpeg(self):
         # really those tests are wrong, this is not b64, if prefixed by b
-        out = new_output(output_jpeg=b'/9', output_type='display_data')
-        
-
+        with pytest.warns(UserWarning, match='bytes instead of likely base64'):
+            out = new_output(output_jpeg=b'/9', output_type='display_data')

@@ -225,4 +225,3 @@ def new_author(name=None, email=None, affiliation=None, url=None):
     if url is not None:
         author.url = str_passthrough(url)
     return author
-
