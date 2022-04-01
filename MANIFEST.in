@@ -9,6 +9,7 @@ recursive-include nbformat *.txt
 recursive-include nbformat *.json
 recursive-include tests *.*
 exclude scripts/jupyter-trust
+exclude .pre-commmit-config.yaml
 
 # Javascript
 include package.json
