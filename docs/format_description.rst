@@ -253,18 +253,16 @@ adding only a ``execution_count`` field, which must be an integer.
 error
 *****
 
-Failed execution may show a traceback
-
-.. sourcecode:: python
+Failed execution may show an error::
 
     {
-	  'output_type': 'error',
-      'ename' : str,   # Exception name, as a string
-      'evalue' : str,  # Exception value, as a string
+        'output_type': 'error',
+        'ename' : str,   # Exception name, as a string
+        'evalue' : str,  # Exception value, as a string
 
-      # The traceback will contain a list of frames,
-      # represented each as a string.
-      'traceback' : list,
+        # The traceback will contain a list of frames,
+        # represented each as a string.
+        'traceback' : list,
     }
 
 .. versionchanged:: nbformat 4.0
