@@ -5,22 +5,13 @@
 # Distributed under the terms of the Modified BSD License.
 
 from __future__ import print_function
+import subprocess
+import os
+import sys
+from glob import glob
 
 # the name of the project
 name = 'nbformat'
-
-#-----------------------------------------------------------------------------
-# Minimal Python version sanity check
-#-----------------------------------------------------------------------------
-
-import sys
-
-#-----------------------------------------------------------------------------
-# get on with it
-#-----------------------------------------------------------------------------
-
-import os
-from glob import glob
 
 from distutils.core import setup
 
@@ -82,6 +73,10 @@ setup_args = dict(
 
 if 'develop' in sys.argv or any(a.startswith('bdist') for a in sys.argv):
     import setuptools
+    subprocess.run([sys.executable, "-m", "pre_commit", "install"])
+    subprocess.run(
+        [sys.executable, "-m", "pre_commit", "install", "--hook-type", "pre-push"]
+    )
 
 setuptools_args = {}
 install_requires = setuptools_args['install_requires'] = [
@@ -92,7 +87,7 @@ install_requires = setuptools_args['install_requires'] = [
 
 extras_require = setuptools_args['extras_require'] = {
     'fast': ['fastjsonschema'],
-    'test': ['check-manifest', 'fastjsonschema', 'testpath', 'pytest'],
+    'test': ['check-manifest', 'fastjsonschema', 'testpath', 'pytest', 'pre-commit'],
 }
 
 if 'setuptools' in sys.modules:
