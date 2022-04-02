@@ -99,5 +99,6 @@ def get_current_validator():
     """
     Return the default validator based on the value of an environment variable.
     """
-    validator_name = os.environ.get("NBFORMAT_VALIDATOR", "jsonschema")
+    default = "fastjsonschema" if fastjsonschema else "jsonschema"
+    validator_name = os.environ.get("NBFORMAT_VALIDATOR", default)
     return _validator_for_name(validator_name)
