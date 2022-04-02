@@ -102,7 +102,7 @@ In Development
 - Documented the editable metadata flag
 - Update description for collapsed field
 - Documented notebook format versions 4.0-4.3 with accurate json schema specification files
-- Clarified info about :ref:`name`'s meaning for cells
+- Clarified info about name's meaning for cells
 - Added a default execution_count of None for new_output_cell('execute_result')
 - Added support for handling nbjson kwargs
 - Wheels now correctly have a LICENSE file

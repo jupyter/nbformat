@@ -1,0 +1,13 @@
+[build-system]
+requires = ["setuptools>=60.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.pytest.ini_options]
+addopts = "-raXs --durations 10 --color=yes --doctest-modules"
+testpaths = [
+    "tests/",
+]
+filterwarnings = [
+    "error",
+    "ignore:Using or importing the ABCs from 'collections':DeprecationWarning:jsonschema"
+]

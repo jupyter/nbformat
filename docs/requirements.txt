@@ -1,3 +1,4 @@
 jsonschema
--e git+https://github.com/jupyter/jupyter_core.git#egg=jupyter_core
-traitlets
+jupyter_core
+sphinx
+sphinxcontrib_github_alt
