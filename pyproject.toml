@@ -9,4 +9,5 @@ testpaths = [
 ]
 filterwarnings = [
     "error",
+    "ignore:Using or importing the ABCs from 'collections':DeprecationWarning:jsonschema"
 ]

@@ -27,13 +27,9 @@ jobs:
             OS: "macos-latest"
     steps:
       - uses: actions/checkout@v3
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: ${{ matrix.PYTHON_VERSION }}
+      - uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
       - name: Install test dependencies
         run: |
-          pip install --upgrade pip setuptools wheel
           pip install .[test]
           pip install codecov pytest-cov
       - name: Install nbformat
@@ -48,3 +44,13 @@ jobs:
         run: check-manifest -v
       - name: Coverage
         run: codecov
+
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
+      - run: cd docs
+          pip install -r requirements.txt
+          make html SPHINXOPTS="-W"
+          make linkcheck
