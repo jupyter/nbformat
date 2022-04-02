@@ -21,7 +21,7 @@ the following markdown flavors:
 *  `CommonMark <http://spec.commonmark.org/0.29/>`_.
 * `GitHub Flavored Markdown <https://github.github.com/gfm/>`_
 
-See the `Marked.js specification page <https://marked.js.org/#/README.md#specifications>`_
+See the `Marked.js specification page <https://marked.js.org>`_
 for more information.
 
 .. note::
@@ -62,5 +62,5 @@ This is currently the MathJax configuration that is used:
         },
     }
 
-See the `MathJax script for the classic Notebook UI <https://github.com/jupyter/notebook/blob/master/notebook/static/notebook/js/mathjaxutils.js>`_
+See the `MathJax script for the classic Notebook UI <https://github.com/jupyter/notebook/blob/6.4.x/notebook/static/notebook/js/mathjaxutils.js>`_
 for one example.
