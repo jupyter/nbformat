@@ -4,32 +4,61 @@
 # Copyright (c) IPython Development Team.
 # Distributed under the terms of the Modified BSD License.
 
-__all__ = ['NotebookNode', 'new_code_cell', 'new_text_cell', 'new_notebook',
-           'new_output', 'new_worksheet', 'new_metadata', 'new_author',
-           'new_heading_cell', 'nbformat', 'nbformat_minor', 'nbformat_schema',
-           'reads_json', 'writes_json', 'read_json', 'write_json',
-           'to_notebook_json', 'reads_py', 'writes_py', 'read_py', 'write_py',
-           'to_notebook_py', 'downgrade', 'upgrade', 'parse_filename'
-        ]
+__all__ = [
+    "NotebookNode",
+    "new_code_cell",
+    "new_text_cell",
+    "new_notebook",
+    "new_output",
+    "new_worksheet",
+    "new_metadata",
+    "new_author",
+    "new_heading_cell",
+    "nbformat",
+    "nbformat_minor",
+    "nbformat_schema",
+    "reads_json",
+    "writes_json",
+    "read_json",
+    "write_json",
+    "to_notebook_json",
+    "reads_py",
+    "writes_py",
+    "read_py",
+    "write_py",
+    "to_notebook_py",
+    "downgrade",
+    "upgrade",
+    "parse_filename",
+]
 
 import os
 
+from .convert import downgrade, upgrade
 from .nbbase import (
     NotebookNode,
-    new_code_cell, new_text_cell, new_notebook, new_output, new_worksheet,
-    new_metadata, new_author, new_heading_cell, nbformat, nbformat_minor,
-    nbformat_schema
+    nbformat,
+    nbformat_minor,
+    nbformat_schema,
+    new_author,
+    new_code_cell,
+    new_heading_cell,
+    new_metadata,
+    new_notebook,
+    new_output,
+    new_text_cell,
+    new_worksheet,
 )
-
-from .nbjson import reads as reads_json, writes as writes_json
-from .nbjson import reads as read_json, writes as write_json
+from .nbjson import reads as read_json
+from .nbjson import reads as reads_json
 from .nbjson import to_notebook as to_notebook_json
-
-from .nbpy import reads as reads_py, writes as writes_py
-from .nbpy import reads as read_py, writes as write_py
+from .nbjson import writes as write_json
+from .nbjson import writes as writes_json
+from .nbpy import reads as read_py
+from .nbpy import reads as reads_py
 from .nbpy import to_notebook as to_notebook_py
-
-from .convert import downgrade, upgrade
+from .nbpy import writes as write_py
+from .nbpy import writes as writes_py
 
 
 def parse_filename(fname):
@@ -57,14 +86,14 @@ def parse_filename(fname):
         The filename, notebook name and format.
     """
     basename, ext = os.path.splitext(fname)
-    if ext == u'.ipynb':
-        format = u'json'
-    elif ext == u'.json':
-        format = u'json'
-    elif ext == u'.py':
-        format = u'py'
+    if ext == ".ipynb":
+        format = "json"
+    elif ext == ".json":
+        format = "json"
+    elif ext == ".py":
+        format = "py"
     else:
         basename = fname
-        fname = fname + u'.ipynb'
-        format = u'json'
+        fname = fname + ".ipynb"
+        format = "json"
     return fname, basename, format

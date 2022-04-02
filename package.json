@@ -4,8 +4,8 @@
   "description": "JSON schemata for Jupyter notebook formats",
   "main": "index.js",
   "files": [
-      "nbformat/v3/nbformat.v3.schema.json",
-      "nbformat/v4/nbformat.v4.schema.json"
+    "nbformat/v3/nbformat.v3.schema.json",
+    "nbformat/v4/nbformat.v4.schema.json"
   ],
   "repository": {
     "type": "git",

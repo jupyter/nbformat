@@ -5,25 +5,26 @@ Authors:
 * Brian Granger
 """
 
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 #  Copyright (C) 2008-2011  The IPython Development Team
 #
 #  Distributed under the terms of the BSD License.  The full license is in
 #  the file COPYING, distributed as part of this software.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Imports
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 import pprint
 import uuid
 
 from .._struct import Struct
 
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Code
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
+
 
 class NotebookNode(Struct):
     pass
@@ -32,7 +33,7 @@ class NotebookNode(Struct):
 def from_dict(d):
     if isinstance(d, dict):
         newd = NotebookNode()
-        for k,v in d.items():
+        for k, v in d.items():
             newd[k] = from_dict(v)
         return newd
     elif isinstance(d, (tuple, list)):
@@ -44,7 +45,7 @@ def from_dict(d):
 def new_code_cell(code=None, prompt_number=None):
     """Create a new code cell with input and output"""
     cell = NotebookNode()
-    cell.cell_type = u'code'
+    cell.cell_type = "code"
     if code is not None:
         cell.code = str(code)
     if prompt_number is not None:
@@ -57,7 +58,7 @@ def new_text_cell(text=None):
     cell = NotebookNode()
     if text is not None:
         cell.text = str(text)
-    cell.cell_type = u'text'
+    cell.cell_type = "text"
     return cell
 
 
@@ -69,4 +70,3 @@ def new_notebook(cells=None):
     else:
         nb.cells = []
     return nb
-

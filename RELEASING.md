@@ -4,29 +4,29 @@
 
 - First check that the docs/changelog.rst is up to date for the next release version
 - If you have a schema version change, you need to bump the schema version manually:
-    First copy `nbformat/v4/nbformat/.v4.schema.json` to `nbformat/v4/nbformat/.v4.<new_minor_version_here>schema.json`.
-    Then edit the top of `nbformat/v4/nbbase.py`:
+  First copy `nbformat/v4/nbformat/.v4.schema.json` to `nbformat/v4/nbformat/.v4.<new_minor_version_here>schema.json`.
+  Then edit the top of `nbformat/v4/nbbase.py`:
 
-    ```python
-    # Change the nbformat_minor and nbformat_schema variables when incrementing the
-    # nbformat version
+  ```python
+  # Change the nbformat_minor and nbformat_schema variables when incrementing the
+  # nbformat version
 
-    # current major version
-    nbformat = 4
+  # current major version
+  nbformat = 4
 
-    # current minor version
-    nbformat_minor = <new_minor_version_here>
+  # current minor version
+  nbformat_minor = <new_minor_version_here>
 
-    # schema files for (major, minor) version tuples. (None, None) means the current version
-    nbformat_schema = {
-        (None, None): 'nbformat.v4.schema.json',
-        (4, 0): 'nbformat.v4.0.schema.json',
-        ...
-        (4, <new_minor_version_here>): 'nbformat.v4.<new_minor_version_here>.schema.json'
-    }
-    ```
+  # schema files for (major, minor) version tuples. (None, None) means the current version
+  nbformat_schema = {
+      (None, None): 'nbformat.v4.schema.json',
+      (4, 0): 'nbformat.v4.0.schema.json',
+      ...
+      (4, <new_minor_version_here>): 'nbformat.v4.<new_minor_version_here>.schema.json'
+  }
+  ```
 
-    If you do one of these steps but not the others it will fail many tests.
+  If you do one of these steps but not the others it will fail many tests.
 
 ## Update version
 
@@ -43,7 +43,7 @@ version component can take any of the following values:
 
 Configuration of bump2version is stored on the [.bumpversion.cfg](https://github.com/jupyter/nbformat/blob/master/.bumpversion.cfg) file and it currently tracks and updates the following files:
 
-- [nbformat/_version.py](https://github.com/jupyter/nbformat/blob/master/nbformat/_version.py)
+- [nbformat/\_version.py](https://github.com/jupyter/nbformat/blob/master/nbformat/_version.py)
 - [docs/conf.py](https://github.com/jupyter/nbformat/blob/master/docs/conf.py)
 - [package.json](https://github.com/jupyter/nbformat/blob/master/package.json)
 

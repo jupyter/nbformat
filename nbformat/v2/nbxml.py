@@ -17,11 +17,14 @@ The issue which prompted this removal is:
 https://github.com/jupyter/nbformat/issues/132
 """
 
+
 def reads(s, **kwargs):
     raise Exception(REMOVED_MSG)
 
+
 def read(fp, **kwargs):
     raise Exception(REMOVED_MSG)
+
 
 def to_notebook(root, **kwargs):
     raise Exception(REMOVED_MSG)

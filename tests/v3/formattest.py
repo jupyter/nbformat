@@ -1,4 +1,3 @@
-# -*- coding: utf8 -*-
 import io
 import os
 import shutil
@@ -8,15 +7,19 @@ pjoin = os.path.join
 
 from nbformat.v3.nbbase import (
     NotebookNode,
-    new_code_cell, new_text_cell, new_worksheet, new_notebook
+    new_code_cell,
+    new_notebook,
+    new_text_cell,
+    new_worksheet,
 )
+from nbformat.v3.nbpy import read, reads, write, writes
 
-from nbformat.v3.nbpy import reads, writes, read, write
 from .nbexamples import nb0, nb0_py
 
 
 def open_utf8(fname, mode):
-    return io.open(fname, mode=mode, encoding='utf-8')
+    return open(fname, mode=mode, encoding="utf-8")
+
 
 class NBFormatTest:
     """Mixin for writing notebook format tests"""
@@ -25,16 +28,16 @@ class NBFormatTest:
     nb0_ref = None
     ext = None
     mod = None
-    
+
     def setUp(self):
         self.wd = tempfile.mkdtemp()
-    
+
     def tearDown(self):
         shutil.rmtree(self.wd)
-    
+
     def assertNBEquals(self, nba, nbb):
         self.assertEqual(nba, nbb)
-        
+
     def test_writes(self):
         s = self.mod.writes(nb0)
         if self.nb0_ref:
@@ -46,18 +49,15 @@ class NBFormatTest:
 
     def test_roundtrip(self):
         s = self.mod.writes(nb0)
-        self.assertNBEquals(self.mod.reads(s),nb0)
+        self.assertNBEquals(self.mod.reads(s), nb0)
 
     def test_write_file(self):
-        with open_utf8(pjoin(self.wd, "nb0.%s" % self.ext), 'w') as f:
+        with open_utf8(pjoin(self.wd, "nb0.%s" % self.ext), "w") as f:
             self.mod.write(nb0, f)
-    
+
     def test_read_file(self):
-        with open_utf8(pjoin(self.wd, "nb0.%s" % self.ext), 'w') as f:
+        with open_utf8(pjoin(self.wd, "nb0.%s" % self.ext), "w") as f:
             self.mod.write(nb0, f)
-        
-        with open_utf8(pjoin(self.wd, "nb0.%s" % self.ext), 'r') as f:
+
+        with open_utf8(pjoin(self.wd, "nb0.%s" % self.ext), "r") as f:
             nb = self.mod.read(f)
-        
-
-

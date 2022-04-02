@@ -6,5 +6,5 @@
 try:
     from base64 import decodebytes, encodebytes
 except ImportError:
-    from base64 import encodestring as encodebytes
     from base64 import decodestring as decodebytes
+    from base64 import encodestring as encodebytes

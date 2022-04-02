@@ -5,7 +5,6 @@ from nbformat.v3 import parse_filename
 
 
 class MiscTests(TestCase):
-
     def check_filename(self, path, exp_fname, exp_bname, exp_format):
         fname, bname, format = parse_filename(path)
         self.assertEqual(fname, exp_fname)
@@ -28,5 +27,4 @@ class MiscTests(TestCase):
         self.check_filename(abs_path, abs_path, basename, "json")
 
         # check parsing a file name containing dots
-        self.check_filename("test.nb.ipynb", "test.nb.ipynb", "test.nb",
-                            "json")
+        self.check_filename("test.nb.ipynb", "test.nb.ipynb", "test.nb", "json")

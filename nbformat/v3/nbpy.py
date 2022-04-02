@@ -5,94 +5,100 @@ Authors:
 * Brian Granger
 """
 
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 #  Copyright (C) 2008-2011  The IPython Development Team
 #
 #  Distributed under the terms of the BSD License.  The full license is in
 #  the file COPYING, distributed as part of this software.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Imports
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 import re
-from .rwbase import NotebookReader, NotebookWriter
-from .nbbase import (
-    new_code_cell, new_text_cell, new_worksheet,
-    new_notebook, new_heading_cell, nbformat, nbformat_minor,
-)
 
-#-----------------------------------------------------------------------------
+from .nbbase import (
+    nbformat,
+    nbformat_minor,
+    new_code_cell,
+    new_heading_cell,
+    new_notebook,
+    new_text_cell,
+    new_worksheet,
+)
+from .rwbase import NotebookReader, NotebookWriter
+
+# -----------------------------------------------------------------------------
 # Code
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 _encoding_declaration_re = re.compile(r"^#.*coding[:=]\s*([-\w.]+)")
+
 
 class PyReaderError(Exception):
     pass
 
 
 class PyReader(NotebookReader):
-
     def reads(self, s, **kwargs):
-        return self.to_notebook(s,**kwargs)
+        return self.to_notebook(s, **kwargs)
 
     def to_notebook(self, s, **kwargs):
         lines = s.splitlines()
         cells = []
         cell_lines = []
         kwargs = {}
-        state = u'codecell'
+        state = "codecell"
         for line in lines:
-            if line.startswith(u'# <nbformat>') or _encoding_declaration_re.match(line):
+            if line.startswith("# <nbformat>") or _encoding_declaration_re.match(line):
                 pass
-            elif line.startswith(u'# <codecell>'):
+            elif line.startswith("# <codecell>"):
                 cell = self.new_cell(state, cell_lines, **kwargs)
                 if cell is not None:
                     cells.append(cell)
-                state = u'codecell'
+                state = "codecell"
                 cell_lines = []
                 kwargs = {}
-            elif line.startswith(u'# <htmlcell>'):
+            elif line.startswith("# <htmlcell>"):
                 cell = self.new_cell(state, cell_lines, **kwargs)
                 if cell is not None:
                     cells.append(cell)
-                state = u'htmlcell'
+                state = "htmlcell"
                 cell_lines = []
                 kwargs = {}
-            elif line.startswith(u'# <markdowncell>'):
+            elif line.startswith("# <markdowncell>"):
                 cell = self.new_cell(state, cell_lines, **kwargs)
                 if cell is not None:
                     cells.append(cell)
-                state = u'markdowncell'
+                state = "markdowncell"
                 cell_lines = []
                 kwargs = {}
             # VERSIONHACK: plaintext -> raw
-            elif line.startswith(u'# <rawcell>') or line.startswith(u'# <plaintextcell>'):
+            elif line.startswith("# <rawcell>") or line.startswith("# <plaintextcell>"):
                 cell = self.new_cell(state, cell_lines, **kwargs)
                 if cell is not None:
                     cells.append(cell)
-                state = u'rawcell'
+                state = "rawcell"
                 cell_lines = []
                 kwargs = {}
-            elif line.startswith(u'# <headingcell'):
+            elif line.startswith("# <headingcell"):
                 cell = self.new_cell(state, cell_lines, **kwargs)
                 if cell is not None:
                     cells.append(cell)
                     cell_lines = []
-                m = re.match(r'# <headingcell level=(?P<level>\d)>',line)
+                m = re.match(r"# <headingcell level=(?P<level>\d)>", line)
                 if m is not None:
-                    state = u'headingcell'
+                    state = "headingcell"
                     kwargs = {}
-                    kwargs['level'] = int(m.group('level'))
+                    kwargs["level"] = int(m.group("level"))
                 else:
-                    state = u'codecell'
+                    state = "codecell"
                     kwargs = {}
                     cell_lines = []
             else:
                 cell_lines.append(line)
-        if cell_lines and state == u'codecell':
+        if cell_lines and state == "codecell":
             cell = self.new_cell(state, cell_lines)
             if cell is not None:
                 cells.append(cell)
@@ -101,38 +107,38 @@ class PyReader(NotebookReader):
         return nb
 
     def new_cell(self, state, lines, **kwargs):
-        if state == u'codecell':
-            input = u'\n'.join(lines)
-            input = input.strip(u'\n')
+        if state == "codecell":
+            input = "\n".join(lines)
+            input = input.strip("\n")
             if input:
                 return new_code_cell(input=input)
-        elif state == u'htmlcell':
+        elif state == "htmlcell":
             text = self._remove_comments(lines)
             if text:
-                return new_text_cell(u'html',source=text)
-        elif state == u'markdowncell':
+                return new_text_cell("html", source=text)
+        elif state == "markdowncell":
             text = self._remove_comments(lines)
             if text:
-                return new_text_cell(u'markdown',source=text)
-        elif state == u'rawcell':
+                return new_text_cell("markdown", source=text)
+        elif state == "rawcell":
             text = self._remove_comments(lines)
             if text:
-                return new_text_cell(u'raw',source=text)
-        elif state == u'headingcell':
+                return new_text_cell("raw", source=text)
+        elif state == "headingcell":
             text = self._remove_comments(lines)
-            level = kwargs.get('level',1)
+            level = kwargs.get("level", 1)
             if text:
-                return new_heading_cell(source=text,level=level)
+                return new_heading_cell(source=text, level=level)
 
     def _remove_comments(self, lines):
         new_lines = []
         for line in lines:
-            if line.startswith(u'#'):
+            if line.startswith("#"):
                 new_lines.append(line[2:])
             else:
                 new_lines.append(line)
-        text = u'\n'.join(new_lines)
-        text = text.strip(u'\n')
+        text = "\n".join(new_lines)
+        text = text.strip("\n")
         return text
 
     def split_lines_into_blocks(self, lines):
@@ -140,57 +146,59 @@ class PyReader(NotebookReader):
             yield lines[0]
             raise StopIteration()
         import ast
-        source = '\n'.join(lines)
+
+        source = "\n".join(lines)
         code = ast.parse(source)
-        starts = [x.lineno-1 for x in code.body]
-        for i in range(len(starts)-1):
-            yield '\n'.join(lines[starts[i]:starts[i+1]]).strip('\n')
-        yield '\n'.join(lines[starts[-1]:]).strip('\n')
+        starts = [x.lineno - 1 for x in code.body]
+        for i in range(len(starts) - 1):
+            yield "\n".join(lines[starts[i] : starts[i + 1]]).strip("\n")
+        yield "\n".join(lines[starts[-1] :]).strip("\n")
 
 
 class PyWriter(NotebookWriter):
-
     def writes(self, nb, **kwargs):
-        lines = [u'# -*- coding: utf-8 -*-']
-        lines.extend([
-            u'# <nbformat>%i.%i</nbformat>' % (nbformat, nbformat_minor),
-            u'',
-        ])
+        lines = ["# -*- coding: utf-8 -*-"]
+        lines.extend(
+            [
+                "# <nbformat>%i.%i</nbformat>" % (nbformat, nbformat_minor),
+                "",
+            ]
+        )
         for ws in nb.worksheets:
             for cell in ws.cells:
-                if cell.cell_type == u'code':
-                    input = cell.get(u'input')
+                if cell.cell_type == "code":
+                    input = cell.get("input")
                     if input is not None:
-                        lines.extend([u'# <codecell>',u''])
+                        lines.extend(["# <codecell>", ""])
                         lines.extend(input.splitlines())
-                        lines.append(u'')
-                elif cell.cell_type == u'html':
-                    input = cell.get(u'source')
+                        lines.append("")
+                elif cell.cell_type == "html":
+                    input = cell.get("source")
                     if input is not None:
-                        lines.extend([u'# <htmlcell>',u''])
-                        lines.extend([u'# ' + line for line in input.splitlines()])
-                        lines.append(u'')
-                elif cell.cell_type == u'markdown':
-                    input = cell.get(u'source')
+                        lines.extend(["# <htmlcell>", ""])
+                        lines.extend(["# " + line for line in input.splitlines()])
+                        lines.append("")
+                elif cell.cell_type == "markdown":
+                    input = cell.get("source")
                     if input is not None:
-                        lines.extend([u'# <markdowncell>',u''])
-                        lines.extend([u'# ' + line for line in input.splitlines()])
-                        lines.append(u'')
-                elif cell.cell_type == u'raw':
-                    input = cell.get(u'source')
+                        lines.extend(["# <markdowncell>", ""])
+                        lines.extend(["# " + line for line in input.splitlines()])
+                        lines.append("")
+                elif cell.cell_type == "raw":
+                    input = cell.get("source")
                     if input is not None:
-                        lines.extend([u'# <rawcell>',u''])
-                        lines.extend([u'# ' + line for line in input.splitlines()])
-                        lines.append(u'')
-                elif cell.cell_type == u'heading':
-                    input = cell.get(u'source')
-                    level = cell.get(u'level',1)
+                        lines.extend(["# <rawcell>", ""])
+                        lines.extend(["# " + line for line in input.splitlines()])
+                        lines.append("")
+                elif cell.cell_type == "heading":
+                    input = cell.get("source")
+                    level = cell.get("level", 1)
                     if input is not None:
-                        lines.extend([u'# <headingcell level=%s>' % level,u''])
-                        lines.extend([u'# ' + line for line in input.splitlines()])
-                        lines.append(u'')
-        lines.append('')
-        return u'\n'.join(lines)
+                        lines.extend(["# <headingcell level=%s>" % level, ""])
+                        lines.extend(["# " + line for line in input.splitlines()])
+                        lines.append("")
+        lines.append("")
+        return "\n".join(lines)
 
 
 _reader = PyReader()
@@ -201,4 +209,3 @@ read = _reader.read
 to_notebook = _reader.to_notebook
 write = _writer.write
 writes = _writer.writes
-

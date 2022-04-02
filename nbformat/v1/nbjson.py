@@ -5,27 +5,28 @@ Authors:
 * Brian Granger
 """
 
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 #  Copyright (C) 2008-2011  The IPython Development Team
 #
 #  Distributed under the terms of the BSD License.  The full license is in
 #  the file COPYING, distributed as part of this software.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Imports
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
-from .rwbase import NotebookReader, NotebookWriter
-from .nbbase import from_dict
 import json
 
-#-----------------------------------------------------------------------------
+from .nbbase import from_dict
+from .rwbase import NotebookReader, NotebookWriter
+
+# -----------------------------------------------------------------------------
 # Code
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
+
 
 class JSONReader(NotebookReader):
-
     def reads(self, s, **kwargs):
         nb = json.loads(s, **kwargs)
         return self.to_notebook(nb, **kwargs)
@@ -36,9 +37,8 @@ class JSONReader(NotebookReader):
 
 
 class JSONWriter(NotebookWriter):
-
     def writes(self, nb, **kwargs):
-        kwargs['indent'] = 4
+        kwargs["indent"] = 4
         return json.dumps(nb, **kwargs)
 
 
@@ -50,4 +50,3 @@ read = _reader.read
 to_notebook = _reader.to_notebook
 write = _writer.write
 writes = _writer.writes
-

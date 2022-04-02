@@ -18,13 +18,13 @@ version. Update the minor format for tests as well.
 For example, for nbformat package version 4.5, if we see that there are material
 changes in the spec, so do the following:
 
-* Update `nbformat/v4/nbformat.v4.schema.json` so that its top-level description
+- Update `nbformat/v4/nbformat.v4.schema.json` so that its top-level description
   says spec version 4.4 (which is the next spec version), and its minimum minor
   version number is 4 in the schema.
-* Copy `nbformat/v4/nbformat.v4.schema.json` to
+- Copy `nbformat/v4/nbformat.v4.schema.json` to
   `nbformat/v4/nbformat.v4.4.schema.json` and commit the file as an archived
   version of that particular nbformat specification.
-* Update the `nbformat` and `nbformat_minor` variables in
+- Update the `nbformat` and `nbformat_minor` variables in
   `nbformat/v4/nbbase.py`
 
 If there are inconsequential changes to the format spec in a package release

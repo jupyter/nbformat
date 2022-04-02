@@ -8,18 +8,28 @@ Use this module to read or write notebook files as particular nbformat versions.
 import io
 
 from traitlets.log import get_logger
-from ._version import version_info, __version__
 
-from . import v1
-from . import v2
-from . import v3
-from . import v4
+from . import v1, v2, v3, v4
+from ._version import __version__, version_info
 from .sentinel import Sentinel
 
-__all__ = ['versions', 'validate', 'ValidationError', 'convert', 'from_dict',
-           'NotebookNode', 'current_nbformat', 'current_nbformat_minor',
-           'NBFormatError', 'NO_CONVERT', 'reads', 'read', 'writes', 'write',
-           'version_info', '__version__',
+__all__ = [
+    "versions",
+    "validate",
+    "ValidationError",
+    "convert",
+    "from_dict",
+    "NotebookNode",
+    "current_nbformat",
+    "current_nbformat_minor",
+    "NBFormatError",
+    "NO_CONVERT",
+    "reads",
+    "read",
+    "writes",
+    "write",
+    "version_info",
+    "__version__",
 ]
 
 versions = {
@@ -29,23 +39,25 @@ versions = {
     4: v4,
 }
 
-from .validator import validate, ValidationError
-from .converter import convert
 from . import reader
-from .notebooknode import from_dict, NotebookNode
+from .converter import convert
+from .notebooknode import NotebookNode, from_dict
+from .v4 import nbformat as current_nbformat
+from .v4 import nbformat_minor as current_nbformat_minor
+from .validator import ValidationError, validate
 
-from .v4 import (
-    nbformat as current_nbformat,
-    nbformat_minor as current_nbformat_minor,
-)
 
 class NBFormatError(ValueError):
     pass
 
+
 # no-conversion singleton
-NO_CONVERT = Sentinel('NO_CONVERT', __name__,
+NO_CONVERT = Sentinel(
+    "NO_CONVERT",
+    __name__,
     """Value to prevent nbformat to convert notebooks to most recent version.
-    """)
+    """,
+)
 
 
 def reads(s, as_version, capture_validation_error=None, **kwargs):
@@ -82,7 +94,7 @@ def reads(s, as_version, capture_validation_error=None, **kwargs):
     except ValidationError as e:
         get_logger().error("Notebook JSON is invalid: %s", e)
         if isinstance(capture_validation_error, dict):
-            capture_validation_error['ValidationError'] = e
+            capture_validation_error["ValidationError"] = e
     return nb
 
 
@@ -118,7 +130,7 @@ def writes(nb, version=NO_CONVERT, capture_validation_error=None, **kwargs):
     except ValidationError as e:
         get_logger().error("Notebook JSON is invalid: %s", e)
         if isinstance(capture_validation_error, dict):
-            capture_validation_error['ValidationError'] = e
+            capture_validation_error["ValidationError"] = e
     return versions[version].writes_json(nb, **kwargs)
 
 
@@ -153,7 +165,7 @@ def read(fp, as_version, capture_validation_error=None, **kwargs):
     try:
         buf = fp.read()
     except AttributeError:
-        with io.open(fp, encoding='utf-8') as f:
+        with open(fp, encoding="utf-8") as f:
             return reads(f.read(), as_version, capture_validation_error, **kwargs)
 
     return reads(buf, as_version, capture_validation_error, **kwargs)
@@ -183,14 +195,14 @@ def write(nb, fp, version=NO_CONVERT, capture_validation_error=None, **kwargs):
     """
     s = writes(nb, version, capture_validation_error, **kwargs)
     if isinstance(s, bytes):
-        s = s.decode('utf8')
+        s = s.decode("utf8")
 
     try:
         fp.write(s)
-        if not s.endswith(u'\n'):
-            fp.write(u'\n')
+        if not s.endswith("\n"):
+            fp.write("\n")
     except AttributeError:
-        with io.open(fp, 'w', encoding='utf-8') as f:
+        with open(fp, "w", encoding="utf-8") as f:
             f.write(s)
-            if not s.endswith(u'\n'):
-                f.write(u'\n')
+            if not s.endswith("\n"):
+                f.write("\n")

@@ -8,20 +8,24 @@ import json
 
 from ..notebooknode import from_dict
 from .rwbase import (
-    NotebookReader, NotebookWriter, rejoin_lines, split_lines, strip_transient
+    NotebookReader,
+    NotebookWriter,
+    rejoin_lines,
+    split_lines,
+    strip_transient,
 )
 
 
 class BytesEncoder(json.JSONEncoder):
     """A JSON encoder that accepts b64 (and other *ascii*) bytestrings."""
+
     def default(self, obj):
         if isinstance(obj, bytes):
-            return obj.decode('ascii')
+            return obj.decode("ascii")
         return json.JSONEncoder.default(self, obj)
 
 
 class JSONReader(NotebookReader):
-
     def reads(self, s, **kwargs):
         """Read a JSON string into a Notebook object"""
         nb = json.loads(s, **kwargs)
@@ -40,17 +44,16 @@ class JSONReader(NotebookReader):
 
 
 class JSONWriter(NotebookWriter):
-
     def writes(self, nb, **kwargs):
         """Serialize a NotebookNode object as a JSON string"""
-        kwargs['cls'] = BytesEncoder
-        kwargs['indent'] = 1
-        kwargs['sort_keys'] = True
-        kwargs['separators'] = (',',': ')
-        kwargs.setdefault('ensure_ascii', False)
+        kwargs["cls"] = BytesEncoder
+        kwargs["indent"] = 1
+        kwargs["sort_keys"] = True
+        kwargs["separators"] = (",", ": ")
+        kwargs.setdefault("ensure_ascii", False)
         # don't modify in-memory dict
         nb = copy.deepcopy(nb)
-        if kwargs.pop('split_lines', True):
+        if kwargs.pop("split_lines", True):
             nb = split_lines(nb)
         nb = strip_transient(nb)
         return json.dumps(nb, **kwargs)

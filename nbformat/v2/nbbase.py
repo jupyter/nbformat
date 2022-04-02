@@ -10,25 +10,26 @@ Authors:
 * Brian Granger
 """
 
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 #  Copyright (C) 2008-2011  The IPython Development Team
 #
 #  Distributed under the terms of the BSD License.  The full license is in
 #  the file COPYING, distributed as part of this software.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Imports
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 import pprint
 import uuid
 
 from .._struct import Struct
 
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Code
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
+
 
 class NotebookNode(Struct):
     pass
@@ -37,7 +38,7 @@ class NotebookNode(Struct):
 def from_dict(d):
     if isinstance(d, dict):
         newd = NotebookNode()
-        for k,v in d.items():
+        for k, v in d.items():
             newd[k] = from_dict(v)
         return newd
     elif isinstance(d, (tuple, list)):
@@ -46,16 +47,27 @@ def from_dict(d):
         return d
 
 
-def new_output(output_type=None, output_text=None, output_png=None,
-    output_html=None, output_svg=None, output_latex=None, output_json=None,
-    output_javascript=None, output_jpeg=None, prompt_number=None,
-    etype=None, evalue=None, traceback=None):
+def new_output(
+    output_type=None,
+    output_text=None,
+    output_png=None,
+    output_html=None,
+    output_svg=None,
+    output_latex=None,
+    output_json=None,
+    output_javascript=None,
+    output_jpeg=None,
+    prompt_number=None,
+    etype=None,
+    evalue=None,
+    traceback=None,
+):
     """Create a new code cell with input and output"""
     output = NotebookNode()
     if output_type is not None:
         output.output_type = str(output_type)
 
-    if output_type != 'pyerr':
+    if output_type != "pyerr":
         if output_text is not None:
             output.text = str(output_text)
         if output_png is not None:
@@ -73,11 +85,11 @@ def new_output(output_type=None, output_text=None, output_png=None,
         if output_javascript is not None:
             output.javascript = str(output_javascript)
 
-    if output_type == u'pyout':
+    if output_type == "pyout":
         if prompt_number is not None:
             output.prompt_number = int(prompt_number)
 
-    if output_type == u'pyerr':
+    if output_type == "pyerr":
         if etype is not None:
             output.etype = str(etype)
         if evalue is not None:
@@ -88,11 +100,10 @@ def new_output(output_type=None, output_text=None, output_png=None,
     return output
 
 
-def new_code_cell(input=None, prompt_number=None, outputs=None,
-    language=u'python', collapsed=False):
+def new_code_cell(input=None, prompt_number=None, outputs=None, language="python", collapsed=False):
     """Create a new code cell with input and output"""
     cell = NotebookNode()
-    cell.cell_type = u'code'
+    cell.cell_type = "code"
     if language is not None:
         cell.language = str(language)
     if input is not None:
@@ -107,6 +118,7 @@ def new_code_cell(input=None, prompt_number=None, outputs=None,
         cell.collapsed = bool(collapsed)
 
     return cell
+
 
 def new_text_cell(cell_type, source=None, rendered=None):
     """Create a new text cell."""
@@ -146,8 +158,7 @@ def new_notebook(metadata=None, worksheets=None):
     return nb
 
 
-def new_metadata(name=None, authors=None, license=None, created=None,
-    modified=None, gistid=None):
+def new_metadata(name=None, authors=None, license=None, created=None, modified=None, gistid=None):
     """Create a new metadata node."""
     metadata = NotebookNode()
     if name is not None:
@@ -164,6 +175,7 @@ def new_metadata(name=None, authors=None, license=None, created=None,
         metadata.gistid = str(gistid)
     return metadata
 
+
 def new_author(name=None, email=None, affiliation=None, url=None):
     """Create a new author."""
     author = NotebookNode()
@@ -176,4 +188,3 @@ def new_author(name=None, email=None, affiliation=None, url=None):
     if url is not None:
         author.url = str(url)
     return author
-

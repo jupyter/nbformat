@@ -71,9 +71,7 @@ class Struct(dict):
         this is not allowed
         """
         if not self._allownew and key not in self:
-            raise KeyError(
-                "can't create new attribute %s when allow_new_attr(False)" % key
-            )
+            raise KeyError("can't create new attribute %s when allow_new_attr(False)" % key)
         dict.__setitem__(self, key, value)
 
     def __setattr__(self, key, value):
@@ -103,9 +101,7 @@ class Struct(dict):
             # self._data.  But I only want keys in the class and in
             # self.__dict__
             if key in self.__dict__ or hasattr(Struct, key):
-                raise AttributeError(
-                    "attr %s is a protected member of class Struct." % key
-                )
+                raise AttributeError("attr %s is a protected member of class Struct." % key)
         try:
             self.__setitem__(key, value)
         except KeyError as e:
