@@ -4,7 +4,6 @@
 # Distributed under the terms of the Modified BSD License.
 
 import hashlib
-import io
 import os
 import sys
 from collections import OrderedDict
@@ -19,6 +18,8 @@ except ImportError:
         from pysqlite2 import dbapi2 as sqlite3
     except ImportError:
         sqlite3 = None
+
+from base64 import encodebytes
 
 from jupyter_core.application import JupyterApp, base_flags
 from traitlets import (
@@ -36,7 +37,6 @@ from traitlets import (
 from traitlets.config import LoggingConfigurable, MultipleInstanceError
 
 from . import NO_CONVERT, __version__, read, reads
-from ._compat import encodebytes
 
 try:
     # Python 3
@@ -576,6 +576,7 @@ class TrustNotebookApp(JupyterApp):
     Otherwise, you will have to re-execute the notebook to see output.
     """
     # This command line tool should use the same config file as the notebook
+
     @default("config_file_name")
     def _config_file_name_default(self):
         return "jupyter_notebook_config"

@@ -1,6 +1,6 @@
 import os
+from base64 import encodebytes
 
-from nbformat._compat import encodebytes
 from nbformat.v4.nbbase import (
     new_code_cell,
     new_markdown_cell,

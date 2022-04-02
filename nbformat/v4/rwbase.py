@@ -38,7 +38,7 @@ def rejoin_lines(nb):
             cell.source = "".join(cell.source)
 
         attachments = cell.get("attachments", {})
-        for key, attachment in attachments.items():
+        for _, attachment in attachments.items():
             _rejoin_mimebundle(attachment)
 
         if cell.get("cell_type", None) == "code":
@@ -80,7 +80,7 @@ def split_lines(nb):
             cell["source"] = source.splitlines(True)
 
         attachments = cell.get("attachments", {})
-        for key, attachment in attachments.items():
+        for _, attachment in attachments.items():
             _split_mimebundle(attachment)
 
         if cell.cell_type == "code":

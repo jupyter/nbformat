@@ -1,11 +1,11 @@
 import json
 import os
 import sys
+from base64 import decodebytes
 from unittest import TestCase
 
-from nbformat._compat import decodebytes
 from nbformat.v4 import nbformat, nbformat_minor, nbjson
-from nbformat.v4.nbjson import reads, writes
+from nbformat.v4.nbjson import writes
 
 from . import formattest
 from .nbexamples import nb0
@@ -68,10 +68,10 @@ class TestJSON(formattest.NBFormatTest, TestCase):
         nb1 = nbjson.reads(s)
         found_png = False
         for cell in nb1.cells:
-            if not "outputs" in cell:
+            if "outputs" not in cell:
                 continue
             for output in cell.outputs:
-                if not "data" in output:
+                if "data" not in output:
                     continue
                 if "image/png" in output.data:
                     found_png = True
@@ -88,10 +88,10 @@ class TestJSON(formattest.NBFormatTest, TestCase):
         nb1 = nbjson.reads(s)
         found_jpeg = False
         for cell in nb1.cells:
-            if not "outputs" in cell:
+            if "outputs" not in cell:
                 continue
             for output in cell.outputs:
-                if not "data" in output:
+                if "data" not in output:
                     continue
                 if "image/jpeg" in output.data:
                     found_jpeg = True

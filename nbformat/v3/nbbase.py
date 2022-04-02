@@ -9,8 +9,6 @@ helpers to build the structs in the right form.
 # Copyright (c) IPython Development Team.
 # Distributed under the terms of the Modified BSD License.
 
-import pprint
-import uuid
 import warnings
 
 from .._struct import Struct
@@ -59,7 +57,7 @@ def cast_str(obj):
             UserWarning,
             stacklevel=3,
         )
-        dec = obj.decode("ascii", "replace")
+        return obj.decode("ascii", "replace")
     else:
         assert isinstance(obj, str)
         return obj

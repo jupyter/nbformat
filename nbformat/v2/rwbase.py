@@ -16,9 +16,7 @@ Authors:
 # Imports
 # -----------------------------------------------------------------------------
 
-import pprint
-
-from .._compat import decodebytes, encodebytes
+from base64 import decodebytes, encodebytes
 
 # -----------------------------------------------------------------------------
 # Code

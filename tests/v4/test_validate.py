@@ -3,19 +3,11 @@
 # Copyright (c) IPython Development Team.
 # Distributed under the terms of the Modified BSD License.
 
-import io
 import os
 
 import pytest
 
-from nbformat.v4.nbbase import (
-    nbformat,
-    new_code_cell,
-    new_markdown_cell,
-    new_notebook,
-    new_output,
-    new_raw_cell,
-)
+from nbformat.v4.nbbase import nbformat, new_code_cell, new_markdown_cell, new_raw_cell
 from nbformat.v4.nbjson import reads
 from nbformat.validator import ValidationError, validate
 

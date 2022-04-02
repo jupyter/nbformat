@@ -5,7 +5,6 @@ Use this module to read or write notebook files as particular nbformat versions.
 
 # Copyright (c) IPython Development Team.
 # Distributed under the terms of the Modified BSD License.
-import io
 
 from traitlets.log import get_logger
 

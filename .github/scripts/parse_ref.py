@@ -5,7 +5,6 @@
 
 # Standard library imports
 import os
-import subprocess
 
 # Constants
 HERE = os.path.abspath(os.path.dirname(__file__))

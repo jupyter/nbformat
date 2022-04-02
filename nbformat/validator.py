@@ -5,7 +5,6 @@
 import json
 import os
 import pprint
-import sys
 
 from traitlets.log import get_logger
 
