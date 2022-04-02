@@ -39,7 +39,7 @@ jobs:
       - name: List dependencies
         run: pip list
       - name: Run tests
-        run: pytest -v --cov=nbformat --cov-report term-missing:skip-covered --no-cov-on-fail
+        run: python -m pytest -v --cov=nbformat --cov-report term-missing:skip-covered --no-cov-on-fail
       - name: Check manfest
         run: check-manifest -v
       - name: Coverage
