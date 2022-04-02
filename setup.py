@@ -81,11 +81,11 @@ install_requires = setuptools_args["install_requires"] = [
     "traitlets>=4.1",
     "jsonschema>=2.6",
     "jupyter_core",
+    "fastjsonschema",
 ]
 
 extras_require = setuptools_args["extras_require"] = {
-    "fast": ["fastjsonschema"],
-    "test": ["check-manifest", "fastjsonschema", "testpath", "pytest", "pre-commit"],
+    "test": ["check-manifest", "testpath", "pytest", "pre-commit"],
 }
 
 if "setuptools" in sys.modules:

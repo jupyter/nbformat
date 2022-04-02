@@ -10,7 +10,7 @@ from traitlets.log import get_logger
 
 from ._imports import import_item
 from .corpus.words import generate_corpus_id
-from .json_compat import ValidationError, get_current_validator
+from .json_compat import ValidationError, _validator_for_name, get_current_validator
 from .reader import get_version
 
 validators = {}
@@ -37,7 +37,7 @@ def _allow_undefined(schema):
     return schema
 
 
-def get_validator(version=None, version_minor=None, relax_add_props=False):
+def get_validator(version=None, version_minor=None, relax_add_props=False, name=None):
     """Load the JSON schema into a Validator"""
     if version is None:
         from . import current_nbformat
@@ -49,7 +49,11 @@ def get_validator(version=None, version_minor=None, relax_add_props=False):
     if version_minor is None:
         version_minor = current_minor
 
-    current_validator = get_current_validator()
+    if name:
+        current_validator = _validator_for_name(name)
+    else:
+        current_validator = get_current_validator()
+
     version_tuple = (current_validator.name, version, version_minor)
 
     if version_tuple not in validators:
@@ -354,6 +358,12 @@ def iter_validate(
         errors = [e for e in validator.iter_errors(nbdict)]
 
         if len(errors) > 0 and strip_invalid_metadata:
+            if validator.name == "fastjsonschema":
+                validator = get_validator(
+                    version, version_minor, relax_add_props=relax_add_props, name="jsonschema"
+                )
+                errors = [e for e in validator.iter_errors(nbdict)]
+
             error_tree = validator.error_tree(errors)
             if "metadata" in error_tree:
                 for key in error_tree["metadata"]:

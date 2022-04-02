@@ -7,16 +7,11 @@ libraries.
 
 import os
 
+import fastjsonschema
 import jsonschema
+from fastjsonschema import JsonSchemaException as _JsonSchemaException
 from jsonschema import Draft4Validator as _JsonSchemaValidator
 from jsonschema import ErrorTree, ValidationError
-
-try:
-    import fastjsonschema
-    from fastjsonschema import JsonSchemaException as _JsonSchemaException
-except ImportError:
-    fastjsonschema = None
-    _JsonSchemaException = ValidationError
 
 
 class JsonSchemaValidator:
@@ -99,5 +94,5 @@ def get_current_validator():
     """
     Return the default validator based on the value of an environment variable.
     """
-    validator_name = os.environ.get("NBFORMAT_VALIDATOR", "jsonschema")
+    validator_name = os.environ.get("NBFORMAT_VALIDATOR", "fastjsonschema")
     return _validator_for_name(validator_name)
