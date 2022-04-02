@@ -1,20 +1,10 @@
-import io
 import os
 import shutil
 import tempfile
 
 pjoin = os.path.join
 
-from nbformat.v3.nbbase import (
-    NotebookNode,
-    new_code_cell,
-    new_notebook,
-    new_text_cell,
-    new_worksheet,
-)
-from nbformat.v3.nbpy import read, reads, write, writes
-
-from .nbexamples import nb0, nb0_py
+from .nbexamples import nb0
 
 
 def open_utf8(fname, mode):

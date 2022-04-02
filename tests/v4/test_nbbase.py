@@ -9,7 +9,6 @@ from nbformat.v4.nbbase import (
     new_output,
     new_raw_cell,
 )
-from nbformat.validator import ValidationError, isvalid, validate
 
 
 def test_empty_notebook():

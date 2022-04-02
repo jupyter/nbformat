@@ -3,7 +3,7 @@ from unittest import TestCase
 from nbformat.v3 import nbpy
 
 from . import formattest
-from .nbexamples import nb0, nb0_py
+from .nbexamples import nb0_py
 
 
 class TestPy(formattest.NBFormatTest, TestCase):

@@ -3,17 +3,7 @@
 # Copyright (c) IPython Development Team.
 # Distributed under the terms of the Modified BSD License.
 
-from nbformat import v2
-
-from .nbbase import (
-    nbformat,
-    nbformat_minor,
-    new_code_cell,
-    new_notebook,
-    new_output,
-    new_text_cell,
-    new_worksheet,
-)
+from .nbbase import nbformat, nbformat_minor
 
 
 def _unbytes(obj):

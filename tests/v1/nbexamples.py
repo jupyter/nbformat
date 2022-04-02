@@ -1,4 +1,4 @@
-from nbformat.v1.nbbase import NotebookNode, new_code_cell, new_notebook, new_text_cell
+from nbformat.v1.nbbase import new_code_cell, new_notebook, new_text_cell
 
 nb0 = new_notebook()
 

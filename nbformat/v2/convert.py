@@ -17,13 +17,7 @@ Authors:
 # Imports
 # -----------------------------------------------------------------------------
 
-from .nbbase import (
-    new_code_cell,
-    new_notebook,
-    new_output,
-    new_text_cell,
-    new_worksheet,
-)
+from .nbbase import new_code_cell, new_notebook, new_text_cell, new_worksheet
 
 # -----------------------------------------------------------------------------
 # Code

@@ -39,7 +39,7 @@ def test_nb2(validator_name):
     with TestsBase.fopen("test2.ipynb", "r") as f:
         nb = read(f, as_version=4)
     validate(nb)
-    assert isvalid(nb) == True
+    assert isvalid(nb)
 
 
 @pytest.mark.parametrize("validator_name", VALIDATORS)
@@ -49,7 +49,7 @@ def test_nb3(validator_name):
     with TestsBase.fopen("test3.ipynb", "r") as f:
         nb = read(f, as_version=4)
     validate(nb)
-    assert isvalid(nb) == True
+    assert isvalid(nb)
 
 
 @pytest.mark.parametrize("validator_name", VALIDATORS)
@@ -59,7 +59,7 @@ def test_nb4(validator_name):
     with TestsBase.fopen("test4.ipynb", "r") as f:
         nb = read(f, as_version=4)
     validate(nb)
-    assert isvalid(nb) == True
+    assert isvalid(nb)
 
 
 @pytest.mark.parametrize("validator_name", VALIDATORS)

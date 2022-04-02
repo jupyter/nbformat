@@ -1,5 +1,4 @@
 import copy
-import io
 import os
 from unittest import mock
 
@@ -55,7 +54,7 @@ def test_upgrade_heading():
 def test_downgrade_heading():
     v3h = v3.new_heading_cell
     v4m = v4.new_markdown_cell
-    v3m = lambda source: v3.new_text_cell("markdown", source)
+    v3m = lambda source: v3.new_text_cell("markdown", source)  # noqa
     for v4cell, expected in [
         (
             v4m(source="# foo"),

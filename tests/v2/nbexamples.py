@@ -1,8 +1,7 @@
 import os
+from base64 import encodebytes
 
-from nbformat._compat import encodebytes
 from nbformat.v2.nbbase import (
-    NotebookNode,
     new_author,
     new_code_cell,
     new_metadata,

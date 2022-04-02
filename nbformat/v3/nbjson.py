@@ -11,7 +11,6 @@ from .rwbase import (
     NotebookReader,
     NotebookWriter,
     rejoin_lines,
-    restore_bytes,
     split_lines,
     strip_transient,
 )

@@ -346,11 +346,11 @@ class Struct(dict):
 
         # policies for conflict resolution: two argument functions which return
         # the value that will go in the new struct
-        preserve = lambda old, new: old
-        update = lambda old, new: new
-        add = lambda old, new: old + new
-        add_flip = lambda old, new: new + old  # note change of order!
-        add_s = lambda old, new: old + " " + new
+        preserve = lambda old, new: old  # noqa
+        update = lambda old, new: new  # noqa
+        add = lambda old, new: old + new  # noqa
+        add_flip = lambda old, new: new + old  # noqa  # note change of order!
+        add_s = lambda old, new: old + " " + new  # noqa
 
         # default policy is to keep current keys when there's a conflict
         conflict_solve = dict.fromkeys(self, preserve)

@@ -4,7 +4,7 @@
 # Distributed under the terms of the Modified BSD License.
 
 
-from .._compat import decodebytes, encodebytes
+from base64 import decodebytes, encodebytes
 
 
 def restore_bytes(nb):

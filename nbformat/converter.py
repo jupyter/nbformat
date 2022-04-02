@@ -70,5 +70,5 @@ def convert(nb, to_version):
         return convert(converted, to_version)
     else:
         raise ValueError(
-            "Cannot convert notebook to v%d because that " "version doesn't exist" % (to_version)
+            "Cannot convert notebook to v%d because that version doesn't exist" % (to_version)
         )
