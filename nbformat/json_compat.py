@@ -9,8 +9,7 @@ import os
 
 import jsonschema
 from jsonschema import Draft4Validator as _JsonSchemaValidator
-from jsonschema import ValidationError
-from jsonschema import ErrorTree
+from jsonschema import ErrorTree, ValidationError
 
 try:
     import fastjsonschema
@@ -18,7 +17,6 @@ try:
 except ImportError:
     fastjsonschema = None
     _JsonSchemaException = ValidationError
-
 
 
 class JsonSchemaValidator:
@@ -88,8 +86,9 @@ VALIDATORS = [item[0] for item in _VALIDATOR_MAP]
 
 def _validator_for_name(validator_name):
     if validator_name not in VALIDATORS:
-        raise ValueError("Invalid validator '{0}' value!\nValid values are: {1}".format(
-            validator_name, VALIDATORS))
+        raise ValueError(
+            f"Invalid validator '{validator_name}' value!\nValid values are: {VALIDATORS}"
+        )
 
     for (name, module, validator_cls) in _VALIDATOR_MAP:
         if module and validator_name == name:

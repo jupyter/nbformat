@@ -3,14 +3,14 @@
 # Copyright (c) IPython Development Team.
 # Distributed under the terms of the Modified BSD License.
 
-from collections import OrderedDict
-from contextlib import contextmanager
-from datetime import datetime
 import hashlib
-from hmac import HMAC
 import io
 import os
 import sys
+from collections import OrderedDict
+from contextlib import contextmanager
+from datetime import datetime
+from hmac import HMAC
 
 try:
     import sqlite3
@@ -20,14 +20,22 @@ except ImportError:
     except ImportError:
         sqlite3 = None
 
+from jupyter_core.application import JupyterApp, base_flags
 from traitlets import (
-    Instance, Bytes, Enum, Any, Unicode, Bool, Integer, TraitType,
-    default, observe,
+    Any,
+    Bool,
+    Bytes,
+    Enum,
+    Instance,
+    Integer,
+    TraitType,
+    Unicode,
+    default,
+    observe,
 )
 from traitlets.config import LoggingConfigurable, MultipleInstanceError
-from jupyter_core.application import JupyterApp, base_flags
 
-from . import read, reads, NO_CONVERT, __version__
+from . import NO_CONVERT, __version__, read, reads
 from ._compat import encodebytes
 
 try:
@@ -35,7 +43,7 @@ try:
     algorithms = hashlib.algorithms_guaranteed
     # shake algorithms in py36 are not compatible with hmac
     # due to required length argument in digests
-    algorithms = [ a for a in algorithms if not a.startswith('shake_') ]
+    algorithms = [a for a in algorithms if not a.startswith("shake_")]
 except AttributeError:
     algorithms = hashlib.algorithms
 
@@ -50,7 +58,7 @@ class Callable(TraitType):
     Classes are callable, as are instances
     with a __call__() method."""
 
-    info_text = 'a callable'
+    info_text = "a callable"
 
     def validate(self, obj, value):
         if callable(value):
@@ -59,8 +67,9 @@ class Callable(TraitType):
             self.error(obj, value)
 
 
-class SignatureStore(object):
+class SignatureStore:
     """Base class for a signature store."""
+
     def store_signature(self, digest, algorithm):
         """Implement in subclass to store a signature.
 
@@ -92,9 +101,10 @@ class SignatureStore(object):
 
 
 class MemorySignatureStore(SignatureStore):
-    """Non-persistent storage of signatures in memory.
-    """
+    """Non-persistent storage of signatures in memory."""
+
     cache_size = 65535
+
     def __init__(self):
         # We really only want an ordered set, but the stdlib has OrderedDict,
         # and it's easy to use a dict as a set.
@@ -109,8 +119,7 @@ class MemorySignatureStore(SignatureStore):
         self._maybe_cull()
 
     def _maybe_cull(self):
-        """If more than cache_size signatures are stored, delete the oldest 25%
-        """
+        """If more than cache_size signatures are stored, delete the oldest 25%"""
         if len(self.data) < self.cache_size:
             return
 
@@ -129,19 +138,21 @@ class MemorySignatureStore(SignatureStore):
     def remove_signature(self, digest, algorithm):
         self.data.pop((digest, algorithm), None)
 
+
 class SQLiteSignatureStore(SignatureStore, LoggingConfigurable):
-    """Store signatures in an SQLite database.
-    """
+    """Store signatures in an SQLite database."""
+
     # 64k entries ~ 12MB
-    cache_size = Integer(65535,
+    cache_size = Integer(
+        65535,
         help="""The number of notebook signatures to cache.
         When the number of signatures exceeds this value,
         the oldest 25% of signatures will be culled.
-        """
+        """,
     ).tag(config=True)
 
     def __init__(self, db_file, **kwargs):
-        super(SQLiteSignatureStore, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.db_file = db_file
         self.db = self._connect_db(db_file)
 
@@ -150,22 +161,24 @@ class SQLiteSignatureStore(SignatureStore, LoggingConfigurable):
             self.db.close()
 
     def _connect_db(self, db_file):
-        kwargs = dict(
-            detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES)
+        kwargs = dict(detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES)
         db = None
         try:
             db = sqlite3.connect(db_file, **kwargs)
             self.init_db(db)
         except (sqlite3.DatabaseError, sqlite3.OperationalError):
-            if db_file != ':memory:':
+            if db_file != ":memory:":
                 old_db_location = db_file + ".bak"
                 if db is not None:
                     db.close()
                 self.log.warning(
-                    ("The signatures database cannot be opened; maybe it is corrupted or encrypted. "
-                     "You may need to rerun your notebooks to ensure that they are trusted to run Javascript. "
-                     "The old signatures database has been renamed to %s and a new one has been created."),
-                    old_db_location)
+                    (
+                        "The signatures database cannot be opened; maybe it is corrupted or encrypted. "
+                        "You may need to rerun your notebooks to ensure that they are trusted to run Javascript. "
+                        "The old signatures database has been renamed to %s and a new one has been created."
+                    ),
+                    old_db_location,
+                )
                 try:
                     os.rename(db_file, old_db_location)
                     db = sqlite3.connect(db_file, **kwargs)
@@ -174,19 +187,21 @@ class SQLiteSignatureStore(SignatureStore, LoggingConfigurable):
                     if db is not None:
                         db.close()
                     self.log.warning(
-                        ("Failed commiting signatures database to disk. "
-                         "You may need to move the database file to a non-networked file system, "
-                         "using config option `NotebookNotary.db_file`. "
-                         "Using in-memory signatures database for the remainder of this session."))
-                    self.db_file = ':memory:'
-                    db = sqlite3.connect(':memory:', **kwargs)
+                        "Failed commiting signatures database to disk. "
+                        "You may need to move the database file to a non-networked file system, "
+                        "using config option `NotebookNotary.db_file`. "
+                        "Using in-memory signatures database for the remainder of this session."
+                    )
+                    self.db_file = ":memory:"
+                    db = sqlite3.connect(":memory:", **kwargs)
                     self.init_db(db)
             else:
                 raise
         return db
 
     def init_db(self, db):
-        db.execute("""
+        db.execute(
+            """
             CREATE TABLE IF NOT EXISTS nbsignatures
             (
                 id integer PRIMARY KEY AUTOINCREMENT,
@@ -194,68 +209,83 @@ class SQLiteSignatureStore(SignatureStore, LoggingConfigurable):
                 signature text,
                 path text,
                 last_seen timestamp
-            )""")
-        db.execute("""
+            )"""
+        )
+        db.execute(
+            """
             CREATE INDEX IF NOT EXISTS algosig ON nbsignatures(algorithm, signature)
-            """)
+            """
+        )
         db.commit()
 
     def store_signature(self, digest, algorithm):
         if self.db is None:
             return
         if not self.check_signature(digest, algorithm):
-            self.db.execute("""
+            self.db.execute(
+                """
                 INSERT INTO nbsignatures (algorithm, signature, last_seen)
                 VALUES (?, ?, ?)
-                """, (algorithm, digest, datetime.utcnow())
+                """,
+                (algorithm, digest, datetime.utcnow()),
             )
         else:
-            self.db.execute("""UPDATE nbsignatures SET last_seen = ? WHERE
+            self.db.execute(
+                """UPDATE nbsignatures SET last_seen = ? WHERE
                 algorithm = ? AND
                 signature = ?;
-                """, (datetime.utcnow(), algorithm, digest)
+                """,
+                (datetime.utcnow(), algorithm, digest),
             )
         self.db.commit()
 
         # Check size and cull old entries if necessary
-        n, = self.db.execute("SELECT Count(*) FROM nbsignatures").fetchone()
+        (n,) = self.db.execute("SELECT Count(*) FROM nbsignatures").fetchone()
         if n > self.cache_size:
             self.cull_db()
 
     def check_signature(self, digest, algorithm):
         if self.db is None:
             return False
-        r = self.db.execute("""SELECT id FROM nbsignatures WHERE
-            algorithm = ? AND
-            signature = ?;
-            """, (algorithm, digest)).fetchone()
-        if r is None:
-            return False
-        self.db.execute("""UPDATE nbsignatures SET last_seen = ? WHERE
+        r = self.db.execute(
+            """SELECT id FROM nbsignatures WHERE
             algorithm = ? AND
             signature = ?;
             """,
-                        (datetime.utcnow(), algorithm, digest),
-                        )
+            (algorithm, digest),
+        ).fetchone()
+        if r is None:
+            return False
+        self.db.execute(
+            """UPDATE nbsignatures SET last_seen = ? WHERE
+            algorithm = ? AND
+            signature = ?;
+            """,
+            (datetime.utcnow(), algorithm, digest),
+        )
         self.db.commit()
         return True
 
     def remove_signature(self, digest, algorithm):
-        self.db.execute("""DELETE FROM nbsignatures WHERE
+        self.db.execute(
+            """DELETE FROM nbsignatures WHERE
                 algorithm = ? AND
                 signature = ?;
             """,
-            (algorithm, digest)
+            (algorithm, digest),
         )
 
         self.db.commit()
 
     def cull_db(self):
         """Cull oldest 25% of the trusted signatures when the size limit is reached"""
-        self.db.execute("""DELETE FROM nbsignatures WHERE id IN (
+        self.db.execute(
+            """DELETE FROM nbsignatures WHERE id IN (
             SELECT id FROM nbsignatures ORDER BY last_seen DESC LIMIT -1 OFFSET ?
         );
-        """, (max(int(0.75 * self.cache_size), 1),))
+        """,
+            (max(int(0.75 * self.cache_size), 1),),
+        )
 
 
 def yield_everything(obj):
@@ -269,16 +299,15 @@ def yield_everything(obj):
             value = obj[key]
             assert isinstance(key, str)
             yield key.encode()
-            for b in yield_everything(value):
-                yield b
+            yield from yield_everything(value)
     elif isinstance(obj, (list, tuple)):
         for element in obj:
-            for b in yield_everything(element):
-                yield b
+            yield from yield_everything(element)
     elif isinstance(obj, str):
-        yield obj.encode('utf8')
+        yield obj.encode("utf8")
     else:
-        yield str(obj).encode('utf8')
+        yield str(obj).encode("utf8")
+
 
 def yield_code_cells(nb):
     """Iterator that yields all cells in a notebook
@@ -286,14 +315,15 @@ def yield_code_cells(nb):
     nbformat version independent
     """
     if nb.nbformat >= 4:
-        for cell in nb['cells']:
-            if cell['cell_type'] == 'code':
+        for cell in nb["cells"]:
+            if cell["cell_type"] == "code":
                 yield cell
     elif nb.nbformat == 3:
-        for ws in nb['worksheets']:
-            for cell in ws['cells']:
-                if cell['cell_type'] == 'code':
+        for ws in nb["worksheets"]:
+            for cell in ws["cells"]:
+                if cell["cell_type"] == "code":
                     yield cell
+
 
 @contextmanager
 def signature_removed(nb):
@@ -301,22 +331,22 @@ def signature_removed(nb):
 
     Used for excluding the previous signature when computing a notebook's signature.
     """
-    save_signature = nb['metadata'].pop('signature', None)
+    save_signature = nb["metadata"].pop("signature", None)
     try:
         yield
     finally:
         if save_signature is not None:
-            nb['metadata']['signature'] = save_signature
+            nb["metadata"]["signature"] = save_signature
 
 
 class NotebookNotary(LoggingConfigurable):
     """A class for computing and verifying notebook signatures."""
 
-    data_dir = Unicode(
-        help="""The storage directory for notary secret and database."""
-    ).tag(config=True)
-    
-    @default('data_dir')
+    data_dir = Unicode(help="""The storage directory for notary secret and database.""").tag(
+        config=True
+    )
+
+    @default("data_dir")
     def _data_dir_default(self):
         app = None
         try:
@@ -331,59 +361,62 @@ class NotebookNotary(LoggingConfigurable):
         return app.data_dir
 
     store_factory = Callable(
-         help="""A callable returning the storage backend for notebook signatures.
-         The default uses an SQLite database.""").tag(config=True)
+        help="""A callable returning the storage backend for notebook signatures.
+         The default uses an SQLite database."""
+    ).tag(config=True)
 
-    @default('store_factory')
+    @default("store_factory")
     def _store_factory_default(self):
         def factory():
             if sqlite3 is None:
                 self.log.warning("Missing SQLite3, all notebooks will be untrusted!")
                 return MemorySignatureStore()
             return SQLiteSignatureStore(self.db_file)
+
         return factory
 
     db_file = Unicode(
         help="""The sqlite file in which to store notebook signatures.
         By default, this will be in your Jupyter data directory.
         You can set it to ':memory:' to disable sqlite writing to the filesystem.
-        """).tag(config=True)
+        """
+    ).tag(config=True)
 
-    @default('db_file')
+    @default("db_file")
     def _db_file_default(self):
         if not self.data_dir:
-            return ':memory:'
-        return os.path.join(self.data_dir, u'nbsignatures.db')
+            return ":memory:"
+        return os.path.join(self.data_dir, "nbsignatures.db")
 
-    algorithm = Enum(algorithms, default_value='sha256',
-        help="""The hashing algorithm used to sign notebooks."""
+    algorithm = Enum(
+        algorithms, default_value="sha256", help="""The hashing algorithm used to sign notebooks."""
     ).tag(config=True)
-    @observe('algorithm')
+
+    @observe("algorithm")
     def _algorithm_changed(self, change):
         self.digestmod = getattr(hashlib, change.new)
 
     digestmod = Any()
-    @default('digestmod')
+
+    @default("digestmod")
     def _digestmod_default(self):
         return getattr(hashlib, self.algorithm)
 
-    secret_file = Unicode(
-        help="""The file where the secret key is stored."""
-    ).tag(config=True)
-    @default('secret_file')
+    secret_file = Unicode(help="""The file where the secret key is stored.""").tag(config=True)
+
+    @default("secret_file")
     def _secret_file_default(self):
         if not self.data_dir:
-            return ''
-        return os.path.join(self.data_dir, 'notebook_secret')
+            return ""
+        return os.path.join(self.data_dir, "notebook_secret")
 
-    secret = Bytes(
-        help="""The secret key with which notebooks are signed."""
-    ).tag(config=True)
-    @default('secret')
+    secret = Bytes(help="""The secret key with which notebooks are signed.""").tag(config=True)
+
+    @default("secret")
     def _secret_default(self):
         # note : this assumes an Application is running
         if os.path.exists(self.secret_file):
-            with io.open(self.secret_file, 'rb') as f:
+            with open(self.secret_file, "rb") as f:
                 return f.read()
         else:
             secret = encodebytes(os.urandom(1024))
@@ -391,21 +424,18 @@ class NotebookNotary(LoggingConfigurable):
             return secret
 
     def __init__(self, **kwargs):
-        super(NotebookNotary, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.store = self.store_factory()
 
     def _write_secret_file(self, secret):
         """write my secret to my secret_file"""
         self.log.info("Writing notebook-signing key to %s", self.secret_file)
-        with io.open(self.secret_file, 'wb') as f:
+        with open(self.secret_file, "wb") as f:
             f.write(secret)
         try:
             os.chmod(self.secret_file, 0o600)
         except OSError:
-            self.log.warning(
-                "Could not set permissions on %s",
-                self.secret_file
-            )
+            self.log.warning("Could not set permissions on %s", self.secret_file)
         return secret
 
     def compute_signature(self, nb):
@@ -472,7 +502,7 @@ class NotebookNotary(LoggingConfigurable):
             return
 
         for cell in yield_code_cells(nb):
-            cell['metadata']['trusted'] = trusted
+            cell["metadata"]["trusted"] = trusted
 
     def _check_cell(self, cell, nbformat_version):
         """Do we trust an individual cell?
@@ -486,19 +516,19 @@ class NotebookNotary(LoggingConfigurable):
         it will always be trusted.
         """
         # explicitly trusted
-        if cell['metadata'].pop("trusted", False):
+        if cell["metadata"].pop("trusted", False):
             return True
 
         # explicitly safe output
         if nbformat_version >= 4:
-            unsafe_output_types = ['execute_result', 'display_data']
+            unsafe_output_types = ["execute_result", "display_data"]
             safe_keys = {"output_type", "execution_count", "metadata"}
-        else: # v3
-            unsafe_output_types = ['pyout', 'display_data']
+        else:  # v3
+            unsafe_output_types = ["pyout", "display_data"]
             safe_keys = {"output_type", "prompt_number", "metadata"}
 
-        for output in cell['outputs']:
-            output_type = output['output_type']
+        for output in cell["outputs"]:
+            output_type = output["output_type"]
             if output_type in unsafe_output_types:
                 # if there are any data keys not in the safe whitelist
                 output_keys = set(output)
@@ -528,11 +558,11 @@ class NotebookNotary(LoggingConfigurable):
 
 
 trust_flags = {
-    'reset' : (
-        {'TrustNotebookApp' : { 'reset' : True}},
+    "reset": (
+        {"TrustNotebookApp": {"reset": True}},
         """Delete the trusted notebook cache.
         All previously signed notebooks will become untrusted.
-        """
+        """,
     ),
 }
 trust_flags.update(base_flags)
@@ -540,15 +570,15 @@ trust_flags.update(base_flags)
 
 class TrustNotebookApp(JupyterApp):
     version = __version__
-    description="""Sign one or more Jupyter notebooks with your key,
+    description = """Sign one or more Jupyter notebooks with your key,
     to trust their dynamic (HTML, Javascript) output.
 
     Otherwise, you will have to re-execute the notebook to see output.
     """
     # This command line tool should use the same config file as the notebook
-    @default('config_file_name')
+    @default("config_file_name")
     def _config_file_name_default(self):
-        return 'jupyter_notebook_config'
+        return "jupyter_notebook_config"
 
     examples = """
     jupyter trust mynotebook.ipynb and_this_one.ipynb
@@ -556,14 +586,16 @@ class TrustNotebookApp(JupyterApp):
 
     flags = trust_flags
 
-    reset = Bool(False,
+    reset = Bool(
+        False,
         help="""If True, delete the trusted signature cache.
         After reset, all previously signed notebooks will become untrusted.
-        """
+        """,
     ).tag(config=True)
 
     notary = Instance(NotebookNotary)
-    @default('notary')
+
+    @default("notary")
     def _notary_default(self):
         return NotebookNotary(parent=self, data_dir=self.data_dir)
 
@@ -572,11 +604,11 @@ class TrustNotebookApp(JupyterApp):
         if not os.path.exists(notebook_path):
             self.log.error("Notebook missing: %s" % notebook_path)
             self.exit(1)
-        with io.open(notebook_path, encoding='utf8') as f:
+        with open(notebook_path, encoding="utf8") as f:
             nb = read(f, NO_CONVERT)
         self.sign_notebook(nb, notebook_path)
 
-    def sign_notebook(self, nb, notebook_path='<stdin>'):
+    def sign_notebook(self, nb, notebook_path="<stdin>"):
         """Sign a notebook that's been loaded"""
         if self.notary.check_signature(nb):
             print("Notebook already signed: %s" % notebook_path)
@@ -601,7 +633,7 @@ class TrustNotebookApp(JupyterApp):
             nb_s = sys.stdin.read()
             assert isinstance(nb_s, str)
             nb = reads(nb_s, NO_CONVERT)
-            self.sign_notebook(nb, '<stdin>')
+            self.sign_notebook(nb, "<stdin>")
         else:
             for notebook_path in self.extra_args:
                 self.sign_notebook_file(notebook_path)
@@ -609,5 +641,5 @@ class TrustNotebookApp(JupyterApp):
 
 main = TrustNotebookApp.launch_instance
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

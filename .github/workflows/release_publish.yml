@@ -3,7 +3,7 @@ name: Create Release and publish package
 on:
   push:
     tags:
-    - '**'
+      - "**"
 
 jobs:
   publish:
@@ -11,42 +11,42 @@ jobs:
     permissions:
       contents: write
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: '3.8'
-    - name: Install dependencies
-      run: |
-        pip install --upgrade pip setuptools
-        pip install bump2version check-manifest twine wheel
-    - name: Build release
-      run: |
-        check-manifest -v
-        python setup.py sdist bdist_wheel
-        python -m twine check dist/*
-    - name: Parse tag
-      run: |
-        echo "RELEASE_TAG=$(python .github/scripts/parse_ref.py)" >> $GITHUB_ENV
-    - name: Create Release
-      id: create_release
-      uses: ncipollo/release-action@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag: ${{ env.RELEASE_TAG }}
-        name: Release ${{ env.RELEASE_TAG }}
-        artifacts: ${{ env.CURRENT_LOCALE_DIR }}/dist/*
-        body: Release ${{ env.RELEASE_TAG }}
-        token: ${{ secrets.GITHUB_TOKEN }}
-    - name: Publish PyPI Package
-      env:
-        TWINE_USERNAME: __token__
-        TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
-      run: python -m twine upload dist/*
-    - name: Create NPM configuration
-      run: python .github/scripts/create_npmrc.py
-    - name: Publish NPM Package
-      env:
-        NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-      run: npm publish
+      - uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.8"
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip setuptools
+          pip install bump2version check-manifest twine wheel
+      - name: Build release
+        run: |
+          check-manifest -v
+          python setup.py sdist bdist_wheel
+          python -m twine check dist/*
+      - name: Parse tag
+        run: |
+          echo "RELEASE_TAG=$(python .github/scripts/parse_ref.py)" >> $GITHUB_ENV
+      - name: Create Release
+        id: create_release
+        uses: ncipollo/release-action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag: ${{ env.RELEASE_TAG }}
+          name: Release ${{ env.RELEASE_TAG }}
+          artifacts: ${{ env.CURRENT_LOCALE_DIR }}/dist/*
+          body: Release ${{ env.RELEASE_TAG }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Publish PyPI Package
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
+        run: python -m twine upload dist/*
+      - name: Create NPM configuration
+        run: python .github/scripts/create_npmrc.py
+      - name: Publish NPM Package
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish

@@ -44,7 +44,7 @@ def convert(nb, to_version):
     # If the version exist, try to convert to it one step at a time.
     elif to_version in versions:
 
-        # Get the the version that this recursion will convert to as a step 
+        # Get the the version that this recursion will convert to as a step
         # closer to the final revision.  Make sure the newer of the conversion
         # functions is used to perform the conversion.
         if to_version > version:
@@ -57,13 +57,18 @@ def convert(nb, to_version):
         try:
             # Convert and make sure version changed during conversion.
             converted = convert_function(nb)
-            if converted.get('nbformat', 1) == version:
-                raise ValueError("Failed to convert notebook from v%d to v%d." % (version, step_version))
+            if converted.get("nbformat", 1) == version:
+                raise ValueError(
+                    "Failed to convert notebook from v%d to v%d." % (version, step_version)
+                )
         except AttributeError as e:
-            raise ValidationError(f"Notebook could not be converted from version {version} to version {step_version} because it's missing a key: {e}")
+            raise ValidationError(
+                f"Notebook could not be converted from version {version} to version {step_version} because it's missing a key: {e}"
+            )
 
         # Recursively convert until target version is reached.
         return convert(converted, to_version)
     else:
-        raise ValueError("Cannot convert notebook to v%d because that " \
-                        "version doesn't exist" % (to_version))
+        raise ValueError(
+            "Cannot convert notebook to v%d because that " "version doesn't exist" % (to_version)
+        )

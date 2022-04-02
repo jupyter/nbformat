@@ -11,40 +11,40 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        OS: ['ubuntu-latest', 'windows-latest', 'macos-latest']
-        PYTHON_VERSION: ['3.7', '3.10', 'pypy-3.8']
+        OS: ["ubuntu-latest", "windows-latest", "macos-latest"]
+        PYTHON_VERSION: ["3.7", "3.10", "pypy-3.8"]
         include:
-          - PYTHON_VERSION: '3.7'
+          - PYTHON_VERSION: "3.7"
             EXTRA_DEPS: '"jsonschema<2.7"'
-          - PYTHON_VERSION: '3.10'
-            EXTRA_DEPS: ''
-          - PYTHON_VERSION: 'pypy-3.8'
+          - PYTHON_VERSION: "3.10"
+            EXTRA_DEPS: ""
+          - PYTHON_VERSION: "pypy-3.8"
             EXTRA_DEPS: '"jsonschema<4"'
         exclude:
-          - PYTHON_VERSION: 'pypy-3.8'
-            OS: 'windows-latest'
-          - PYTHON_VERSION: 'pypy-3.8'
-            OS: 'macos-latest'
+          - PYTHON_VERSION: "pypy-3.8"
+            OS: "windows-latest"
+          - PYTHON_VERSION: "pypy-3.8"
+            OS: "macos-latest"
     steps:
-    - uses: actions/checkout@v3
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.PYTHON_VERSION }}
-    - name: Install test dependencies
-      run: |
-        pip install --upgrade pip setuptools wheel
-        pip install .[test]
-        pip install codecov pytest-cov
-    - name: Install nbformat
-      run: |
-        pip install . ${{ matrix.EXTRA_DEPS }}
-        pip freeze
-    - name: List dependencies
-      run: pip list
-    - name: Run tests
-      run: pytest -v --cov=nbformat --cov-report term-missing:skip-covered --no-cov-on-fail
-    - name: Check manfest
-      run: check-manifest -v
-    - name: Coverage
-      run: codecov
+      - uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.PYTHON_VERSION }}
+      - name: Install test dependencies
+        run: |
+          pip install --upgrade pip setuptools wheel
+          pip install .[test]
+          pip install codecov pytest-cov
+      - name: Install nbformat
+        run: |
+          pip install . ${{ matrix.EXTRA_DEPS }}
+          pip freeze
+      - name: List dependencies
+        run: pip list
+      - name: Run tests
+        run: pytest -v --cov=nbformat --cov-report term-missing:skip-covered --no-cov-on-fail
+      - name: Check manfest
+        run: check-manifest -v
+      - name: Coverage
+        run: codecov

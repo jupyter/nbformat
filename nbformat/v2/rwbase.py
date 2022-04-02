@@ -5,24 +5,25 @@ Authors:
 * Brian Granger
 """
 
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 #  Copyright (C) 2008-2011  The IPython Development Team
 #
 #  Distributed under the terms of the BSD License.  The full license is in
 #  the file COPYING, distributed as part of this software.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Imports
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 import pprint
 
-from .._compat import encodebytes, decodebytes
+from .._compat import decodebytes, encodebytes
 
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Code
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
+
 
 def restore_bytes(nb):
     """Restore bytes of image data from unicode-only formats.
@@ -32,7 +33,7 @@ def restore_bytes(nb):
     """
     for ws in nb.worksheets:
         for cell in ws.cells:
-            if cell.cell_type == 'code':
+            if cell.cell_type == "code":
                 for output in cell.outputs:
                     if "png" in output:
                         output.png = output.png.encode("ascii")
@@ -40,8 +41,10 @@ def restore_bytes(nb):
                         output.jpeg = output.jpeg.encode("ascii")
     return nb
 
+
 # output keys that are likely to have multiline values
-_multiline_outputs = ['text', 'html', 'svg', 'latex', 'javascript', 'json']
+_multiline_outputs = ["text", "html", "svg", "latex", "javascript", "json"]
+
 
 def rejoin_lines(nb):
     """rejoin multiline text into strings
@@ -55,19 +58,19 @@ def rejoin_lines(nb):
     """
     for ws in nb.worksheets:
         for cell in ws.cells:
-            if cell.cell_type == 'code':
-                if 'input' in cell and isinstance(cell.input, list):
-                    cell.input = u'\n'.join(cell.input)
+            if cell.cell_type == "code":
+                if "input" in cell and isinstance(cell.input, list):
+                    cell.input = "\n".join(cell.input)
                 for output in cell.outputs:
                     for key in _multiline_outputs:
                         item = output.get(key, None)
                         if isinstance(item, list):
-                            output[key] = u'\n'.join(item)
-            else: # text cell
-                for key in ['source', 'rendered']:
+                            output[key] = "\n".join(item)
+            else:  # text cell
+                for key in ["source", "rendered"]:
                     item = cell.get(key, None)
                     if isinstance(item, list):
-                        cell[key] = u'\n'.join(item)
+                        cell[key] = "\n".join(item)
     return nb
 
 
@@ -81,23 +84,25 @@ def split_lines(nb):
     """
     for ws in nb.worksheets:
         for cell in ws.cells:
-            if cell.cell_type == 'code':
-                if 'input' in cell and isinstance(cell.input, str):
+            if cell.cell_type == "code":
+                if "input" in cell and isinstance(cell.input, str):
                     cell.input = cell.input.splitlines()
                 for output in cell.outputs:
                     for key in _multiline_outputs:
                         item = output.get(key, None)
                         if isinstance(item, str):
                             output[key] = item.splitlines()
-            else: # text cell
-                for key in ['source', 'rendered']:
+            else:  # text cell
+                for key in ["source", "rendered"]:
                     item = cell.get(key, None)
                     if isinstance(item, str):
                         cell[key] = item.splitlines()
     return nb
 
+
 # b64 encode/decode are never actually used, because all bytes objects in
 # the notebook are already b64-encoded, and we don't need/want to double-encode
+
 
 def base64_decode(nb):
     """Restore all bytes objects in the notebook from base64-encoded strings.
@@ -106,15 +111,15 @@ def base64_decode(nb):
     """
     for ws in nb.worksheets:
         for cell in ws.cells:
-            if cell.cell_type == 'code':
+            if cell.cell_type == "code":
                 for output in cell.outputs:
-                    if 'png' in output:
+                    if "png" in output:
                         if isinstance(output.png, str):
-                            output.png = output.png.encode('ascii')
+                            output.png = output.png.encode("ascii")
                         output.png = decodebytes(output.png)
-                    if 'jpeg' in output:
+                    if "jpeg" in output:
                         if isinstance(output.jpeg, str):
-                            output.jpeg = output.jpeg.encode('ascii')
+                            output.jpeg = output.jpeg.encode("ascii")
                         output.jpeg = decodebytes(output.jpeg)
     return nb
 
@@ -128,16 +133,16 @@ def base64_encode(nb):
     """
     for ws in nb.worksheets:
         for cell in ws.cells:
-            if cell.cell_type == 'code':
+            if cell.cell_type == "code":
                 for output in cell.outputs:
-                    if 'png' in output:
-                        output.png = encodebytes(output.png).decode('ascii')
-                    if 'jpeg' in output:
-                        output.jpeg = encodebytes(output.jpeg).decode('ascii')
+                    if "png" in output:
+                        output.png = encodebytes(output.png).decode("ascii")
+                    if "jpeg" in output:
+                        output.jpeg = encodebytes(output.jpeg).decode("ascii")
     return nb
 
 
-class NotebookReader(object):
+class NotebookReader:
     """A class for reading notebooks."""
 
     def reads(self, s, **kwargs):
@@ -149,7 +154,7 @@ class NotebookReader(object):
         return self.read(fp.read(), **kwargs)
 
 
-class NotebookWriter(object):
+class NotebookWriter:
     """A class for writing notebooks."""
 
     def writes(self, nb, **kwargs):
@@ -158,7 +163,4 @@ class NotebookWriter(object):
 
     def write(self, nb, fp, **kwargs):
         """Write a notebook to a file like object"""
-        return fp.write(self.writes(nb,**kwargs))
-
-
-
+        return fp.write(self.writes(nb, **kwargs))

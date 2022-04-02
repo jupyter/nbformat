@@ -9,13 +9,13 @@ and Python APIs for working with notebooks.
 
 There is also a JSON schema for notebook format versions >= 3.
 
-[Jupyter Notebook format]: https://nbformat.readthedocs.org/en/latest/format_description.html
+[jupyter notebook format]: https://nbformat.readthedocs.org/en/latest/format_description.html
 
 ## Installation
 
 From the command line:
 
-``` {.sourceCode .bash}
+```{.sourceCode .bash}
 pip install nbformat
 ```
 
@@ -23,7 +23,7 @@ pip install nbformat
 
 You can install and use [fastjsonschema](https://horejsek.github.io/python-fastjsonschema/) by running:
 
-``` {.sourceCode .bash}
+```{.sourceCode .bash}
 pip install nbformat[fast]
 ```
 

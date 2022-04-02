@@ -1,6 +1,7 @@
 """NotebookNode - adding attribute access to dicts"""
 
 from ._struct import Struct
+
 try:
     from collections.abc import Mapping
 except ImportError:
@@ -13,7 +14,7 @@ class NotebookNode(Struct):
     def __setitem__(self, key, value):
         if isinstance(value, Mapping) and not isinstance(value, NotebookNode):
             value = from_dict(value)
-        super(NotebookNode, self).__setitem__(key, value)
+        super().__setitem__(key, value)
 
     def update(self, *args, **kwargs):
         """
@@ -21,8 +22,7 @@ class NotebookNode(Struct):
         method.
         """
         if len(args) > 1:
-            raise TypeError('update expected at most 1 arguments, got %d' %
-                            len(args))
+            raise TypeError("update expected at most 1 arguments, got %d" % len(args))
         if args:
             other = args[0]
             if isinstance(other, Mapping):

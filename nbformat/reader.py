@@ -4,10 +4,13 @@
 # Distributed under the terms of the Modified BSD License.
 
 import json
+
 from .validator import ValidationError
+
 
 class NotJSONError(ValueError):
     pass
+
 
 def parse_json(s, **kwargs):
     """Parse a JSON string into a dict."""
@@ -18,7 +21,9 @@ def parse_json(s, **kwargs):
         raise NotJSONError(("Notebook does not appear to be JSON: %r" % s)[:77] + "...") from e
     return nb_dict
 
+
 # High level API
+
 
 def get_version(nb):
     """Get the version of a notebook.
@@ -32,16 +37,16 @@ def get_version(nb):
     -------
     Tuple containing major (int) and minor (int) version numbers
     """
-    major = nb.get('nbformat', 1)
-    minor = nb.get('nbformat_minor', 0)
+    major = nb.get("nbformat", 1)
+    minor = nb.get("nbformat_minor", 0)
     return (major, minor)
 
 
 def reads(s, **kwargs):
-    """Read a notebook from a json string and return the 
+    """Read a notebook from a json string and return the
     NotebookNode object.
 
-    This function properly reads notebooks of any version.  No version 
+    This function properly reads notebooks of any version.  No version
     conversion is performed.
 
     Parameters
@@ -53,17 +58,17 @@ def reads(s, **kwargs):
     -------
     nb : NotebookNode
         The notebook that was read.
-    
+
     Raises
     ------
-    ValidationError 
+    ValidationError
         Notebook JSON for a given version is missing an expected key and cannot be read.
-    
+
     NBFormatError
         Specified major version is invalid or unsupported.
     """
-    from . import versions, NBFormatError
-    
+    from . import NBFormatError, versions
+
     nb_dict = parse_json(s, **kwargs)
     (major, minor) = get_version(nb_dict)
     if major in versions:
@@ -72,13 +77,13 @@ def reads(s, **kwargs):
         except AttributeError as e:
             raise ValidationError(f"The notebook is invalid and is missing an expected key: {e}")
     else:
-        raise NBFormatError('Unsupported nbformat version %s' % major)
+        raise NBFormatError("Unsupported nbformat version %s" % major)
 
 
 def read(fp, **kwargs):
     """Read a notebook from a file and return the NotebookNode object.
 
-    This function properly reads notebooks of any version.  No version 
+    This function properly reads notebooks of any version.  No version
     conversion is performed.
 
     Parameters
@@ -92,4 +97,3 @@ def read(fp, **kwargs):
         The notebook that was read.
     """
     return reads(fp.read(), **kwargs)
-

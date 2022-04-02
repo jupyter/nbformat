@@ -15,16 +15,15 @@ import warnings
 
 from .._struct import Struct
 
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Code
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 # Change this when incrementing the nbformat version
 nbformat = 3
 nbformat_minor = 0
-nbformat_schema = {
-    (3, 0): 'nbformat.v3.schema.json'
-}
+nbformat_schema = {(3, 0): "nbformat.v3.schema.json"}
+
 
 class NotebookNode(Struct):
     pass
@@ -33,7 +32,7 @@ class NotebookNode(Struct):
 def from_dict(d):
     if isinstance(d, dict):
         newd = NotebookNode()
-        for k,v in d.items():
+        for k, v in d.items():
             newd[k] = from_dict(v)
         return newd
     elif isinstance(d, (tuple, list)):
@@ -66,12 +65,24 @@ def cast_str(obj):
         return obj
 
 
-def new_output(output_type, output_text=None, output_png=None,
-    output_html=None, output_svg=None, output_latex=None, output_json=None,
-    output_javascript=None, output_jpeg=None, prompt_number=None,
-    ename=None, evalue=None, traceback=None, stream=None, metadata=None):
-    """Create a new output, to go in the ``cell.outputs`` list of a code cell.
-    """
+def new_output(
+    output_type,
+    output_text=None,
+    output_png=None,
+    output_html=None,
+    output_svg=None,
+    output_latex=None,
+    output_json=None,
+    output_javascript=None,
+    output_jpeg=None,
+    prompt_number=None,
+    ename=None,
+    evalue=None,
+    traceback=None,
+    stream=None,
+    metadata=None,
+):
+    """Create a new output, to go in the ``cell.outputs`` list of a code cell."""
     output = NotebookNode()
     output.output_type = str(output_type)
 
@@ -80,11 +91,10 @@ def new_output(output_type, output_text=None, output_png=None,
     if not isinstance(metadata, dict):
         raise TypeError("metadata must be dict")
 
-
-    if output_type in {u'pyout', 'display_data'}:
+    if output_type in {"pyout", "display_data"}:
         output.metadata = metadata
 
-    if output_type != 'pyerr':
+    if output_type != "pyerr":
         if output_text is not None:
             output.text = str_passthrough(output_text)
         if output_png is not None:
@@ -102,11 +112,11 @@ def new_output(output_type, output_text=None, output_png=None,
         if output_javascript is not None:
             output.javascript = str_passthrough(output_javascript)
 
-    if output_type == u'pyout':
+    if output_type == "pyout":
         if prompt_number is not None:
             output.prompt_number = int(prompt_number)
 
-    if output_type == u'pyerr':
+    if output_type == "pyerr":
         if ename is not None:
             output.ename = str_passthrough(ename)
         if evalue is not None:
@@ -114,17 +124,18 @@ def new_output(output_type, output_text=None, output_png=None,
         if traceback is not None:
             output.traceback = [str_passthrough(frame) for frame in list(traceback)]
 
-    if output_type == u"stream":
+    if output_type == "stream":
         output.stream = "stdout" if stream is None else str_passthrough(stream)
 
     return output
 
 
-def new_code_cell(input=None, prompt_number=None, outputs=None,
-    language=u'python', collapsed=False, metadata=None):
+def new_code_cell(
+    input=None, prompt_number=None, outputs=None, language="python", collapsed=False, metadata=None
+):
     """Create a new code cell with input and output"""
     cell = NotebookNode()
-    cell.cell_type = u'code'
+    cell.cell_type = "code"
     if language is not None:
         cell.language = str_passthrough(language)
     if input is not None:
@@ -141,13 +152,14 @@ def new_code_cell(input=None, prompt_number=None, outputs=None,
 
     return cell
 
+
 def new_text_cell(cell_type, source=None, rendered=None, metadata=None):
     """Create a new text cell."""
     cell = NotebookNode()
     # VERSIONHACK: plaintext -> raw
     # handle never-released plaintext name for raw cells
-    if cell_type == 'plaintext':
-        cell_type = 'raw'
+    if cell_type == "plaintext":
+        cell_type = "raw"
     if source is not None:
         cell.source = str_passthrough(source)
     cell.metadata = NotebookNode(metadata or {})
@@ -158,7 +170,7 @@ def new_text_cell(cell_type, source=None, rendered=None, metadata=None):
 def new_heading_cell(source=None, level=1, rendered=None, metadata=None):
     """Create a new section cell with a given integer level."""
     cell = NotebookNode()
-    cell.cell_type = u'heading'
+    cell.cell_type = "heading"
     if source is not None:
         cell.source = str_passthrough(source)
     cell.level = int(level)
@@ -195,8 +207,7 @@ def new_notebook(name=None, metadata=None, worksheets=None):
     return nb
 
 
-def new_metadata(name=None, authors=None, license=None, created=None,
-    modified=None, gistid=None):
+def new_metadata(name=None, authors=None, license=None, created=None, modified=None, gistid=None):
     """Create a new metadata node."""
     metadata = NotebookNode()
     if name is not None:
@@ -212,6 +223,7 @@ def new_metadata(name=None, authors=None, license=None, created=None,
     if gistid is not None:
         metadata.gistid = str_passthrough(gistid)
     return metadata
+
 
 def new_author(name=None, email=None, affiliation=None, url=None):
     """Create a new author."""

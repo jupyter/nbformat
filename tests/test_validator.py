@@ -7,15 +7,15 @@ import json
 import os
 import re
 
+import pytest
+from jsonschema import ValidationError
+
 import nbformat
+from nbformat import read
+from nbformat.json_compat import VALIDATORS
+from nbformat.validator import isvalid, iter_validate, validate
 
 from .base import TestsBase
-from jsonschema import ValidationError
-from nbformat import read
-from nbformat.validator import isvalid, validate, iter_validate
-from nbformat.json_compat import VALIDATORS
-
-import pytest
 
 
 # Fixtures
@@ -36,7 +36,7 @@ def set_validator(validator_name):
 def test_nb2(validator_name):
     """Test that a v2 notebook converted to current passes validation"""
     set_validator(validator_name)
-    with TestsBase.fopen(u'test2.ipynb', u'r') as f:
+    with TestsBase.fopen("test2.ipynb", "r") as f:
         nb = read(f, as_version=4)
     validate(nb)
     assert isvalid(nb) == True
@@ -46,7 +46,7 @@ def test_nb2(validator_name):
 def test_nb3(validator_name):
     """Test that a v3 notebook passes validation"""
     set_validator(validator_name)
-    with TestsBase.fopen(u'test3.ipynb', u'r') as f:
+    with TestsBase.fopen("test3.ipynb", "r") as f:
         nb = read(f, as_version=4)
     validate(nb)
     assert isvalid(nb) == True
@@ -56,7 +56,7 @@ def test_nb3(validator_name):
 def test_nb4(validator_name):
     """Test that a v4 notebook passes validation"""
     set_validator(validator_name)
-    with TestsBase.fopen(u'test4.ipynb', u'r') as f:
+    with TestsBase.fopen("test4.ipynb", "r") as f:
         nb = read(f, as_version=4)
     validate(nb)
     assert isvalid(nb) == True
@@ -66,7 +66,7 @@ def test_nb4(validator_name):
 def test_nb4_document_info(validator_name):
     """Test that a notebook with document_info passes validation"""
     set_validator(validator_name)
-    with TestsBase.fopen(u'test4docinfo.ipynb', u'r') as f:
+    with TestsBase.fopen("test4docinfo.ipynb", "r") as f:
         nb = read(f, as_version=4)
     validate(nb)
     assert isvalid(nb)
@@ -76,7 +76,7 @@ def test_nb4_document_info(validator_name):
 def test_nb4custom(validator_name):
     """Test that a notebook with a custom JSON mimetype passes validation"""
     set_validator(validator_name)
-    with TestsBase.fopen(u'test4custom.ipynb', u'r') as f:
+    with TestsBase.fopen("test4custom.ipynb", "r") as f:
         nb = read(f, as_version=4)
     validate(nb)
     assert isvalid(nb)
@@ -86,7 +86,7 @@ def test_nb4custom(validator_name):
 def test_nb4jupyter_metadata(validator_name):
     """Test that a notebook with a jupyter metadata passes validation"""
     set_validator(validator_name)
-    with TestsBase.fopen(u'test4jupyter_metadata.ipynb', u'r') as f:
+    with TestsBase.fopen("test4jupyter_metadata.ipynb", "r") as f:
         nb = read(f, as_version=4)
     validate(nb)
     assert isvalid(nb)
@@ -96,7 +96,7 @@ def test_nb4jupyter_metadata(validator_name):
 def test_nb4jupyter_metadata_timings(validator_name):
     """Tests that a notebook with "timing" in metadata passes validation"""
     set_validator(validator_name)
-    with TestsBase.fopen(u'test4jupyter_metadata_timings.ipynb', u'r') as f:
+    with TestsBase.fopen("test4jupyter_metadata_timings.ipynb", "r") as f:
         nb = read(f, as_version=4)
     validate(nb)
     assert isvalid(nb)
@@ -110,7 +110,7 @@ def test_invalid(validator_name):
     # - one cell is missing its source
     # - invalid cell type
     # - invalid output_type
-    with TestsBase.fopen(u'invalid.ipynb', u'r') as f:
+    with TestsBase.fopen("invalid.ipynb", "r") as f:
         nb = read(f, as_version=4)
     with pytest.raises(ValidationError):
         validate(nb)
@@ -129,7 +129,7 @@ def test_validate_empty(validator_name):
 def test_future(validator_name):
     """Test that a notebook from the future with extra keys passes validation"""
     set_validator(validator_name)
-    with TestsBase.fopen(u'test4plus.ipynb', u'r') as f:
+    with TestsBase.fopen("test4plus.ipynb", "r") as f:
         nb = read(f, as_version=4)
     with pytest.raises(ValidationError):
         validate(nb, version=4, version_minor=3)
@@ -142,7 +142,7 @@ def test_future(validator_name):
 @pytest.mark.parametrize("validator_name", ["jsonschema"])
 def test_validation_error(validator_name):
     set_validator(validator_name)
-    with TestsBase.fopen(u'invalid.ipynb', u'r') as f:
+    with TestsBase.fopen("invalid.ipynb", "r") as f:
         nb = read(f, as_version=4)
     with pytest.raises(ValidationError) as exception_info:
         validate(nb)
@@ -153,16 +153,17 @@ def test_validation_error(validator_name):
     assert re.compile(r"On instance\[u?['\"].*cells['\"]\]\[0\]").search(s)
     assert len(s.splitlines()) < 10
 
+
 # This is only a valid test for the default validator, jsonschema
 @pytest.mark.parametrize("validator_name", ["jsonschema"])
 def test_iter_validation_error(validator_name):
     set_validator(validator_name)
-    with TestsBase.fopen(u'invalid.ipynb', u'r') as f:
+    with TestsBase.fopen("invalid.ipynb", "r") as f:
         nb = read(f, as_version=4)
 
     errors = list(iter_validate(nb))
     assert len(errors) == 3
-    assert {e.ref for e in errors} == {'markdown_cell', 'heading_cell', 'bad stream'}
+    assert {e.ref for e in errors} == {"markdown_cell", "heading_cell", "bad stream"}
 
 
 @pytest.mark.parametrize("validator_name", VALIDATORS)
@@ -179,21 +180,21 @@ def test_validation_no_version(validator_name):
     """Test that an invalid notebook with no version fails validation"""
     set_validator(validator_name)
     with pytest.raises(ValidationError) as e:
-        validate({'invalid': 'notebook'})
+        validate({"invalid": "notebook"})
 
 
 def test_invalid_validator_raises_value_error():
     """Test that an invalid notebook with no version fails validation"""
     set_validator("foobar")
     with pytest.raises(ValueError):
-        with TestsBase.fopen(u'test2.ipynb', u'r') as f:
+        with TestsBase.fopen("test2.ipynb", "r") as f:
             nb = read(f, as_version=4)
 
 
 def test_invalid_validator_raises_value_error_after_read():
     """Test that an invalid notebook with no version fails validation"""
     set_validator("jsonschema")
-    with TestsBase.fopen(u'test2.ipynb', u'r') as f:
+    with TestsBase.fopen("test2.ipynb", "r") as f:
         nb = read(f, as_version=4)
 
     set_validator("foobar")
@@ -207,6 +208,7 @@ def test_fallback_validator_with_iter_errors_using_ref(recwarn):
     the default validator is used as fallback.
     """
     import nbformat
+
     set_validator("fastjsonschema")
     nbformat.v4.new_code_cell()
     nbformat.v4.new_markdown_cell()
@@ -214,11 +216,11 @@ def test_fallback_validator_with_iter_errors_using_ref(recwarn):
     assert len(recwarn) == 0
 
 
-
 def test_non_unique_cell_ids():
     """Test than a non-unique cell id does not pass validation"""
     import nbformat
-    with TestsBase.fopen(u'invalid_unique_cell_id.ipynb', u'r') as f:
+
+    with TestsBase.fopen("invalid_unique_cell_id.ipynb", "r") as f:
         # Avoids validate call from `.read`
         nb = nbformat.from_dict(json.load(f))
     with pytest.raises(ValidationError):
@@ -231,7 +233,8 @@ def test_non_unique_cell_ids():
 def test_repair_non_unique_cell_ids():
     """Test that we will repair non-unique cell ids if asked during validation"""
     import nbformat
-    with TestsBase.fopen(u'invalid_unique_cell_id.ipynb', u'r') as f:
+
+    with TestsBase.fopen("invalid_unique_cell_id.ipynb", "r") as f:
         # Avoids validate call from `.read`
         nb = nbformat.from_dict(json.load(f))
     validate(nb)
@@ -241,7 +244,8 @@ def test_repair_non_unique_cell_ids():
 def test_no_cell_ids():
     """Test that a cell without a cell ID does not pass validation"""
     import nbformat
-    with TestsBase.fopen(u'v4_5_no_cell_id.ipynb', u'r') as f:
+
+    with TestsBase.fopen("v4_5_no_cell_id.ipynb", "r") as f:
         # Avoids validate call from `.read`
         nb = nbformat.from_dict(json.load(f))
     with pytest.raises(ValidationError):
@@ -254,7 +258,8 @@ def test_no_cell_ids():
 def test_repair_no_cell_ids():
     """Test that we will repair cells without ids if asked during validation"""
     import nbformat
-    with TestsBase.fopen(u'v4_5_no_cell_id.ipynb', u'r') as f:
+
+    with TestsBase.fopen("v4_5_no_cell_id.ipynb", "r") as f:
         # Avoids validate call from `.read`
         nb = nbformat.from_dict(json.load(f))
     validate(nb)
@@ -263,7 +268,7 @@ def test_repair_no_cell_ids():
 
 def test_invalid_cell_id():
     """Test than an invalid cell id does not pass validation"""
-    with TestsBase.fopen(u'invalid_cell_id.ipynb', u'r') as f:
+    with TestsBase.fopen("invalid_cell_id.ipynb", "r") as f:
         nb = read(f, as_version=4)
     with pytest.raises(ValidationError):
         validate(nb)
@@ -271,7 +276,7 @@ def test_invalid_cell_id():
 
 
 def test_notebook_invalid_without_min_version():
-    with TestsBase.fopen(u'no_min_version.ipynb', u'r') as f:
+    with TestsBase.fopen("no_min_version.ipynb", "r") as f:
         nb = read(f, as_version=4)
     with pytest.raises(ValidationError):
         validate(nb)
@@ -282,7 +287,7 @@ def test_notebook_invalid_without_main_version():
 
 
 def test_strip_invalid_metadata():
-    with TestsBase.fopen(u'v4_5_invalid_metadata.ipynb', u'r') as f:
+    with TestsBase.fopen("v4_5_invalid_metadata.ipynb", "r") as f:
         nb = nbformat.from_dict(json.load(f))
     assert not isvalid(nb)
     validate(nb, strip_invalid_metadata=True)
