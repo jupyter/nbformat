@@ -21,13 +21,7 @@ pip install nbformat
 
 ## Using a different json schema validator
 
-You can install and use [fastjsonschema](https://horejsek.github.io/python-fastjsonschema/) by running:
-
-```{.sourceCode .bash}
-pip install nbformat[fast]
-```
-
-To enable fast validation with `fastjsonschema`, set the environment variable `NBFORMAT_VALIDATOR` to the value `fastjsonschema`.
+We use `fastjsonschema` by default. To use `jsonschema` instead, set the environment variable `NBFORMAT_VALIDATOR` to the value `jsonschema`.
 
 ## Python Version Support
 
