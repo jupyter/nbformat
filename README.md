@@ -21,7 +21,7 @@ pip install nbformat
 
 ## Using a different json schema validator
 
-We use `fastjsonschema` by default.  To use `jsonschema` instead, set the environment variable `NBFORMAT_VALIDATOR` to the value `jsonschema`.
+We use `fastjsonschema` by default. To use `jsonschema` instead, set the environment variable `NBFORMAT_VALIDATOR` to the value `jsonschema`.
 
 ## Python Version Support
 
