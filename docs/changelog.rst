@@ -7,6 +7,12 @@ Changes in nbformat
 In Development
 ==============
 
+5.3.0
+=====
+- Use `f`astjsonschema`` by default
+- Adopt ``pre-commit`` and auto-formatters
+- Increase minimum ``jsonschema`` to 2.6, handle warnings
+
 5.2.0
 =====
 - Add ability to capture validation errors
