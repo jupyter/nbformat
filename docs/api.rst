@@ -120,15 +120,3 @@ bindings are available, and an in-memory store otherwise.
 .. autoclass:: SQLiteSignatureStore
 
 .. autoclass:: MemorySignatureStore
-
-Optional fast validation
-------------------------
-
-You can install and use `fastjsonschema <https://horejsek.github.io/python-fastjsonschema/>`_ by running::
-
-    pip install nbformat[fast]
-
-
-To enable fast validation with `fastjsonschema`, set the environment variable::
-
-   NBFORMAT_VALIDATOR="fastjsonschema"
