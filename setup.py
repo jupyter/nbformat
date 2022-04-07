@@ -56,6 +56,12 @@ setup_args = dict(
     python_requires=">=3.7",
     platforms="Linux, Mac OS X, Windows",
     keywords=["Interactive", "Interpreter", "Shell", "Web"],
+    project_urls={
+        "Documentation": "http://nbformat.readthedocs.io/",
+        "Funding": "https://numfocus.org/donate-to-jupyter",
+        "Source": "https://github.com/jupyter/nbformat",
+        "Tracker": "https://github.com/jupyter/nbformat/issues",
+    },
     classifiers=[
         "Intended Audience :: Developers",
         "Intended Audience :: System Administrators",
