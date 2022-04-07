@@ -58,6 +58,7 @@ setup_args = dict(
     keywords=["Interactive", "Interpreter", "Shell", "Web"],
     project_urls={
         "Documentation": "http://nbformat.readthedocs.io/",
+        "Funding": "https://numfocus.org/donate-to-jupyter",
         "Source": "https://github.com/jupyter/nbformat",
         "Tracker": "https://github.com/jupyter/nbformat/issues",
     },
