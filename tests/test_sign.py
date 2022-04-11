@@ -224,10 +224,12 @@ class TestNotary(TestsBase):
                 stdout=PIPE,
                 env=env,
             )
+            assert p.stdin is not None
             write(nb, codecs.getwriter("utf8")(p.stdin))
             p.stdin.close()
             p.wait()
             self.assertEqual(p.returncode, 0)
+            assert p.stdout is not None
             out = p.stdout.read().decode("utf8", "replace")
             p.stdout.close()
             return out

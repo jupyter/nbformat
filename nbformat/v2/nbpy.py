@@ -17,6 +17,7 @@ Authors:
 # -----------------------------------------------------------------------------
 
 import re
+from typing import List
 
 from .nbbase import new_code_cell, new_notebook, new_text_cell, new_worksheet
 from .rwbase import NotebookReader, NotebookWriter
@@ -39,7 +40,7 @@ class PyReader(NotebookReader):
     def to_notebook(self, s, **kwargs):
         lines = s.splitlines()
         cells = []
-        cell_lines = []
+        cell_lines: List[str] = []
         state = "codecell"
         for line in lines:
             if line.startswith("# <nbformat>") or _encoding_declaration_re.match(line):

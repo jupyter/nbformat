@@ -8,11 +8,12 @@ import os
 import subprocess
 import sys
 from glob import glob
+from typing import Any, Dict
 
 # the name of the project
 name = "nbformat"
 
-from distutils.core import setup
+from setuptools import setup  # type:ignore[import]
 
 pjoin = os.path.join
 here = os.path.abspath(os.path.dirname(__file__))
@@ -30,9 +31,10 @@ package_data = {
     "nbformat.v4": [
         "nbformat.v4*.schema.json",
     ],
+    "nbformat": ["py.typed"],
 }
 
-version_ns = {}
+version_ns: Dict[str, Any] = {}
 with open(pjoin(here, name, "_version.py")) as f:
     exec(f.read(), {}, version_ns)
 
@@ -77,12 +79,10 @@ setup_args = dict(
 )
 
 if "develop" in sys.argv or any(a.startswith("bdist") for a in sys.argv):
-    import setuptools
-
     subprocess.run([sys.executable, "-m", "pre_commit", "install"])
     subprocess.run([sys.executable, "-m", "pre_commit", "install", "--hook-type", "pre-push"])
 
-setuptools_args = {}
+setuptools_args: Dict[str, Any] = {}
 install_requires = setuptools_args["install_requires"] = [
     "traitlets>=4.1",
     "jsonschema>=2.6",
