@@ -84,7 +84,7 @@ if "develop" in sys.argv or any(a.startswith("bdist") for a in sys.argv):
 
 setuptools_args: Dict[str, Any] = {}
 install_requires = setuptools_args["install_requires"] = [
-    "traitlets>=4.1",
+    "traitlets>=5.1",
     "jsonschema>=2.6",
     "jupyter_core",
     "fastjsonschema",
