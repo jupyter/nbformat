@@ -46,6 +46,8 @@ algorithms = [a for a in algorithms_set if not a.startswith("shake_")]
 
 # This has been added to traitlets, but is not released as of traitlets 4.3.1,
 # so a copy is included here for now.
+
+
 class Callable(TraitType):
     """A trait which is callable.
 
