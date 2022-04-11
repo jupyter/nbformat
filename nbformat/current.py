@@ -11,7 +11,7 @@
 import re
 import warnings
 
-warnings.warning(
+warnings.warn(
     """nbformat.current is deprecated.
 
 - use nbformat for read/write/validate public API
