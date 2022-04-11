@@ -394,7 +394,7 @@ class NotebookNotary(LoggingConfigurable):
 
     @observe("algorithm")
     def _algorithm_changed(self, change):
-        self.digestmod = getattr(hashlib, change.new)
+        self.digestmod = getattr(hashlib, change["new"])
 
     digestmod = Any()
 
