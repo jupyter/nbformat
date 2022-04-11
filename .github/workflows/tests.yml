@@ -40,8 +40,6 @@ jobs:
         run: pip list
       - name: Run tests
         run: python -m pytest -v --cov=nbformat --cov-report term-missing:skip-covered --no-cov-on-fail
-      - name: Check manfest
-        run: check-manifest -v
       - name: Coverage
         run: codecov
 
