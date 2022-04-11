@@ -30,7 +30,6 @@ from traitlets import (
     Enum,
     Instance,
     Integer,
-    TraitType,
     Unicode,
     default,
     observe,
