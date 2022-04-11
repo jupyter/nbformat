@@ -39,10 +39,10 @@ from traitlets.config import LoggingConfigurable, MultipleInstanceError
 
 from . import NO_CONVERT, __version__, read, reads
 
-algorithms = hashlib.algorithms_guaranteed
+algorithms_set = hashlib.algorithms_guaranteed
 # The shake algorithms in are not compatible with hmac
 # due to required length argument in digests
-algorithms = [a for a in algorithms if not a.startswith("shake_")]
+algorithms = [a for a in algorithms_set if not a.startswith("shake_")]
 
 # This has been added to traitlets, but is not released as of traitlets 4.3.1,
 # so a copy is included here for now.
