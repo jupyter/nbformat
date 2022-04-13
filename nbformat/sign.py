@@ -6,6 +6,7 @@
 import hashlib
 import os
 import sys
+import typing as t
 from collections import OrderedDict
 from contextlib import contextmanager
 from datetime import datetime
@@ -15,9 +16,9 @@ try:
     import sqlite3
 except ImportError:
     try:
-        from pysqlite2 import dbapi2 as sqlite3
+        from pysqlite2 import dbapi2 as sqlite3  # type:ignore[no-redef]
     except ImportError:
-        sqlite3 = None
+        sqlite3 = None  # type:ignore[assignment]
 
 from base64 import encodebytes
 
@@ -38,18 +39,15 @@ from traitlets.config import LoggingConfigurable, MultipleInstanceError
 
 from . import NO_CONVERT, __version__, read, reads
 
-try:
-    # Python 3
-    algorithms = hashlib.algorithms_guaranteed
-    # shake algorithms in py36 are not compatible with hmac
-    # due to required length argument in digests
-    algorithms = [a for a in algorithms if not a.startswith("shake_")]
-except AttributeError:
-    algorithms = hashlib.algorithms
-
+algorithms_set = hashlib.algorithms_guaranteed
+# The shake algorithms in are not compatible with hmac
+# due to required length argument in digests
+algorithms = [a for a in algorithms_set if not a.startswith("shake_")]
 
 # This has been added to traitlets, but is not released as of traitlets 4.3.1,
 # so a copy is included here for now.
+
+
 class Callable(TraitType):
     """A trait which is callable.
 
@@ -161,7 +159,9 @@ class SQLiteSignatureStore(SignatureStore, LoggingConfigurable):
             self.db.close()
 
     def _connect_db(self, db_file):
-        kwargs = dict(detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES)
+        kwargs: t.Dict[str, t.Any] = dict(
+            detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES
+        )
         db = None
         try:
             db = sqlite3.connect(db_file, **kwargs)

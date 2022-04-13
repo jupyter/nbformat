@@ -142,25 +142,25 @@ def _truncate_obj(obj):
     Cell and output lists are squashed, as are long strings, lists, and dicts.
     """
     if isinstance(obj, dict):
-        truncated = {k: _truncate_obj(v) for k, v in list(obj.items())[:_ITEM_LIMIT]}
-        if isinstance(truncated.get("cells"), list):
-            truncated["cells"] = ["...%i cells..." % len(obj["cells"])]
-        if isinstance(truncated.get("outputs"), list):
-            truncated["outputs"] = ["...%i outputs..." % len(obj["outputs"])]
+        truncated_dict = {k: _truncate_obj(v) for k, v in list(obj.items())[:_ITEM_LIMIT]}
+        if isinstance(truncated_dict.get("cells"), list):
+            truncated_dict["cells"] = ["...%i cells..." % len(obj["cells"])]
+        if isinstance(truncated_dict.get("outputs"), list):
+            truncated_dict["outputs"] = ["...%i outputs..." % len(obj["outputs"])]
 
         if len(obj) > _ITEM_LIMIT:
-            truncated["..."] = "%i keys truncated" % (len(obj) - _ITEM_LIMIT)
-        return truncated
+            truncated_dict["..."] = "%i keys truncated" % (len(obj) - _ITEM_LIMIT)
+        return truncated_dict
     elif isinstance(obj, list):
-        truncated = [_truncate_obj(item) for item in obj[:_ITEM_LIMIT]]
+        truncated_list = [_truncate_obj(item) for item in obj[:_ITEM_LIMIT]]
         if len(obj) > _ITEM_LIMIT:
-            truncated.append("...%i items truncated..." % (len(obj) - _ITEM_LIMIT))
-        return truncated
+            truncated_list.append("...%i items truncated..." % (len(obj) - _ITEM_LIMIT))
+        return truncated_list
     elif isinstance(obj, str):
-        truncated = obj[:_STR_LIMIT]
+        truncated_str = obj[:_STR_LIMIT]
         if len(obj) > _STR_LIMIT:
-            truncated += "..."
-        return truncated
+            truncated_str += "..."
+        return truncated_str
     else:
         return obj
 

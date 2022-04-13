@@ -35,9 +35,9 @@ nbformat_schema = {
 
 def validate(node, ref=None):
     """validate a v4 node"""
-    from .. import validate
+    from .. import validate as validate_orig
 
-    return validate(node, ref=ref, version=nbformat)
+    return validate_orig(node, ref=ref, version=nbformat)
 
 
 def new_output(output_type, data=None, **kwargs):
