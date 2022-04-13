@@ -149,7 +149,9 @@ def downgrade_cell(cell):
     elif cell.cell_type == "markdown":
         source = cell.get("source", "")
         if "\n" not in source and source.startswith("#"):
-            prefix, text = re.match(r"(#+)\s*(.*)", source).groups()
+            match = re.match(r"(#+)\s*(.*)", source)
+            assert match is not None
+            prefix, text = match.groups()
             cell.cell_type = "heading"
             cell.source = text
             cell.level = len(prefix)

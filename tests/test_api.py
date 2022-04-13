@@ -9,6 +9,7 @@ import pathlib
 import sys
 import unittest
 from tempfile import TemporaryDirectory
+from typing import Any, Dict
 
 from jsonschema import ValidationError
 
@@ -69,7 +70,7 @@ class TestAPI(TestsBase):
 
     def test_capture_validation_error(self):
         """Test that validation error can be captured on read() and write()"""
-        validation_error = {}
+        validation_error: Dict[str, Any] = {}
         path = os.path.join(self._get_files_path(), "invalid.ipynb")
         nb = read(path, as_version=4, capture_validation_error=validation_error)
         assert not isvalid(nb)

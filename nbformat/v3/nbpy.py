@@ -17,6 +17,7 @@ Authors:
 # -----------------------------------------------------------------------------
 
 import re
+from typing import List
 
 from .nbbase import (
     nbformat,
@@ -47,7 +48,7 @@ class PyReader(NotebookReader):
     def to_notebook(self, s, **kwargs):
         lines = s.splitlines()
         cells = []
-        cell_lines = []
+        cell_lines: List[str] = []
         kwargs = {}
         state = "codecell"
         for line in lines:

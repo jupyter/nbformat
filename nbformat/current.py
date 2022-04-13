@@ -83,7 +83,7 @@ class NBFormatError(ValueError):
 
 
 def _warn_format():
-    warnings.warning(
+    warnings.warn(
         """Non-JSON file support in nbformat is deprecated.
     Use nbconvert to create files of other formats."""
     )
@@ -107,13 +107,13 @@ def parse_py(s, **kwargs):
 
 def reads_json(nbjson, **kwargs):
     """DEPRECATED, use reads"""
-    warnings.warning("reads_json is deprecated, use reads")
+    warnings.warn("reads_json is deprecated, use reads")
     return reads(nbjson)
 
 
 def writes_json(nb, **kwargs):
     """DEPRECATED, use writes"""
-    warnings.warning("writes_json is deprecated, use writes")
+    warnings.warn("writes_json is deprecated, use writes")
     return writes(nb, **kwargs)
 
 
