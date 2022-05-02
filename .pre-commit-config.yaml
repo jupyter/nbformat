@@ -65,7 +65,7 @@ repos:
         stages: [manual]
 
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v0.942
+    rev: v0.950
     hooks:
       - id: mypy
         exclude: jupyter_client/tests
@@ -74,7 +74,7 @@ repos:
         stages: [manual]
 
   - repo: https://github.com/sirosen/check-jsonschema
-    rev: 0.14.2
+    rev: 0.14.3
     hooks:
       - id: check-jsonschema
         name: "Check GitHub Workflows"
