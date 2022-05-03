@@ -7,9 +7,16 @@ Changes in nbformat
 In Development
 ==============
 
+5.4.0
+=====
+* Add project URLs to ``setup.py``
+* Fix import in ``nbformat.current``
+* Add ``mypy`` and typings support
+* Improve CI
+
 5.3.0
 =====
-- Use `f`astjsonschema`` by default
+- Use `fastjsonschema`` by default
 - Adopt ``pre-commit`` and auto-formatters
 - Increase minimum ``jsonschema`` to 2.6, handle warnings
 
