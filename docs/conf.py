@@ -59,7 +59,7 @@ numpydoc_class_members_toctree = False
 # built documents.
 #
 # The short X.Y version.
-version = "5.3"
+version = "5.4"
 # The full version, including alpha/beta/rc tags.
 release = version
 
