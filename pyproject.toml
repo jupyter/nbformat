@@ -1,6 +1,57 @@
 [build-system]
-requires = ["setuptools>=60.0"]
-build-backend = "setuptools.build_meta"
+requires = ["flit_core >=3.2,<4"]
+build-backend = "flit_core.buildapi"
+
+[project]
+name = "nbformat"
+version = "5.4.0"
+description = "The Jupyter Notebook format"
+license = { file = "COPYING.md" }
+keywords = ["Interactive", "Interpreter", "Shell", "Web"]
+classifiers = [
+    "Intended Audience :: Developers",
+    "Intended Audience :: System Administrators",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: BSD License",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10"
+]
+requires-python = ">=3.7"
+dependencies = [
+    "fastjsonschema",
+    "jsonschema>=2.6",
+    "jupyter_core",
+    "traitlets>=5.1",
+]
+
+[[project.authors]]
+name = "Jupyter Development Team"
+email = "jupyter@googlegroups.com"
+
+[project.readme]
+text = "This package contains the base implementation of the Jupyter Notebook format,\nand Python APIs for working with notebooks."
+content-type = "text/plain"
+
+[project.urls]
+Homepage = "http://jupyter.org"
+
+[project.optional-dependencies]
+test = [
+    "check-manifest",
+    "testpath",
+    "pytest",
+    "pre-commit"
+]
+
+[project.scripts]
+jupyter-trust = "nbformat.sign:TrustNotebookApp.launch_instance"
+
+[tool.flit.sdist]
+include = ["tests/"]
 
 [tool.pytest.ini_options]
 addopts = "-raXs --durations 10 --color=yes --doctest-modules"
@@ -11,7 +62,6 @@ filterwarnings = [
     "error",
     "ignore:Using or importing the ABCs from 'collections':DeprecationWarning:jsonschema"
 ]
-
 
 [tool.mypy]
 check_untyped_defs = true

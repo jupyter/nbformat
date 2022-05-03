@@ -41,11 +41,12 @@ version component can take any of the following values:
 - `release`: Bump the release component. `5.0.9b0 -> 5.0.9`
 - `build`: Bump the build component. `5.0.9b0 -> 5.0.9b1`
 
-Configuration of bump2version is stored on the [.bumpversion.cfg](https://github.com/jupyter/nbformat/blob/master/.bumpversion.cfg) file and it currently tracks and updates the following files:
+Configuration of bump2version is stored on the [.bumpversion.cfg](https://github.com/jupyter/nbformat/blob/main/.bumpversion.cfg) file and it currently tracks and updates the following files:
 
-- [nbformat/\_version.py](https://github.com/jupyter/nbformat/blob/master/nbformat/_version.py)
-- [docs/conf.py](https://github.com/jupyter/nbformat/blob/master/docs/conf.py)
-- [package.json](https://github.com/jupyter/nbformat/blob/master/package.json)
+- [pyproject.toml](https://github.com/jupyter/nbformat/blob/main/pyproject.toml)
+- [nbformat/\_version.py](https://github.com/jupyter/nbformat/blob/main/nbformat/_version.py)
+- [docs/conf.py](https://github.com/jupyter/nbformat/blob/main/docs/conf.py)
+- [package.json](https://github.com/jupyter/nbformat/blob/main/package.json)
 
 ### To make a beta release
 
@@ -67,7 +68,7 @@ version updates depending on the release type that will follow.
 bump2version release --tag
 bump2version <VERSION-COMPONENT>
 
-git push upstream master
+git push upstream main
 git push upstream --tags
 ```
 
