@@ -65,6 +65,7 @@ version updates depending on the release type that will follow.
 
 ```bash
 # Commit, test, publish, tag release
+pip install build twine bump2version
 bump2version release --tag
 bump2version <VERSION-COMPONENT>
 
@@ -83,7 +84,7 @@ PyPI and NPM packages will be built and published on CI when a tag is pushed.
 ```bash
 rm -rf dist/*
 rm -rf build/*
-python setup.py sdist bdist_wheel
+python -m build .
 # Double check the dist/* files have the right verison (no `.dev`) and install the wheel to ensure it's good
 pip install dist/*
 twine upload dist/*
