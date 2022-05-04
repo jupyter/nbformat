@@ -37,7 +37,7 @@ text = "This package contains the base implementation of the Jupyter Notebook fo
 content-type = "text/plain"
 
 [project.urls]
-Homepage = "http://jupyter.org"
+Homepage = "https://jupyter.org"
 
 [project.optional-dependencies]
 test = [
