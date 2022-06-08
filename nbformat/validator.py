@@ -406,7 +406,7 @@ def validate(
         raise error
 
 
-def _try_fix_error(nbdict, version, version_minor, relax_add_props):
+def _try_fix_error(nbdict, version: int, version_minor: int, relax_add_props: bool) -> int:
     """
     This function try to extract errors from the validator
     and fix them if necessary.
@@ -417,6 +417,7 @@ def _try_fix_error(nbdict, version, version_minor, relax_add_props):
         raise ValidationError(f"No schema for validating v{version}.{version_minor} notebooks")
     errors = [e for e in validator.iter_errors(nbdict)]
 
+    changes = 0
     if len(errors) > 0:
         if validator.name == "fastjsonschema":
             validator = get_validator(
@@ -428,7 +429,6 @@ def _try_fix_error(nbdict, version, version_minor, relax_add_props):
             errors = [e for e in validator.iter_errors(nbdict)]
 
         error_tree = validator.error_tree(errors)
-        changes = 0
         if "metadata" in error_tree:
             for key in error_tree["metadata"]:
                 nbdict["metadata"].pop(key, None)
@@ -460,7 +460,7 @@ def _try_fix_error(nbdict, version, version_minor, relax_add_props):
                                 nbdict["cells"][cell_idx]["metadata"].pop(rel_path[1], None)
                                 changes += 1
 
-            return 0
+    return changes
 
 
 def iter_validate(
