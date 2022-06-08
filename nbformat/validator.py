@@ -247,11 +247,13 @@ def better_validation_error(error, version, version_minor):
     return NotebookValidationError(error, ref)
 
 
-def normalize(nbdict, version, version_minor):
+def normalize(nbdict, version=None, version_minor=None, *, relax_add_props: bool = False):
     """
-    EXPERIMENTAL
+    Normalise a notebook prior to validation.
 
-    normalise a notebook prior to validation.
+    .. note::
+
+        Experimental
 
     This tries to implement a couple of normalisation steps to standardise
     notebooks and make validation easier.
@@ -265,6 +267,9 @@ def normalize(nbdict, version, version_minor):
         notebook document
     version : int
     version_minor : int
+    relax_add_props : bool
+        Wether to allow extra property in the Json schema validating the
+        notebook.
 
     Returns
     -------
@@ -275,10 +280,23 @@ def normalize(nbdict, version, version_minor):
 
     """
     nbdict = deepcopy(nbdict)
-    return _normalize(nbdict, version, version_minor, True)
+    nbdict_version, nbdict_version_minor = get_version(nbdict)
+    if version is None:
+        version = nbdict_version
+    if version_minor is None:
+        version_minor = nbdict_version_minor
+    return _normalize(nbdict, version, version_minor, True, relax_add_props=relax_add_props)
 
 
-def _normalize(nbdict, version, version_minor, repair_duplicate_cell_ids):
+def _normalize(nbdict, version, version_minor, repair_duplicate_cell_ids, relax_add_props):
+    """
+    Private normalisation routine.
+
+
+    This attempt to mormalize teh
+
+
+    """
     changes = 0
 
     if version >= 4 and version_minor >= 5:
@@ -320,6 +338,8 @@ def _normalize(nbdict, version, version_minor, repair_duplicate_cell_ids):
                 else:
                     raise ValidationError(f"Non-unique cell id '{cell_id}' detected.")
             seen_ids.add(cell_id)
+
+    changes += _try_fix_error(nbdict, version, version_minor, relax_add_props=relax_add_props)
     return changes, nbdict
 
 
@@ -366,7 +386,13 @@ def validate(
             version, version_minor = 1, 0
 
     if ref is None:
-        _normalize(nbdict, version, version_minor, repair_duplicate_cell_ids)
+        _normalize(
+            nbdict,
+            version,
+            version_minor,
+            repair_duplicate_cell_ids,
+            relax_add_props=relax_add_props,
+        )
 
     for error in iter_validate(
         nbdict,
@@ -378,6 +404,63 @@ def validate(
     ):
 
         raise error
+
+
+def _try_fix_error(nbdict, version, version_minor, relax_add_props):
+    """
+    This function try to extract errors from the validator
+    and fix them if necessary.
+
+    """
+    validator = get_validator(version, version_minor, relax_add_props=relax_add_props)
+    if not validator:
+        raise ValidationError(f"No schema for validating v{version}.{version_minor} notebooks")
+    errors = [e for e in validator.iter_errors(nbdict)]
+
+    if len(errors) > 0:
+        if validator.name == "fastjsonschema":
+            validator = get_validator(
+                version,
+                version_minor,
+                relax_add_props=relax_add_props,
+                name="jsonschema",
+            )
+            errors = [e for e in validator.iter_errors(nbdict)]
+
+        error_tree = validator.error_tree(errors)
+        changes = 0
+        if "metadata" in error_tree:
+            for key in error_tree["metadata"]:
+                nbdict["metadata"].pop(key, None)
+                changes += 1
+
+        if "cells" in error_tree:
+            number_of_cells = len(nbdict.get("cells", 0))
+            for cell_idx in range(number_of_cells):
+                # Cells don't report individual metadata keys as having failed validation
+                # Instead it reports that it failed to validate against each cell-type definition.
+                # We have to delve into why those definitions failed to uncover which metadata
+                # keys are misbehaving.
+                if "oneOf" in error_tree["cells"][cell_idx].errors:
+                    intended_cell_type = nbdict["cells"][cell_idx]["cell_type"]
+                    schemas_by_index = [
+                        ref["$ref"]
+                        for ref in error_tree["cells"][cell_idx].errors["oneOf"].schema["oneOf"]
+                    ]
+                    cell_type_definition_name = f"#/definitions/{intended_cell_type}_cell"
+                    if cell_type_definition_name in schemas_by_index:
+                        schema_index = schemas_by_index.index(cell_type_definition_name)
+                        for error in error_tree["cells"][cell_idx].errors["oneOf"].context:
+                            rel_path = error.relative_path
+                            error_for_intended_schema = error.schema_path[0] == schema_index
+                            is_top_level_metadata_key = (
+                                len(rel_path) == 2 and rel_path[0] == "metadata"
+                            )
+                            if error_for_intended_schema and is_top_level_metadata_key:
+                                nbdict["cells"][cell_idx]["metadata"].pop(rel_path[1], None)
+                                changes += 1
+
+            return 0
 
 
 def iter_validate(
@@ -393,6 +476,14 @@ def iter_validate(
     relevant notebook format schema.
 
     Returns a generator of all ValidationErrors if not valid.
+
+
+    Notes
+    -----
+    To fix: For security reason this should not ever mutate it's arguments, and
+    should not ever try to validate a mutated or modified version of it's notebook.
+
+
     """
     # backwards compatibility for nbjson argument
     if nbdict is not None:
@@ -415,50 +506,14 @@ def iter_validate(
     if ref:
         errors = validator.iter_errors(nbdict, {"$ref": "#/definitions/%s" % ref})
     else:
-        errors = [e for e in validator.iter_errors(nbdict)]
+        if strip_invalid_metadata:
+            _try_fix_error(nbdict, version, version_minor, relax_add_props)
 
-        if len(errors) > 0 and strip_invalid_metadata:
-            if validator.name == "fastjsonschema":
-                validator = get_validator(
-                    version, version_minor, relax_add_props=relax_add_props, name="jsonschema"
-                )
-                errors = [e for e in validator.iter_errors(nbdict)]
-
-            error_tree = validator.error_tree(errors)
-            if "metadata" in error_tree:
-                for key in error_tree["metadata"]:
-                    nbdict["metadata"].pop(key, None)
-
-            if "cells" in error_tree:
-                number_of_cells = len(nbdict.get("cells", 0))
-                for cell_idx in range(number_of_cells):
-                    # Cells don't report individual metadata keys as having failed validation
-                    # Instead it reports that it failed to validate against each cell-type definition.
-                    # We have to delve into why those definitions failed to uncover which metadata
-                    # keys are misbehaving.
-                    if "oneOf" in error_tree["cells"][cell_idx].errors:
-                        intended_cell_type = nbdict["cells"][cell_idx]["cell_type"]
-                        schemas_by_index = [
-                            ref["$ref"]
-                            for ref in error_tree["cells"][cell_idx].errors["oneOf"].schema["oneOf"]
-                        ]
-                        cell_type_definition_name = f"#/definitions/{intended_cell_type}_cell"
-                        if cell_type_definition_name in schemas_by_index:
-                            schema_index = schemas_by_index.index(cell_type_definition_name)
-                            for error in error_tree["cells"][cell_idx].errors["oneOf"].context:
-                                rel_path = error.relative_path
-                                error_for_intended_schema = error.schema_path[0] == schema_index
-                                is_top_level_metadata_key = (
-                                    len(rel_path) == 2 and rel_path[0] == "metadata"
-                                )
-                                if error_for_intended_schema and is_top_level_metadata_key:
-                                    nbdict["cells"][cell_idx]["metadata"].pop(rel_path[1], None)
-
-            # Validate one more time to ensure that us removing metadata
-            # didn't cause another complex validation issue in the schema.
-            # Also to ensure that higher-level errors produced by individual metadata validation
-            # failures are removed.
-            errors = validator.iter_errors(nbdict)
+        # Validate one more time to ensure that us removing metadata
+        # didn't cause another complex validation issue in the schema.
+        # Also to ensure that higher-level errors produced by individual metadata validation
+        # failures are removed.
+        errors = validator.iter_errors(nbdict)
 
     for error in errors:
         yield better_validation_error(error, version, version_minor)
