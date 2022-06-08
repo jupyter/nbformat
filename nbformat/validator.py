@@ -288,7 +288,14 @@ def normalize(nbdict, version=None, version_minor=None, *, relax_add_props: bool
     return _normalize(nbdict, version, version_minor, True, relax_add_props=relax_add_props)
 
 
-def _normalize(nbdict, version, version_minor, repair_duplicate_cell_ids, relax_add_props):
+def _normalize(
+    nbdict,
+    version,
+    version_minor,
+    repair_duplicate_cell_ids,
+    relax_add_props,
+    strip_invalid_metadata=False,
+):
     """
     Private normalisation routine.
 
@@ -338,8 +345,8 @@ def _normalize(nbdict, version, version_minor, repair_duplicate_cell_ids, relax_
                 else:
                     raise ValidationError(f"Non-unique cell id '{cell_id}' detected.")
             seen_ids.add(cell_id)
-
-    changes += _try_fix_error(nbdict, version, version_minor, relax_add_props=relax_add_props)
+    if strip_invalid_metadata:
+        changes += _try_fix_error(nbdict, version, version_minor, relax_add_props=relax_add_props)
     return changes, nbdict
 
 
@@ -392,6 +399,7 @@ def validate(
             version_minor,
             repair_duplicate_cell_ids,
             relax_add_props=relax_add_props,
+            strip_invalid_metadata=strip_invalid_metadata,
         )
 
     for error in iter_validate(
