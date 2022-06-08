@@ -6,8 +6,6 @@
 import json
 import os
 import pathlib
-import sys
-import unittest
 from tempfile import TemporaryDirectory
 from typing import Any, Dict
 
@@ -54,10 +52,6 @@ class TestAPI(TestsBase):
             write(nb, dest)
             assert os.path.isfile(dest)
 
-    @unittest.skipIf(
-        sys.version_info < (3, 6, 0),
-        "python versions 3.5 and lower don't support opening pathlib.Path objects",
-    )
     def test_read_write_pathlib_object(self):
         """read() and write() take path-like objects such as pathlib objects"""
         path = pathlib.Path(self._get_files_path()) / "test4.ipynb"
