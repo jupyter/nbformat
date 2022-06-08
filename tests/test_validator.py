@@ -70,9 +70,8 @@ def test_should_not_mutate(validator_name):
     assert nb.cells[3]["cell_type"] == "code"
 
     nb_deep_copy = deepcopy(nb)
-    with pytest.warns(None):
-        with pytest.raises(MissingIDFieldWarning):
-            validate(nb)
+    with pytest.raises(MissingIDFieldWarning):
+        validate(nb)
 
     assert nb == nb_deep_copy
 
