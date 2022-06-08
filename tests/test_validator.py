@@ -51,7 +51,7 @@ def test_should_warn(validator_name):
 
     with pytest.warns(MissingIDFieldWarning):
         validate(nb)
-    assert isvalid(nb) == True
+    assert isvalid(nb) is True
 
 
 @pytest.mark.xfail(reason="In the future we want to stop warning, and raise an error")
@@ -70,13 +70,13 @@ def test_should_not_mutate(validator_name):
     assert nb.cells[3]["cell_type"] == "code"
 
     nb_deep_copy = deepcopy(nb)
-
-    with (pytest.raises(MissingIDFieldWarning), pytest.warns(None)):
-        validate(nb)
+    with pytest.warns(None):
+        with pytest.raises(MissingIDFieldWarning):
+            validate(nb)
 
     assert nb == nb_deep_copy
 
-    assert isvalid(nb) == True
+    assert isvalid(nb) is True
 
 
 @pytest.mark.parametrize("validator_name", VALIDATORS)

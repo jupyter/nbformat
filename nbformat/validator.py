@@ -275,7 +275,7 @@ def normalize(nbdict, version, version_minor):
 
     """
     nbdict = deepcopy(nbdict)
-    return _normalize(nbdict)
+    return _normalize(nbdict, version, version_minor, True)
 
 
 def _normalize(nbdict, version, version_minor, repair_duplicate_cell_ids):
