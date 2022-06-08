@@ -5,11 +5,8 @@
 import json
 import os
 import pprint
-import sys
 import warnings
 from copy import deepcopy
-
-from traitlets.log import get_logger
 
 from ._imports import import_item
 from .corpus.words import generate_corpus_id

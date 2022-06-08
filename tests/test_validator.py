@@ -290,7 +290,7 @@ def test_repair_non_unique_cell_ids():
     assert isvalid(nb)
 
 
-@pytest.mark.filterwarnings(MissingIDFieldWarning)
+@pytest.mark.filterwarnings("ignore::nbformat.warnings.MissingIDFieldWarning")
 def test_no_cell_ids():
     """Test that a cell without a cell ID does not pass validation"""
     import nbformat
@@ -305,7 +305,7 @@ def test_no_cell_ids():
         validate(nb, repair_duplicate_cell_ids=False)
 
 
-@pytest.mark.filterwarnings(MissingIDFieldWarning)
+@pytest.mark.filterwarnings("ignore::nbformat.warnings.MissingIDFieldWarning")
 def test_repair_no_cell_ids():
     """Test that we will repair cells without ids if asked during validation"""
     import nbformat
