@@ -7,6 +7,7 @@ import os
 import pprint
 import warnings
 from copy import deepcopy
+from typing import Any, Optional
 
 from ._imports import import_item
 from .corpus.words import generate_corpus_id
@@ -247,7 +248,13 @@ def better_validation_error(error, version, version_minor):
     return NotebookValidationError(error, ref)
 
 
-def normalize(nbdict, version=None, version_minor=None, *, relax_add_props: bool = False):
+def normalize(
+    nbdict: Any,
+    version: Optional[int] = None,
+    version_minor: Optional[int] = None,
+    *,
+    relax_add_props: bool = False,
+) -> Any:
     """
     Normalise a notebook prior to validation.
 
@@ -414,7 +421,7 @@ def validate(
         raise error
 
 
-def _try_fix_error(nbdict, version: int, version_minor: int, relax_add_props: bool) -> int:
+def _try_fix_error(nbdict: Any, version: int, version_minor: int, relax_add_props: bool) -> int:
     """
     This function try to extract errors from the validator
     and fix them if necessary.
