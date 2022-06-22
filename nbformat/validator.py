@@ -7,7 +7,7 @@ import os
 import pprint
 import warnings
 from copy import deepcopy
-from typing import Any, Optional
+from typing import Any, Optional, Tuple
 
 from ._imports import import_item
 from .corpus.words import generate_corpus_id
@@ -16,6 +16,7 @@ from .reader import get_version
 from .warnings import DuplicateCellId, MissingIDFieldWarning
 
 validators = {}
+_deprecated = object()
 
 
 def _relax_additional_properties(obj):
@@ -254,7 +255,7 @@ def normalize(
     version_minor: Optional[int] = None,
     *,
     relax_add_props: bool = False,
-) -> Any:
+) -> Tuple[Any, int]:
     """
     Normalise a notebook prior to validation.
 
@@ -280,10 +281,10 @@ def normalize(
 
     Returns
     -------
-    changes : int
-        number of changes in the notebooks
     notebook : dict
         deep-copy of the original object with relevant changes.
+    changes : int
+        number of changes in the notebooks
 
     """
     nbdict = deepcopy(nbdict)
@@ -296,19 +297,21 @@ def normalize(
 
 
 def _normalize(
-    nbdict,
-    version,
-    version_minor,
-    repair_duplicate_cell_ids,
-    relax_add_props,
-    strip_invalid_metadata=False,
-):
+    nbdict: Any,
+    version: int,
+    version_minor: int,
+    repair_duplicate_cell_ids: bool,
+    relax_add_props: bool,
+    strip_invalid_metadata: bool = False,
+) -> Tuple[Any, int]:
     """
     Private normalisation routine.
 
 
-    This attempt to mormalize teh
-
+    This attempt to normalize le nbdict passed to it. As this is currently used
+    both in `validate()` for historical reasons, and in the `normalize` public
+    function it does currently mutates it's argument. Ideally once removed from
+    the `validate()` function, it should stop mutating it's arguments.
 
     """
     changes = 0
@@ -357,16 +360,29 @@ def _normalize(
     return changes, nbdict
 
 
+def _dep_warn(field):
+    warnings.warn(
+        f"""`{field}` kwargs of validate has been deprecated for security reason, and will be removed soon.
+
+        Please explicitly use the `new_notebook,n_changes = nbformat.validator.normalize(old_notebook, ...)` if you wish to
+        normalise your notebook. `normalize` is available since nbformat 5.5.0
+
+        """,
+        DeprecationWarning,
+        stacklevel=3,
+    )
+
+
 def validate(
-    nbdict=None,
-    ref=None,
-    version=None,
-    version_minor=None,
-    relax_add_props=False,
-    nbjson=None,
-    repair_duplicate_cell_ids=True,
-    strip_invalid_metadata=False,
-):
+    nbdict: Any = None,
+    ref: Optional[str] = None,
+    version: Optional[int] = None,
+    version_minor: Optional[int] = None,
+    relax_add_props: bool = _deprecated,  # type: ignore
+    nbjson: Any = None,
+    repair_duplicate_cell_ids: bool = _deprecated,  # type: ignore
+    strip_invalid_metadata: bool = _deprecated,  # type: ignore
+) -> None:
 
     """Checks whether the given notebook dict-like object
     conforms to the relevant notebook format schema.
@@ -379,6 +395,24 @@ def validate(
     Raises ValidationError if not valid.
     """
     assert isinstance(ref, str) or ref is None
+
+    if relax_add_props is _deprecated:
+        relax_add_props = False
+    else:
+        _dep_warn("relax_add_props")
+
+    if strip_invalid_metadata is _deprecated:
+        strip_invalid_metadata = False
+    else:
+        _dep_warn("strip_invalid_metadata")
+        pass
+
+    if repair_duplicate_cell_ids is _deprecated:
+        repair_duplicate_cell_ids = True
+    else:
+        _dep_warn("repair_duplicate_cell_ids")
+        pass
+
     # backwards compatibility for nbjson argument
     if nbdict is not None:
         pass
@@ -398,6 +432,9 @@ def validate(
         # if ref is specified, and we don't have a version number, assume we're validating against 1.0
         if version is None:
             version, version_minor = 1, 0
+
+    assert isinstance(version, int)
+    assert isinstance(version_minor, int)
 
     if ref is None:
         _normalize(
