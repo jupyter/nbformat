@@ -311,15 +311,18 @@ def _normalize(
     Private normalisation routine.
 
 
-    This attempt to normalize le nbdict passed to it. As this is currently used
-    both in `validate()` for historical reasons, and in the `normalize` public
-    function it does currently mutates it's argument. Ideally once removed from
-    the `validate()` function, it should stop mutating it's arguments.
+    This function attempts to normalize the `nbdict` passed to it.
+    
+    As `_normalize()` is currently used both in `validate()` (for
+    historical reasons), and in the `normalize()` public function,
+    `_normalize()` does currently mutate `nbdict`.
+    Ideally, once `validate()` stops calling `_normalize()`, `_normalize()`
+    may stop mutating `nbdict`.
 
     """
     changes = 0
 
-    if version >= 4 and version_minor >= 5:
+    if (version, version_minor) >= (4, 5):
         # if we support cell ids ensure default ids are provided
         for cell in nbdict["cells"]:
             if "id" not in cell:
@@ -327,8 +330,8 @@ def _normalize(
                     "Code cell is missing an id field, this will become"
                     " a hard error in future nbformat versions. You may want"
                     " to use `normalize()` on your notebooks before validations"
-                    " (available since nbformat 5.1.4). Previous of nbformat"
-                    " are also mutating their arguments, and will stop to do so"
+                    " (available since nbformat 5.1.4). Previous versions of nbformat"
+                    " are fixing this issue transparently, and will stop doing so"
                     " in the future.",
                     MissingIDFieldWarning,
                     stacklevel=3,
@@ -465,7 +468,7 @@ def validate(
 
 def _try_fix_error(nbdict: Any, version: int, version_minor: int, relax_add_props: bool) -> int:
     """
-    This function try to extract errors from the validator
+    This function tries to extract errors from the validator
     and fix them if necessary.
 
     """
@@ -478,12 +481,12 @@ def _try_fix_error(nbdict: Any, version: int, version_minor: int, relax_add_prop
     if len(errors) > 0:
         if validator.name == "fastjsonschema":
             validator = get_validator(
-                version,
-                version_minor,
+                version=version,
+                version_minor=version_minor,
                 relax_add_props=relax_add_props,
                 name="jsonschema",
             )
-            errors = [e for e in validator.iter_errors(nbdict)]
+            errors = list(validator.iter_errors(nbdict))
 
         error_tree = validator.error_tree(errors)
         if "metadata" in error_tree:
@@ -537,8 +540,8 @@ def iter_validate(
 
     Notes
     -----
-    To fix: For security reason this should not ever mutate it's arguments, and
-    should not ever try to validate a mutated or modified version of it's notebook.
+    To fix: For security reasons, this function should *never* mutate its `nbdict` argument, and
+    should *never* try to validate a mutated or modified version of its notebook.
 
 
     """
