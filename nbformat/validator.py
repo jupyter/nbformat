@@ -7,6 +7,7 @@ import os
 import pprint
 import warnings
 from copy import deepcopy
+from textwrap import dedent
 from typing import Any, Optional, Tuple
 
 from ._imports import import_item
@@ -259,15 +260,12 @@ def normalize(
     """
     Normalise a notebook prior to validation.
 
-    .. note::
-
-        Experimental
-
     This tries to implement a couple of normalisation steps to standardise
     notebooks and make validation easier.
 
     You should in general not rely on this function and make sure the notebooks
-    that reach nbformat are already in a normal form.
+    that reach nbformat are already in a normal form. If not you likely have a bug,
+    and may have security issues.
 
     Parameters
     ----------
@@ -362,12 +360,15 @@ def _normalize(
 
 def _dep_warn(field):
     warnings.warn(
-        f"""`{field}` kwargs of validate has been deprecated for security reason, and will be removed soon.
+        dedent(
+            f"""`{field}` kwargs of validate has been deprecated for security
+        reasons, and will be removed soon.
 
         Please explicitly use the `new_notebook,n_changes = nbformat.validator.normalize(old_notebook, ...)` if you wish to
         normalise your notebook. `normalize` is available since nbformat 5.5.0
 
-        """,
+        """
+        ),
         DeprecationWarning,
         stacklevel=3,
     )
@@ -433,10 +434,9 @@ def validate(
         if version is None:
             version, version_minor = 1, 0
 
-    assert isinstance(version, int)
-    assert isinstance(version_minor, int)
-
     if ref is None:
+        assert isinstance(version, int)
+        assert isinstance(version_minor, int)
         _normalize(
             nbdict,
             version,

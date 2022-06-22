@@ -271,10 +271,12 @@ def test_non_unique_cell_ids():
         # Avoids validate call from `.read`
         nb = nbformat.from_dict(json.load(f))
     with pytest.raises(ValidationError):
-        validate(nb, repair_duplicate_cell_ids=False)
+        with pytest.warns(DeprecationWarning):
+            validate(nb, repair_duplicate_cell_ids=False)
     # try again to verify that we didn't modify the content
     with pytest.raises(ValidationError):
-        validate(nb, repair_duplicate_cell_ids=False)
+        with pytest.warns(DeprecationWarning):
+            validate(nb, repair_duplicate_cell_ids=False)
 
 
 def test_repair_non_unique_cell_ids():
@@ -298,10 +300,12 @@ def test_no_cell_ids():
         # Avoids validate call from `.read`
         nb = nbformat.from_dict(json.load(f))
     with pytest.raises(ValidationError):
-        validate(nb, repair_duplicate_cell_ids=False)
+        with pytest.warns(DeprecationWarning):
+            validate(nb, repair_duplicate_cell_ids=False)
     # try again to verify that we didn't modify the content
     with pytest.raises(ValidationError):
-        validate(nb, repair_duplicate_cell_ids=False)
+        with pytest.warns(DeprecationWarning):
+            validate(nb, repair_duplicate_cell_ids=False)
 
 
 @pytest.mark.filterwarnings("ignore::nbformat.warnings.MissingIDFieldWarning")
@@ -340,5 +344,6 @@ def test_strip_invalid_metadata():
     with TestsBase.fopen("v4_5_invalid_metadata.ipynb", "r") as f:
         nb = nbformat.from_dict(json.load(f))
     assert not isvalid(nb)
-    validate(nb, strip_invalid_metadata=True)
+    with pytest.warns(DeprecationWarning):
+        validate(nb, strip_invalid_metadata=True)
     assert isvalid(nb)
