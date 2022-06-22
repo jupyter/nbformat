@@ -42,7 +42,7 @@ from nbformat.v3 import (
 from . import versions
 from .converter import convert
 from .reader import reads as reader_reads
-from .validator import ValidationError, validate
+from .validator import ValidationError, isvalid, validate
 
 __all__ = [
     "NotebookNode",
@@ -61,6 +61,7 @@ __all__ = [
     "to_notebook_json",
     "convert",
     "validate",
+    "isvalid",
     "NBFormatError",
     "parse_py",
     "reads_json",
@@ -165,11 +166,7 @@ def reads(s, format="DEPRECATED", version=current_nbformat, **kwargs):
         _warn_format()
     nb = reader_reads(s, **kwargs)
     nb = convert(nb, version)
-    try:
-        with warnings.catch_warnings():
-            warnings.filterwarnings("ignore", category=DeprecationWarning)
-            validate(nb, repair_duplicate_cell_ids=False)
-    except ValidationError as e:
+    if not isvalid(nb):
         get_logger().error("Notebook JSON is invalid: %s", e)
     return nb
 
@@ -195,11 +192,7 @@ def writes(nb, format="DEPRECATED", version=current_nbformat, **kwargs):
     if format not in {"DEPRECATED", "json"}:
         _warn_format()
     nb = convert(nb, version)
-    try:
-        with warnings.catch_warnings():
-            warnings.filterwarnings("ignore", category=DeprecationWarning)
-            validate(nb, repair_duplicate_cell_ids=False)
-    except ValidationError as e:
+    if not isvalid(nb):
         get_logger().error("Notebook JSON is invalid: %s", e)
     return versions[version].writes_json(nb, **kwargs)
 

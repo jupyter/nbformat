@@ -114,12 +114,17 @@ def isvalid(nbjson, ref=None, version=None, version_minor=None):
     To see the individual errors that were encountered, please use the
     `validate` function instead.
     """
+    orig = deepcopy(nbjson)
     try:
-        validate(nbjson, ref, version, version_minor)
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", category=DeprecationWarning)
+            validate(nbjson, ref, version, version_minor, repair_duplicate_cell_ids=False)
     except ValidationError:
         return False
     else:
         return True
+    finally:
+        assert nbjson == orig
 
 
 def _format_as_index(indices):
