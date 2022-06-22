@@ -296,7 +296,14 @@ def normalize(
         version = nbdict_version
     if version_minor is None:
         version_minor = nbdict_version_minor
-    return _normalize(nbdict, version, version_minor, True, relax_add_props=relax_add_props)
+    return _normalize(
+        nbdict,
+        version,
+        version_minor,
+        True,
+        relax_add_props=relax_add_props,
+        strip_invalid_metadata=False,
+    )
 
 
 def _normalize(
@@ -305,7 +312,7 @@ def _normalize(
     version_minor: int,
     repair_duplicate_cell_ids: bool,
     relax_add_props: bool,
-    strip_invalid_metadata: bool = False,
+    strip_invalid_metadata: bool,
 ) -> Tuple[Any, int]:
     """
     Private normalisation routine.
