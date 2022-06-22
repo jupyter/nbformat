@@ -312,7 +312,7 @@ def _normalize(
 
 
     This function attempts to normalize the `nbdict` passed to it.
-    
+
     As `_normalize()` is currently used both in `validate()` (for
     historical reasons), and in the `normalize()` public function,
     `_normalize()` does currently mutate `nbdict`.
