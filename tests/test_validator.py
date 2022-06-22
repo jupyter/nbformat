@@ -254,8 +254,6 @@ def test_fallback_validator_with_iter_errors_using_ref(recwarn):
     Test that when creating a standalone object (code_cell etc)
     the default validator is used as fallback.
     """
-    import nbformat
-
     set_validator("fastjsonschema")
     nbformat.v4.new_code_cell()
     nbformat.v4.new_markdown_cell()
@@ -265,8 +263,6 @@ def test_fallback_validator_with_iter_errors_using_ref(recwarn):
 
 def test_non_unique_cell_ids():
     """Test than a non-unique cell id does not pass validation"""
-    import nbformat
-
     with TestsBase.fopen("invalid_unique_cell_id.ipynb", "r") as f:
         # Avoids validate call from `.read`
         nb = nbformat.from_dict(json.load(f))
@@ -281,7 +277,6 @@ def test_non_unique_cell_ids():
 
 def test_repair_non_unique_cell_ids():
     """Test that we will repair non-unique cell ids if asked during validation"""
-    import nbformat
 
     with TestsBase.fopen("invalid_unique_cell_id.ipynb", "r") as f:
         # Avoids validate call from `.read`
@@ -294,7 +289,6 @@ def test_repair_non_unique_cell_ids():
 @pytest.mark.filterwarnings("ignore::nbformat.warnings.MissingIDFieldWarning")
 def test_no_cell_ids():
     """Test that a cell without a cell ID does not pass validation"""
-    import nbformat
 
     with TestsBase.fopen("v4_5_no_cell_id.ipynb", "r") as f:
         # Avoids validate call from `.read`
@@ -311,7 +305,6 @@ def test_no_cell_ids():
 @pytest.mark.filterwarnings("ignore::nbformat.warnings.MissingIDFieldWarning")
 def test_repair_no_cell_ids():
     """Test that we will repair cells without ids if asked during validation"""
-    import nbformat
 
     with TestsBase.fopen("v4_5_no_cell_id.ipynb", "r") as f:
         # Avoids validate call from `.read`
