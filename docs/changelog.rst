@@ -16,7 +16,7 @@ In Development
 
 5.3.0
 =====
-- Use `fastjsonschema`` by default
+- Use ``fastjsonschema`` by default
 - Adopt ``pre-commit`` and auto-formatters
 - Increase minimum ``jsonschema`` to 2.6, handle warnings
 
