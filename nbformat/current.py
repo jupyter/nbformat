@@ -12,11 +12,12 @@ import re
 import warnings
 
 warnings.warn(
-    """nbformat.current is deprecated.
+    """nbformat.current is deprecated since before nbformat 3.0
 
 - use nbformat for read/write/validate public API
 - use nbformat.vX directly to composing notebooks of a particular version
-"""
+""",
+    DeprecationWarning,
 )
 
 from traitlets.log import get_logger
@@ -84,7 +85,7 @@ class NBFormatError(ValueError):
 
 def _warn_format():
     warnings.warn(
-        """Non-JSON file support in nbformat is deprecated.
+        """Non-JSON file support in nbformat is deprecated since nbformat 1.0.
     Use nbconvert to create files of other formats."""
     )
 
@@ -107,13 +108,21 @@ def parse_py(s, **kwargs):
 
 def reads_json(nbjson, **kwargs):
     """DEPRECATED, use reads"""
-    warnings.warn("reads_json is deprecated, use reads")
+    warnings.warn(
+        "reads_json is deprecated since nbformat 3.0, use reads",
+        DeprecationWarning,
+        stacklevel=2,
+    )
     return reads(nbjson)
 
 
 def writes_json(nb, **kwargs):
     """DEPRECATED, use writes"""
-    warnings.warn("writes_json is deprecated, use writes")
+    warnings.warn(
+        "writes_json is deprecated since nbformat 3.0, use writes",
+        DeprecationWarning,
+        stacklevel=2,
+    )
     return writes(nb, **kwargs)
 
 
