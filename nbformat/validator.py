@@ -369,7 +369,9 @@ def _normalize(
                     raise ValidationError(f"Non-unique cell id '{cell_id}' detected.")
             seen_ids.add(cell_id)
     if strip_invalid_metadata:
-        changes += _try_fix_error(nbdict, version, version_minor, relax_add_props=relax_add_props)
+        changes += _strip_invalida_metadata(
+            nbdict, version, version_minor, relax_add_props=relax_add_props
+        )
     return changes, nbdict
 
 
@@ -473,10 +475,30 @@ def validate(
         raise error
 
 
-def _try_fix_error(nbdict: Any, version: int, version_minor: int, relax_add_props: bool) -> int:
+def _strip_invalida_metadata(
+    nbdict: Any, version: int, version_minor: int, relax_add_props: bool
+) -> int:
     """
-    This function tries to extract errors from the validator
-    and fix them if necessary.
+
+    This function tries to extract metadata errors from the validator and fix
+    them if necessary. This mostly mean stripping unknown keys from metadata
+    fields, or removing metadata fields altogether.
+
+    Parameters
+    ----------
+    nbdict : dict
+        notebook document
+    version : int
+    version_minor : int
+    relax_add_props : bool
+        Wether to allow extra property in the Json schema validating the
+        notebook.
+
+    Return
+    ------
+    int :
+        number of modifications
+
 
     """
     validator = get_validator(version, version_minor, relax_add_props=relax_add_props)
@@ -574,7 +596,7 @@ def iter_validate(
         errors = validator.iter_errors(nbdict, {"$ref": "#/definitions/%s" % ref})
     else:
         if strip_invalid_metadata:
-            _try_fix_error(nbdict, version, version_minor, relax_add_props)
+            _strip_invalida_metadata(nbdict, version, version_minor, relax_add_props)
 
         # Validate one more time to ensure that us removing metadata
         # didn't cause another complex validation issue in the schema.

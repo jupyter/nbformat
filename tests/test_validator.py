@@ -44,7 +44,6 @@ def test_should_warn(validator_name):
         nb = read(f, as_version=4)
 
     del nb.cells[3]["id"]
-    assert nb.cells[3].get("id") is None
     assert nb.cells[3]["cell_type"] == "code"
 
     nb_copy = deepcopy(nb)
@@ -59,7 +58,7 @@ def test_should_warn(validator_name):
 def test_should_not_mutate(validator_name):
     """Test that a v4 notebook without id raise an error and does/not mutate
 
-    Probably should be 2 test. To enable in the future.
+    Probably should be 2 distinct tests. To enable in the future.
     """
     set_validator(validator_name)
     with TestsBase.fopen("test4.5.ipynb", "r") as f:
@@ -75,7 +74,7 @@ def test_should_not_mutate(validator_name):
 
     assert nb == nb_deep_copy
 
-    assert isvalid(nb) is True
+    assert isvalid(nb) is False
 
 
 @pytest.mark.parametrize("validator_name", VALIDATORS)
