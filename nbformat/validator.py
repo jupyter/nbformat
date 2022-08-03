@@ -430,6 +430,16 @@ def validate(
     Raises
     ------
     ValidationError if not valid.
+
+
+    Notes
+    -----
+
+    Prior to Nbformat 5.5.0 the `validate` and `isvalid` method would silently
+    try to fix invalid notebook and mutate arguments. This behavior is deprecated
+    and will be removed in a near future.
+
+    Please explicitly call `normalize` if you need to normalize notebooks.
     """
     assert isinstance(ref, str) or ref is None
 
