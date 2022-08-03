@@ -407,10 +407,31 @@ def validate(
 
     Parameters
     ----------
+    nbdict : dict
+        notebook document
     ref : optional, str
         reference to the subset of the schema we want to validate against.
         for example ``"markdown_cell"``, `"code_cell"` ....
-    Raises ValidationError if not valid.
+    version : int
+    version_minor : int
+    relax_add_props : bool
+        Deprecated since 5.5.0 – will be removed in the future.
+        Wether to allow extra property in the Json schema validating the
+        notebook.
+    nbjson :
+    repair_duplicate_cell_ids : boolny
+        Deprecated since 5.5.0 – will be removed in the future.
+    strip_invalid_metadata : bool
+        Deprecated since 5.5.0 – will be removed in the future.
+
+    Returns
+    -------
+    None
+
+
+    Raises
+    ------
+    ValidationError if not valid.
     """
     assert isinstance(ref, str) or ref is None
 
