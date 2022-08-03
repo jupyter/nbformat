@@ -317,7 +317,6 @@ def _normalize(
     """
     Private normalisation routine.
 
-
     This function attempts to normalize the `nbdict` passed to it.
 
     As `_normalize()` is currently used both in `validate()` (for
@@ -418,7 +417,7 @@ def validate(
         Deprecated since 5.5.0 – will be removed in the future.
         Wether to allow extra property in the Json schema validating the
         notebook.
-    nbjson :
+    nbjson
     repair_duplicate_cell_ids : boolny
         Deprecated since 5.5.0 – will be removed in the future.
     strip_invalid_metadata : bool
@@ -427,7 +426,6 @@ def validate(
     Returns
     -------
     None
-
 
     Raises
     ------
@@ -500,7 +498,6 @@ def _strip_invalida_metadata(
     nbdict: Any, version: int, version_minor: int, relax_add_props: bool
 ) -> int:
     """
-
     This function tries to extract metadata errors from the validator and fix
     them if necessary. This mostly mean stripping unknown keys from metadata
     fields, or removing metadata fields altogether.
@@ -515,11 +512,10 @@ def _strip_invalida_metadata(
         Wether to allow extra property in the Json schema validating the
         notebook.
 
-    Return
-    ------
-    int :
+    Returns
+    -------
+    int
         number of modifications
-
 
     """
     validator = get_validator(version, version_minor, relax_add_props=relax_add_props)
@@ -587,12 +583,10 @@ def iter_validate(
 
     Returns a generator of all ValidationErrors if not valid.
 
-
     Notes
     -----
     To fix: For security reasons, this function should *never* mutate its `nbdict` argument, and
     should *never* try to validate a mutated or modified version of its notebook.
-
 
     """
     # backwards compatibility for nbjson argument
