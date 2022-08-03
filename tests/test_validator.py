@@ -65,7 +65,6 @@ def test_should_not_mutate(validator_name):
         nb = read(f, as_version=4)
 
     del nb.cells[3]["id"]
-    assert nb.cells[3].get("id") is None
     assert nb.cells[3]["cell_type"] == "code"
 
     nb_deep_copy = deepcopy(nb)
@@ -75,6 +74,36 @@ def test_should_not_mutate(validator_name):
     assert nb == nb_deep_copy
 
     assert isvalid(nb) is False
+
+
+def _invalidator_1(nb):
+    del nb.cells[3]["id"]
+
+
+def _invalidator_3(nb):
+    nb.cells[3]["id"] = "hey"
+    nb.cells[2]["id"] = "hey"
+
+
+def _invalidator_2(nb):
+    nb.cells[3]["id"] = nb.cells[2]["id"]
+
+
+@pytest.mark.parametrize("validator_name", VALIDATORS)
+@pytest.mark.parametrize("invalidator", [_invalidator_1, _invalidator_2])
+def test_is_valid_should_not_mutate(validator_name, invalidator):
+    """Test that a v4 notebook does not mutate in is_valid, and does note autofix."""
+    set_validator(validator_name)
+    with TestsBase.fopen("test4.5.ipynb", "r") as f:
+        nb = read(f, as_version=4)
+
+    invalidator(nb)
+    assert nb.cells[3]["cell_type"] == "code"
+
+    nb_deep_copy = deepcopy(nb)
+    assert isvalid(nb) is False
+
+    assert nb == nb_deep_copy
 
 
 @pytest.mark.parametrize("validator_name", VALIDATORS)

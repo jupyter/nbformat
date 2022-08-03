@@ -118,6 +118,7 @@ def isvalid(nbjson, ref=None, version=None, version_minor=None):
     try:
         with warnings.catch_warnings():
             warnings.filterwarnings("ignore", category=DeprecationWarning)
+            warnings.filterwarnings("ignore", category=MissingIDFieldWarning)
             validate(nbjson, ref, version, version_minor, repair_duplicate_cell_ids=False)
     except ValidationError:
         return False
