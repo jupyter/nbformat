@@ -7,6 +7,18 @@ Changes in nbformat
 In Development
 ==============
 
+The  biggest change in nbformat 5.5.0 is the deprecation of arguments to
+``validate()`` that try to fix notebooks errors during validation.
+
+``validate()`` is a function that is core to the security model of Jupyter,
+and is assumed in a number of places to not mutate it's argument, or try to fix
+notebooks passed to it.
+
+Auto fixing of notebook in validate can also hide subtle bugs, and will
+therefore be updated in a near future to not take any of the argument related to
+auto-fixing, and fail instead of silently modifying its parameters on invalid
+notebooks.
+
 5.4.0
 =====
 * Add project URLs to ``setup.py``
