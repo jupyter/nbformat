@@ -44,7 +44,8 @@ test = [
     "check-manifest",
     "testpath",
     "pytest",
-    "pre-commit"
+    "pre-commit",
+    "pep440"
 ]
 
 [project.scripts]
