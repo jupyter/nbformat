@@ -63,7 +63,6 @@ def reads(s, **kwargs):
     ------
     ValidationError
         Notebook JSON for a given version is missing an expected key and cannot be read.
-
     NBFormatError
         Specified major version is invalid or unsupported.
     """

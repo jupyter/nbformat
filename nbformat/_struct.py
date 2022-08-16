@@ -31,14 +31,13 @@ class Struct(dict):
 
         Parameters
         ----------
-        args : dict, Struct
+        *args : dict, Struct
             Initialize with one dict or Struct
-        kw : dict
+        **kw : dict
             Initialize with key, value pairs.
 
         Examples
         --------
-
         >>> s = Struct(a=10,b=30)
         >>> s.a
         10
@@ -56,7 +55,6 @@ class Struct(dict):
 
         Examples
         --------
-
         >>> s = Struct()
         >>> s['a'] = 10
         >>> s.allow_new_attr(False)
@@ -82,7 +80,6 @@ class Struct(dict):
 
         Examples
         --------
-
         >>> s = Struct()
         >>> s.a = 10
         >>> s.a
@@ -115,7 +112,6 @@ class Struct(dict):
 
         Examples
         --------
-
         >>> s = Struct(a=10)
         >>> s.a
         10
@@ -140,7 +136,6 @@ class Struct(dict):
 
         Examples
         --------
-
         >>> s = Struct(a=10,b=30)
         >>> s2 = Struct(a=20,c=40)
         >>> s += s2
@@ -155,7 +150,6 @@ class Struct(dict):
 
         Examples
         --------
-
         >>> s1 = Struct(a=10,b=30)
         >>> s2 = Struct(a=20,c=40)
         >>> s = s1 + s2
@@ -171,7 +165,6 @@ class Struct(dict):
 
         Examples
         --------
-
         >>> s1 = Struct(a=10,b=30)
         >>> s2 = Struct(a=40)
         >>> s = s1 - s2
@@ -187,7 +180,6 @@ class Struct(dict):
 
         Examples
         --------
-
         >>> s1 = Struct(a=10,b=30)
         >>> s2 = Struct(a=40)
         >>> s1 -= s2
@@ -221,7 +213,6 @@ class Struct(dict):
 
         Examples
         --------
-
         >>> s = Struct(a=10,b=30)
         >>> s2 = s.copy()
         >>> type(s2) is Struct
@@ -236,7 +227,6 @@ class Struct(dict):
 
         Examples
         --------
-
         >>> s = Struct(a=10)
         >>> s.hasattr('a')
         True
@@ -269,7 +259,7 @@ class Struct(dict):
 
         Parameters
         ----------
-        __loc_data : dict, Struct
+        __loc_data__ : dict, Struct
             The data to merge into self
         __conflict_solve : dict
             The conflict policy dict.  The keys are binary functions used to
@@ -277,12 +267,11 @@ class Struct(dict):
             the keys the conflict resolution function applies to.  Instead of
             a list of strings a space separated string can be used, like
             'a b c'.
-        kw : dict
+        **kw : dict
             Additional key, value pairs to merge in
 
         Notes
         -----
-
         The `__conflict_solve` dict is a dictionary of binary functions which will be used to
         solve key conflicts.  Here is an example::
 
@@ -323,7 +312,6 @@ class Struct(dict):
 
         Examples
         --------
-
         This show the default policy:
 
         >>> s = Struct(a=10,b=30)

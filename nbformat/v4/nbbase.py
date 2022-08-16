@@ -74,12 +74,10 @@ def output_from_msg(msg):
 
     Returns
     -------
-
     NotebookNode: the output as a notebook node.
 
     Raises
     ------
-
     ValueError: if the message is not an output message.
 
     """

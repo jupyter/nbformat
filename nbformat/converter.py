@@ -26,10 +26,8 @@ def convert(nb, to_version):
     ------
     ValueError
         Notebook failed to convert.
-
     ValueError
         The version specified is invalid or doesn't exist.
-
     ValidationError
         Conversion failed due to missing expected attributes.
     """
