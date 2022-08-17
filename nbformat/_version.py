@@ -1,5 +1,5 @@
 # Make sure to update package.json, too!
-version_info = (5, 5, 0, "b0")
+version_info = (5, 5, 0, "b1")
 
 if len(version_info) <= 3:
     version_extra = ""
