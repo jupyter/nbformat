@@ -19,10 +19,9 @@ jobs:
       - name: Install dependencies
         run: |
           pip install --upgrade pip setuptools
-          pip install bump2version check-manifest twine wheel flit
+          pip install bump2version twine wheel flit
       - name: Build release
         run: |
-          check-manifest -v
           flit build
           python -m twine check dist/*
       - name: Parse tag
