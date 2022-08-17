@@ -4,10 +4,10 @@
 Changes in nbformat
 =========================
 
-In Development
-==============
+5.5.0
+=====
 
-The  biggest change in nbformat 5.5.0 is the deprecation of arguments to
+The  biggest change in ``nbformat`` 5.5.0 is the deprecation of arguments to
 ``validate()`` that try to fix notebooks errors during validation.
 
 ``validate()`` is a function that is core to the security model of Jupyter,
@@ -18,6 +18,17 @@ Auto fixing of notebook in validate can also hide subtle bugs, and will
 therefore be updated in a near future to not take any of the argument related to
 auto-fixing, and fail instead of silently modifying its parameters on invalid
 notebooks.
+
+``nbformat`` now contain a ``normalize`` function that will return a normalized
+copy of a notebook that is suitable for validation. While offered as a convenience
+we discourage its use and suggest library make sure to generate valid notebooks.
+
+
+Other changes
+-------------
+
+* ``nbformat``  is now built with flit, and uses ``pyproject.toml``
+* Documentation and Deprecations have been updated with version number and stack levels.
 
 5.4.0
 =====
