@@ -4,7 +4,7 @@ build-backend = "flit_core.buildapi"
 
 [project]
 name = "nbformat"
-version = "5.5.0b1"
+version = "5.5.0"
 description = "The Jupyter Notebook format"
 license = { file = "COPYING.md" }
 keywords = ["Interactive", "Interpreter", "Shell", "Web"]
