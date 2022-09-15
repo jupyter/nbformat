@@ -262,7 +262,7 @@ def normalize(
     version_minor: Optional[int] = None,
     *,
     relax_add_props: bool = False,
-) -> Tuple[Any, int]:
+) -> Tuple[int, Any]:
     """
     Normalise a notebook prior to validation.
 
@@ -285,10 +285,10 @@ def normalize(
 
     Returns
     -------
-    notebook : dict
-        deep-copy of the original object with relevant changes.
     changes : int
         number of changes in the notebooks
+    notebook : dict
+        deep-copy of the original object with relevant changes.
 
     """
     nbdict = deepcopy(nbdict)
@@ -314,7 +314,7 @@ def _normalize(
     repair_duplicate_cell_ids: bool,
     relax_add_props: bool,
     strip_invalid_metadata: bool,
-) -> Tuple[Any, int]:
+) -> Tuple[int, Any]:
     """
     Private normalisation routine.
 
