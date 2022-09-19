@@ -59,8 +59,9 @@ numpydoc_class_members_toctree = False
 # built documents.
 #
 # The short X.Y version.
-from importlib.metadata import get_version
-version = ".".join(get_version("nbformat").split(".")[:2])
+from importlib.metadata import version
+
+version = ".".join(version("nbformat").split(".")[:2])
 # The full version, including alpha/beta/rc tags.
 release = version
 

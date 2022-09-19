@@ -1,5 +1,6 @@
 # Use "hatchling version xx.yy.zz" to handle version changes
 import re
+
 try:
     from importlib.metadata import version
 except ImportError:
@@ -10,7 +11,7 @@ __version__ = version("nbformat")
 
 # matches tbump regex in pyproject.toml
 _version_regex = re.compile(
-    r'''
+    r"""
   (?P<major>\d+)
   \.
   (?P<minor>\d+)
@@ -20,7 +21,7 @@ _version_regex = re.compile(
   (\.
     (?P<dev>dev\d*)
   )?
-  ''',
+  """,
     re.VERBOSE,
 )
 
