@@ -30,46 +30,20 @@
 
 ## Update version
 
-We use [bump2version](https://github.com/c4urself/bump2version) to manage versions.
+We use [hatch](https://hatch.pypa.io/latest/version/) to manage versions.
 
-To bump versions we use the `bump2version <VERSION-COMPONENT>` command, where the
-version component can take any of the following values:
+You must first install `pipx` (or install `hatch` itself if you prefer).
 
-- `major`: Bump the major component. `5.0.9b0 -> 6.0.0b0`
-- `minor`: Bump the minor component. `5.0.9b0 -> 5.1.0b0`
-- `patch`: Bump the patch component. `5.0.9b0 -> 5.0.10b0`
-- `release`: Bump the release component. `5.0.9b0 -> 5.0.9`
-- `build`: Bump the build component. `5.0.9b0 -> 5.0.9b1`
-
-Configuration of bump2version is stored on the [.bumpversion.cfg](https://github.com/jupyter/nbformat/blob/main/.bumpversion.cfg) file and it currently tracks and updates the following files:
-
-- [pyproject.toml](https://github.com/jupyter/nbformat/blob/main/pyproject.toml)
-- [nbformat/\_version.py](https://github.com/jupyter/nbformat/blob/main/nbformat/_version.py)
-- [docs/conf.py](https://github.com/jupyter/nbformat/blob/main/docs/conf.py)
-- [package.json](https://github.com/jupyter/nbformat/blob/main/package.json)
-
-### To make a beta release
-
-```bash
-# Commit, test, publish, beta tag
-bump2version build --tag
-
-git push upstream master
-git push upstream --tags
-```
+To bump versions we use the `pipx run hatch version <new_version>` command.
 
 ### To make a release
 
-Change `<VERSION-COMPONENT>` to `major`, `minor` or `patch` for the corresponding
-version updates depending on the release type that will follow.
-
 ```bash
-# Commit, test, publish, tag release
-pip install build twine bump2version
-bump2version release --tag
-bump2version <VERSION-COMPONENT>
+# Commit, test, publish, beta tag
+pipx run hatch version <new_version>
+git tag -a <new_version> -m "<new_version>"
 
-git push upstream main
+git push upstream master
 git push upstream --tags
 ```
 
@@ -84,10 +58,10 @@ PyPI and NPM packages will be built and published on CI when a tag is pushed.
 ```bash
 rm -rf dist/*
 rm -rf build/*
-python -m build .
+pipx run build .
 # Double check the dist/* files have the right verison (no `.dev`) and install the wheel to ensure it's good
 pip install dist/*
-twine upload dist/*
+pipx run twine upload dist/*
 ```
 
 ### Push to npm
@@ -96,4 +70,4 @@ twine upload dist/*
 npm publish
 ```
 
-Note for JavaScript developers -- `bump2version` updates the version in `package.json`.
+Note for JavaScript developers -- `hatch` updates the version in `package.json`.

@@ -39,6 +39,10 @@ jobs:
         run: python -m pytest -v --cov=nbformat --cov-report term-missing:skip-covered --no-cov-on-fail
       - name: Coverage
         run: codecov
+      - name: Bump version test
+        run: |
+          pip install pipx
+          pipx run hatch version 100.100.100
 
   # Run "pre-commit run --all-files --hook-stage=manual"
   pre-commit:

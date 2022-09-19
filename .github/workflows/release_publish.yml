@@ -18,12 +18,11 @@ jobs:
           python-version: "3.10"
       - name: Install dependencies
         run: |
-          pip install --upgrade pip setuptools
-          pip install bump2version twine wheel flit
+          pip install pipx
       - name: Build release
         run: |
-          flit build
-          python -m twine check dist/*
+          pipx run build .
+          pipx run twine check dist/*
       - name: Parse tag
         run: |
           echo "RELEASE_TAG=$(python .github/scripts/parse_ref.py)" >> $GITHUB_ENV
@@ -42,7 +41,7 @@ jobs:
         env:
           TWINE_USERNAME: __token__
           TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
-        run: python -m twine upload dist/*
+        run: pipx run twine upload dist/*
       - name: Create NPM configuration
         run: python .github/scripts/create_npmrc.py
       - name: Publish NPM Package

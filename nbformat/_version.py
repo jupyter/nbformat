@@ -1,8 +1,12 @@
 # Use "hatchling version xx.yy.zz" to handle version changes
 import re
-from importlib.metadata import get_version
+try:
+    from importlib.metadata import version
+except ImportError:
+    # Not available until Python 3.8
+    version = lambda _: "0.0.0"
 
-__version__ = get_version("nbformat")
+__version__ = version("nbformat")
 
 # matches tbump regex in pyproject.toml
 _version_regex = re.compile(
