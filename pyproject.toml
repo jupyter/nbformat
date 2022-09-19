@@ -1,10 +1,10 @@
 [build-system]
-requires = ["flit_core >=3.2,<4"]
-build-backend = "flit_core.buildapi"
+requires = ["hatchling>=1.5", "hatch-nodejs-version"]
+build-backend = "hatchling.build"
 
 [project]
 name = "nbformat"
-version = "5.6.0b0"
+dynamic = ["version"]
 description = "The Jupyter Notebook format"
 license = { file = "COPYING.md" }
 keywords = ["Interactive", "Interpreter", "Shell", "Web"]
@@ -51,8 +51,8 @@ test = [
 [project.scripts]
 jupyter-trust = "nbformat.sign:TrustNotebookApp.launch_instance"
 
-[tool.flit.sdist]
-include = ["tests/"]
+[tool.hatch.version]
+source = "nodejs"
 
 [tool.pytest.ini_options]
 addopts = "-raXs --durations 10 --color=yes --doctest-modules"
