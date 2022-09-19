@@ -5,7 +5,7 @@ try:
     from importlib.metadata import version
 except ImportError:
     # Not available until Python 3.8
-    version = lambda _: "0.0.0"
+    version = lambda _: "0.0.0"  # noqa
 
 __version__ = version("nbformat")
 
