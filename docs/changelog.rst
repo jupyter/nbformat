@@ -4,6 +4,12 @@
 Changes in nbformat
 =========================
 
+5.6.0
+=====
+
+* Fix docs and type annotations for ``validator.normalize``.
+* Switch to hatch build backend.
+
 5.5.0
 =====
 
