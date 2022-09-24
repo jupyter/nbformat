@@ -26,6 +26,7 @@ dependencies = [
     "jsonschema>=2.6",
     "jupyter_core",
     "traitlets>=5.1",
+    "importlib-metadata>=3.6;python_version<\"3.8\"",
 ]
 
 [[project.authors]]

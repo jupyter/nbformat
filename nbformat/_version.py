@@ -4,8 +4,7 @@ import re
 try:
     from importlib.metadata import version
 except ImportError:
-    # Not available until Python 3.8
-    version = lambda _: "0.0.0"  # noqa
+    from importlib_metadata import version  # type:ignore
 
 __version__ = version("nbformat")
 
