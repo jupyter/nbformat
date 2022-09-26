@@ -4,6 +4,11 @@
 Changes in nbformat
 =========================
 
+5.6.1
+=====
+
+* Fix handling of ``__version__` on Python 3.7.
+
 5.6.0
 =====
 
