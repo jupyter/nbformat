@@ -381,7 +381,7 @@ def _dep_warn(field):
             f"""`{field}` kwargs of validate has been deprecated for security
         reasons, and will be removed soon.
 
-        Please explicitly use the `new_notebook,n_changes = nbformat.validator.normalize(old_notebook, ...)` if you wish to
+        Please explicitly use the `n_changes, new_notebook = nbformat.validator.normalize(old_notebook, ...)` if you wish to
         normalise your notebook. `normalize` is available since nbformat 5.5.0
 
         """
