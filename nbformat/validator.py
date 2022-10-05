@@ -548,7 +548,7 @@ def _strip_invalida_metadata(
     """
     errors = _get_errors(nbdict, version, version_minor, relax_add_props)
     changes = 0
-    if len(errors) > 0:
+    if len(list(errors)) > 0:
         # jsonschema gives a better error tree.
         validator = get_validator(
             version=version,
