@@ -213,8 +213,7 @@ def test_future(validator_name):
     assert isvalid(nb)
 
 
-# This is only a valid test for the default validator, jsonschema
-@pytest.mark.parametrize("validator_name", ["jsonschema"])
+@pytest.mark.parametrize("validator_name", VALIDATORS)
 def test_validation_error(validator_name):
     set_validator(validator_name)
     with TestsBase.fopen("invalid.ipynb", "r") as f:
@@ -229,8 +228,7 @@ def test_validation_error(validator_name):
     assert len(s.splitlines()) < 10
 
 
-# This is only a valid test for the default validator, jsonschema
-@pytest.mark.parametrize("validator_name", ["jsonschema"])
+@pytest.mark.parametrize("validator_name", VALIDATORS)
 def test_iter_validation_error(validator_name):
     set_validator(validator_name)
     with TestsBase.fopen("invalid.ipynb", "r") as f:
@@ -246,7 +244,7 @@ def test_iter_validation_empty(validator_name):
     """Test that an empty notebook (invalid) fails validation via iter_validate"""
     set_validator(validator_name)
     errors = list(iter_validate({}))
-    assert len(errors) == 1
+    assert len(errors)
     assert type(errors[0]) == ValidationError
 
 

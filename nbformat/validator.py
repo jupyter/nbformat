@@ -223,6 +223,8 @@ def better_validation_error(error, version, version_minor):
     if it's a cell type or output_type error,
     try validating directly based on the type for a better error message
     """
+    if not len(error.schema_path):
+        return error
     key = error.schema_path[-1]
     ref = None
     if key.endswith("Of"):
@@ -503,9 +505,7 @@ def validate(
         raise error
 
 
-def _get_errors(
-    nbdict: Any, version: int, version_minor: int, relax_add_props: bool, *args
-) -> Tuple:
+def _get_errors(nbdict: Any, version: int, version_minor: int, relax_add_props: bool, *args) -> Any:
     validator = get_validator(version, version_minor, relax_add_props=relax_add_props)
     if not validator:
         raise ValidationError(f"No schema for validating v{version}.{version_minor} notebooks")
@@ -560,6 +560,7 @@ def _strip_invalida_metadata(
             raise ValidationError(
                 f"No jsonschema for validating v{version}.{version_minor} notebooks"
             )
+        errors = validator.iter_errors(nbdict)
         error_tree = validator.error_tree(errors)
         if "metadata" in error_tree:
             for key in error_tree["metadata"]:
@@ -627,9 +628,13 @@ def iter_validate(
         version, version_minor = get_version(nbdict)
 
     if ref:
-        errors = _get_errors(
-            nbdict, version, version_minor, relax_add_props, {"$ref": "#/definitions/%s" % ref}
-        )
+        try:
+            errors = _get_errors(
+                nbdict, version, version_minor, relax_add_props, {"$ref": "#/definitions/%s" % ref}
+            )
+        except ValidationError as e:
+            yield e
+            return
 
     else:
         if strip_invalid_metadata:
@@ -639,7 +644,11 @@ def iter_validate(
         # didn't cause another complex validation issue in the schema.
         # Also to ensure that higher-level errors produced by individual metadata validation
         # failures are removed.
-        errors = _get_errors(nbdict, version, version_minor, relax_add_props)
+        try:
+            errors = _get_errors(nbdict, version, version_minor, relax_add_props)
+        except ValidationError as e:
+            yield e
+            return
 
     for error in errors:
         yield better_validation_error(error, version, version_minor)
