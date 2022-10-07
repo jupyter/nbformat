@@ -505,7 +505,9 @@ def validate(
         raise error
 
 
-def _get_errors(nbdict: Any, version: int, version_minor: int, relax_add_props: bool, *args) -> Any:
+def _get_errors(
+    nbdict: Any, version: int, version_minor: int, relax_add_props: bool, *args: Any
+) -> Any:
     validator = get_validator(version, version_minor, relax_add_props=relax_add_props)
     if not validator:
         raise ValidationError(f"No schema for validating v{version}.{version_minor} notebooks")
