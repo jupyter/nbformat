@@ -510,8 +510,9 @@ def _get_errors(nbdict: Any, version: int, version_minor: int, relax_add_props: 
     if not validator:
         raise ValidationError(f"No schema for validating v{version}.{version_minor} notebooks")
     iter_errors = validator.iter_errors(nbdict, *args)
+    errors = list(iter_errors)
     # jsonschema gives the best error messages.
-    if list(iter_errors) and validator.name != "jsonschema":
+    if len(errors) and validator.name != "jsonschema":
         validator = get_validator(
             version=version,
             version_minor=version_minor,
@@ -519,7 +520,7 @@ def _get_errors(nbdict: Any, version: int, version_minor: int, relax_add_props: 
             name="jsonschema",
         )
         return validator.iter_errors(nbdict, *args)
-    return validator.iter_errors(nbdict, *args)
+    return iter(errors)
 
 
 def _strip_invalida_metadata(
