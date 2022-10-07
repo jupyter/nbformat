@@ -519,7 +519,7 @@ def _get_errors(nbdict: Any, version: int, version_minor: int, relax_add_props: 
             name="jsonschema",
         )
         return validator.iter_errors(nbdict, *args)
-    return iter_errors
+    return validator.iter_errors(nbdict, *args)
 
 
 def _strip_invalida_metadata(
