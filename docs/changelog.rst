@@ -4,6 +4,11 @@
 Changes in nbformat
 =========================
 
+5.7.0
+=====
+* Always use jsonschema to handle error reporting.
+* Fix deprecation warning suggestion.
+
 5.6.1
 =====
 
