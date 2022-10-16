@@ -1,4 +1,0 @@
-jsonschema
-jupyter_core
-sphinx
-sphinxcontrib_github_alt

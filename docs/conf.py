@@ -17,6 +17,11 @@
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 # sys.path.insert(0, os.path.abspath('.'))
 
+import os
+import shutil
+
+HERE = os.path.abspath(os.path.dirname(__file__))
+
 # -- General configuration ------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
@@ -26,6 +31,7 @@
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
+    "myst_parser",
     "sphinx.ext.autodoc",
     "sphinx.ext.intersphinx",
     "sphinx.ext.napoleon",
@@ -114,7 +120,7 @@ todo_include_todos = False
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-# html_theme = 'alabaster'
+html_theme = "pydata_sphinx_theme"
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -216,7 +222,13 @@ htmlhelp_basename = "nbformatdoc"
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, "nbformat.tex", "nbformat Documentation", "Jupyter Development Team", "manual"),
+    (
+        master_doc,
+        "nbformat.tex",
+        "nbformat Documentation",
+        "Jupyter Development Team",
+        "manual",
+    ),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -287,3 +299,8 @@ intersphinx_mapping = {
     "nbconvert": ("https://nbconvert.readthedocs.org/en/stable", None),
     "notebook": ("https://jupyter-notebook.readthedocs.org/en/stable", None),
 }
+
+
+def setup(_):
+    dest = os.path.join(HERE, "changelog.md")
+    shutil.copy(os.path.join(HERE, "..", "CHANGELOG.md"), dest)

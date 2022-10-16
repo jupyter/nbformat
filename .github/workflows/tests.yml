@@ -2,6 +2,7 @@ name: Run tests
 
 on:
   push:
+    branches: ["main"]
   pull_request:
   schedule:
     - cron: "0 8 * * *"
@@ -25,45 +26,16 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
-      - name: Install test dependencies
-        run: |
-          pip install .[test]
-          pip install codecov pytest-cov
-      - name: Install nbformat
-        run: |
-          pip install . ${{ matrix.EXTRA_DEPS }}
-          pip freeze
-      - name: List dependencies
-        run: pip list
-      - name: Run tests
-        run: python -m pytest -v --cov=nbformat --cov-report term-missing:skip-covered --no-cov-on-fail
-      - name: Coverage
-        run: codecov
-      - name: Bump version test
-        run: |
-          pip install pipx
-          pipx run hatch version 100.100.100
+      - run: hatch run cov:test
+      - run: codecov
+      - run: hatch version 100.100.100
 
-  # Run "pre-commit run --all-files --hook-stage=manual"
   pre-commit:
     runs-on: ubuntu-20.04
-    timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
-      - uses: pre-commit/action@v2.0.0
-        with:
-          extra_args: --all-files --hook-stage=manual
-      - name: Help message if pre-commit fail
-        if: ${{ failure() }}
-        run: |
-          echo "You can install pre-commit hooks to automatically run formatting"
-          echo "on each commit with:"
-          echo "    pre-commit install"
-          echo "or you can run by hand on staged files with"
-          echo "    pre-commit run"
-          echo "or after-the-fact on already committed files with"
-          echo "    pre-commit run --all-files --hook-stage=manual"
+      - uses: jupyterlab/maintainer-tools/.github/actions/pre-commit@v1
 
   docs:
     runs-on: ubuntu-latest
@@ -71,12 +43,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
       - name: Test docs
-        run: |
-          pip install .
-          cd docs
-          pip install -r requirements.txt
-          make html SPHINXOPTS="-W"
-          make linkcheck
+        run: hatch run docs:build
 
   test_minimum_versions:
     name: Test Minimum Versions
