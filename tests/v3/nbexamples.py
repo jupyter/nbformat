@@ -103,7 +103,10 @@ ws.cells.append(
 
 authors = [
     new_author(
-        name="Bart Simpson", email="bsimpson@fox.com", affiliation="Fox", url="http://www.fox.com"
+        name="Bart Simpson",
+        email="bsimpson@fox.com",
+        affiliation="Fox",
+        url="http://www.fox.com",
     )
 ]
 md = new_metadata(

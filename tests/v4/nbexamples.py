@@ -84,7 +84,11 @@ cells.append(
                     "application/vnd.listofstr+json": ["a", "b", "c"],
                     "application/vnd.numbers+json": [1, 2, 3],
                     "application/vnd.number+json": 42,
-                    "application/vnd.object+json": {"number": 5, "array": [1, 2], "str": "x"},
+                    "application/vnd.object+json": {
+                        "number": 5,
+                        "array": [1, 2],
+                        "str": "x",
+                    },
                     "application/vnd.string+json": "ok",
                 },
             )

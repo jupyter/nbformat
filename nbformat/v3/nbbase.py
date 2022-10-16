@@ -129,7 +129,12 @@ def new_output(
 
 
 def new_code_cell(
-    input=None, prompt_number=None, outputs=None, language="python", collapsed=False, metadata=None
+    input=None,
+    prompt_number=None,
+    outputs=None,
+    language="python",
+    collapsed=False,
+    metadata=None,
 ):
     """Create a new code cell with input and output"""
     cell = NotebookNode()

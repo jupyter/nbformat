@@ -3,6 +3,7 @@
 ## Prerequisites
 
 - First check that the docs/changelog.rst is up to date for the next release version
+
 - If you have a schema version change, you need to bump the schema version manually:
   First copy `nbformat/v4/nbformat/.v4.schema.json` to `nbformat/v4/nbformat/.v4.<new_minor_version_here>schema.json`.
   Then edit the top of `nbformat/v4/nbbase.py`:

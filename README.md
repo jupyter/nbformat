@@ -4,12 +4,10 @@
 [![Code Health](https://landscape.io/github/jupyter/nbformat/master/landscape.svg?style=flat)](https://landscape.io/github/jupyter/nbformat/master)
 ![CI Tests](https://github.com/jupyter/nbformat/workflows/Run%20tests/badge.svg)
 
-`nbformat` contains the reference implementation of the [Jupyter Notebook format][],
+`nbformat` contains the reference implementation of the [Jupyter Notebook format],
 and Python APIs for working with notebooks.
 
 There is also a JSON schema for notebook format versions >= 3.
-
-[jupyter notebook format]: https://nbformat.readthedocs.org/en/latest/format_description.html
 
 ## Installation
 
@@ -30,3 +28,5 @@ This library supported Python 2.7 and Python 3.5+ for `4.x.x` releases. With Pyt
 ## Contributing
 
 Read [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines on how to setup a local development environment and make code changes back to nbformat.
+
+[jupyter notebook format]: https://nbformat.readthedocs.org/en/latest/format_description.html

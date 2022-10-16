@@ -80,6 +80,12 @@ ARGS = "-vv --cov nbformat --cov-branch --cov-report term-missing:skip-covered"
 [tool.hatch.envs.cov.scripts]
 test = "python -m pytest $ARGS --cov-fail-under 75 {args}"
 
+[tool.black]
+line_length = 100
+
+[tool.isort]
+profile = "black"
+
 [tool.pytest.ini_options]
 addopts = "-raXs --durations 10 --color=yes --doctest-modules"
 testpaths = [
