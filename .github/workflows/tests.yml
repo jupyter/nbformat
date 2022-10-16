@@ -30,7 +30,14 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
-      - run: hatch run cov:test
+      - name: Run the tests
+        if: ${{ !startsWith(matrix.python-version, 'pypy') && !startsWith(matrix.os, 'windows') }}
+        run: |
+          hatch run cov:test || hatch run test:test --lf
+      - name: Run the tests on pypy and windows
+        if: ${{ startsWith(matrix.python-version, 'pypy') || startsWith(matrix.os, 'windows') }}
+        run:
+          hatch run test:test || hatch run test:test --lf
       - name: Codecov
         run: |
           pip install codecov
