@@ -7,6 +7,10 @@ on:
   schedule:
     - cron: "0 8 * * *"
 
+defaults:
+  run:
+    shell: bash -eux {0}
+
 jobs:
   tests:
     runs-on: ${{ matrix.os }}
