@@ -10,7 +10,7 @@ from tempfile import TemporaryDirectory
 from typing import Any, Dict
 
 from jsonschema import ValidationError
-from pep440 import is_canonical  # type: ignore
+from pep440 import is_canonical
 
 from nbformat import __version__ as nbf_version
 from nbformat import current_nbformat, read, write, writes

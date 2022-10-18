@@ -102,7 +102,8 @@ def test_invalid_raw_cell():
 def test_sample_notebook():
     here = os.path.dirname(__file__)
     with open(
-        os.path.join(here, os.pardir, os.pardir, "tests", "test4.ipynb"), encoding="utf-8"
+        os.path.join(here, os.pardir, os.pardir, "tests", "test4.ipynb"),
+        encoding="utf-8",
     ) as f:
         nb = reads(f.read())
     validate4(nb)

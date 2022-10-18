@@ -41,6 +41,12 @@ content-type = "text/plain"
 Homepage = "https://jupyter.org"
 
 [project.optional-dependencies]
+docs = [
+"myst_parser",
+"pydata_sphinx_theme",
+"sphinx",
+"sphinxcontrib_github_alt"
+]
 test = [
     "check-manifest",
     "testpath",
@@ -54,6 +60,31 @@ jupyter-trust = "nbformat.sign:TrustNotebookApp.launch_instance"
 
 [tool.hatch.version]
 source = "nodejs"
+
+[tool.hatch.envs.docs]
+features = ["docs"]
+[tool.hatch.envs.docs.scripts]
+build = "make -C docs html SPHINXOPTS='-W'"
+
+[tool.hatch.envs.test]
+features = ["test"]
+[tool.hatch.envs.test.scripts]
+test = "python -m pytest -vv {args}"
+nowarn = "python -m pytest -vv -W default {args}"
+
+[tool.hatch.envs.cov]
+features = ["test"]
+dependencies = ["coverage", "pytest-cov"]
+[tool.hatch.envs.cov.env-vars]
+ARGS = "-vv --cov nbformat --cov-branch --cov-report term-missing:skip-covered"
+[tool.hatch.envs.cov.scripts]
+test = "python -m pytest $ARGS --cov-fail-under 75 {args}"
+
+[tool.black]
+line_length = 100
+
+[tool.isort]
+profile = "black"
 
 [tool.pytest.ini_options]
 addopts = "-raXs --durations 10 --color=yes --doctest-modules"
@@ -88,3 +119,27 @@ module = [
     "testpath"
 ]
 ignore_missing_imports = true
+
+[tool.flake8]
+ignore = "E501, W503, E402"
+builtins = "c, get_config"
+exclude = [
+    ".cache",
+    ".github",
+    "docs",
+    "setup.py",
+]
+enable-extensions = "G"
+extend-ignore = [
+    "G001", "G002", "G004", "G200", "G201", "G202",
+    # black adds spaces around ':'
+    "E203",
+]
+per-file-ignores = [
+    # B011: Do not call assert False since python -O removes these calls
+    # F841 local variable 'foo' is assigned to but never used
+    # B007 Loop control variable 'foo' not used within the loop body
+    "tests/*: B011", "F841", "B007",
+    # F401 '.foo' imported but unused
+    "nbformat/*/__init__.py: F401",
+]

@@ -633,7 +633,11 @@ def iter_validate(
     if ref:
         try:
             errors = _get_errors(
-                nbdict, version, version_minor, relax_add_props, {"$ref": "#/definitions/%s" % ref}
+                nbdict,
+                version,
+                version_minor,
+                relax_add_props,
+                {"$ref": "#/definitions/%s" % ref},
             )
         except ValidationError as e:
             yield e

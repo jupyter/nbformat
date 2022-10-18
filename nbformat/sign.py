@@ -369,7 +369,9 @@ class NotebookNotary(LoggingConfigurable):
         return os.path.join(self.data_dir, "nbsignatures.db")
 
     algorithm = Enum(
-        algorithms, default_value="sha256", help="""The hashing algorithm used to sign notebooks."""
+        algorithms,
+        default_value="sha256",
+        help="""The hashing algorithm used to sign notebooks.""",
     ).tag(config=True)
 
     @observe("algorithm")
