@@ -1,4 +1,5 @@
-# Changes in nbformat {#changelog}
+(changelog)=
+# Changes in nbformat
 
 ## 5.7.0
 
