@@ -23,22 +23,11 @@ warnings.warn(
 from traitlets.log import get_logger
 
 from nbformat import v3 as _v_latest
-from nbformat.v3 import (
-    NotebookNode,
-    nbformat,
-    nbformat_minor,
-    nbformat_schema,
-    new_author,
-    new_code_cell,
-    new_heading_cell,
-    new_metadata,
-    new_notebook,
-    new_output,
-    new_text_cell,
-    new_worksheet,
-    parse_filename,
-    to_notebook_json,
-)
+from nbformat.v3 import (NotebookNode, nbformat, nbformat_minor,
+                         nbformat_schema, new_author, new_code_cell,
+                         new_heading_cell, new_metadata, new_notebook,
+                         new_output, new_text_cell, new_worksheet,
+                         parse_filename, to_notebook_json)
 
 from . import versions
 from .converter import convert

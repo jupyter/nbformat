@@ -23,18 +23,8 @@ except ImportError:
 from base64 import encodebytes
 
 from jupyter_core.application import JupyterApp, base_flags
-from traitlets import (
-    Any,
-    Bool,
-    Bytes,
-    Callable,
-    Enum,
-    Instance,
-    Integer,
-    Unicode,
-    default,
-    observe,
-)
+from traitlets import (Any, Bool, Bytes, Callable, Enum, Instance, Integer,
+                       Unicode, default, observe)
 from traitlets.config import LoggingConfigurable, MultipleInstanceError
 
 from . import NO_CONVERT, __version__, read, reads

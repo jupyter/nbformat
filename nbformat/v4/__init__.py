@@ -19,17 +19,9 @@ __all__ = [
     "upgrade",
 ]
 
-from .nbbase import (
-    nbformat,
-    nbformat_minor,
-    nbformat_schema,
-    new_code_cell,
-    new_markdown_cell,
-    new_notebook,
-    new_output,
-    new_raw_cell,
-    output_from_msg,
-)
+from .nbbase import (nbformat, nbformat_minor, nbformat_schema, new_code_cell,
+                     new_markdown_cell, new_notebook, new_output, new_raw_cell,
+                     output_from_msg)
 from .nbjson import reads, to_notebook, writes
 
 reads_json = reads

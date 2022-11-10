@@ -7,13 +7,8 @@ import copy
 import json
 
 from ..notebooknode import from_dict
-from .rwbase import (
-    NotebookReader,
-    NotebookWriter,
-    rejoin_lines,
-    split_lines,
-    strip_transient,
-)
+from .rwbase import (NotebookReader, NotebookWriter, rejoin_lines, split_lines,
+                     strip_transient)
 
 
 class BytesEncoder(json.JSONEncoder):

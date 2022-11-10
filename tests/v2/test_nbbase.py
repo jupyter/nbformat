@@ -1,15 +1,8 @@
 from unittest import TestCase
 
-from nbformat.v2.nbbase import (
-    NotebookNode,
-    new_author,
-    new_code_cell,
-    new_metadata,
-    new_notebook,
-    new_output,
-    new_text_cell,
-    new_worksheet,
-)
+from nbformat.v2.nbbase import (NotebookNode, new_author, new_code_cell,
+                                new_metadata, new_notebook, new_output,
+                                new_text_cell, new_worksheet)
 
 
 class TestCell(TestCase):

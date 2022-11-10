@@ -7,7 +7,8 @@ import os
 
 import pytest
 
-from nbformat.v4.nbbase import nbformat, new_code_cell, new_markdown_cell, new_raw_cell
+from nbformat.v4.nbbase import (nbformat, new_code_cell, new_markdown_cell,
+                                new_raw_cell)
 from nbformat.v4.nbjson import reads
 from nbformat.validator import ValidationError, validate
 

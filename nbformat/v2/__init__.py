@@ -19,16 +19,8 @@ Authors:
 import os
 
 from .convert import downgrade, upgrade
-from .nbbase import (
-    NotebookNode,
-    new_author,
-    new_code_cell,
-    new_metadata,
-    new_notebook,
-    new_output,
-    new_text_cell,
-    new_worksheet,
-)
+from .nbbase import (NotebookNode, new_author, new_code_cell, new_metadata,
+                     new_notebook, new_output, new_text_cell, new_worksheet)
 from .nbjson import reads as read_json
 from .nbjson import reads as reads_json
 from .nbjson import to_notebook as to_notebook_json
@@ -39,7 +31,6 @@ from .nbpy import reads as reads_py
 from .nbpy import to_notebook as to_notebook_py
 from .nbpy import writes as write_py
 from .nbpy import writes as writes_py
-
 # Implementation removed, vulnerable to DoS attacks
 from .nbxml import reads as read_xml
 from .nbxml import reads as reads_xml
