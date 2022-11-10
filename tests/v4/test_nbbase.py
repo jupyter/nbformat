@@ -1,8 +1,14 @@
 """Tests for the Python API for composing notebook elements"""
 
-from nbformat.v4.nbbase import (NotebookNode, nbformat, new_code_cell,
-                                new_markdown_cell, new_notebook, new_output,
-                                new_raw_cell)
+from nbformat.v4.nbbase import (
+    NotebookNode,
+    nbformat,
+    new_code_cell,
+    new_markdown_cell,
+    new_notebook,
+    new_output,
+    new_raw_cell,
+)
 
 
 def test_empty_notebook():

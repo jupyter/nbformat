@@ -35,9 +35,20 @@ __all__ = [
 import os
 
 from .convert import downgrade, upgrade
-from .nbbase import (NotebookNode, nbformat, nbformat_minor, nbformat_schema,
-                     new_author, new_code_cell, new_heading_cell, new_metadata,
-                     new_notebook, new_output, new_text_cell, new_worksheet)
+from .nbbase import (
+    NotebookNode,
+    nbformat,
+    nbformat_minor,
+    nbformat_schema,
+    new_author,
+    new_code_cell,
+    new_heading_cell,
+    new_metadata,
+    new_notebook,
+    new_output,
+    new_text_cell,
+    new_worksheet,
+)
 from .nbjson import reads as read_json
 from .nbjson import reads as reads_json
 from .nbjson import to_notebook as to_notebook_json

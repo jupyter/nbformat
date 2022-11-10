@@ -1,8 +1,13 @@
 import os
 from base64 import encodebytes
 
-from nbformat.v4.nbbase import (new_code_cell, new_markdown_cell, new_notebook,
-                                new_output, new_raw_cell)
+from nbformat.v4.nbbase import (
+    new_code_cell,
+    new_markdown_cell,
+    new_notebook,
+    new_output,
+    new_raw_cell,
+)
 
 # some random base64-encoded *text*
 png = encodebytes(os.urandom(5)).decode("ascii")

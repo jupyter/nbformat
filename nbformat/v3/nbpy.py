@@ -19,8 +19,15 @@ Authors:
 import re
 from typing import List
 
-from .nbbase import (nbformat, nbformat_minor, new_code_cell, new_heading_cell,
-                     new_notebook, new_text_cell, new_worksheet)
+from .nbbase import (
+    nbformat,
+    nbformat_minor,
+    new_code_cell,
+    new_heading_cell,
+    new_notebook,
+    new_text_cell,
+    new_worksheet,
+)
 from .rwbase import NotebookReader, NotebookWriter
 
 # -----------------------------------------------------------------------------
