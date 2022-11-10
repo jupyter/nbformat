@@ -93,7 +93,7 @@ testpaths = [
 ]
 filterwarnings = [
     "error",
-    "ignore:Using or importing the ABCs from 'collections':DeprecationWarning:jsonschema"
+    "ignore:Using or importing the ABCs from 'collections':DeprecationWarning:jsonschema",
     "module:Jupyter is migrating its paths to use standard platformdirs:DeprecationWarning",
 ]
 
