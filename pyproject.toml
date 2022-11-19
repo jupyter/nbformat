@@ -18,7 +18,8 @@ classifiers = [
     "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10"
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11"
 ]
 requires-python = ">=3.7"
 dependencies = [
@@ -70,15 +71,14 @@ build = "make -C docs html SPHINXOPTS='-W'"
 features = ["test"]
 [tool.hatch.envs.test.scripts]
 test = "python -m pytest -vv {args}"
-nowarn = "python -m pytest -vv -W default {args}"
+nowarn = "test -W default {args}"
 
 [tool.hatch.envs.cov]
 features = ["test"]
 dependencies = ["coverage", "pytest-cov"]
-[tool.hatch.envs.cov.env-vars]
-ARGS = "-vv --cov nbformat --cov-branch --cov-report term-missing:skip-covered"
 [tool.hatch.envs.cov.scripts]
-test = "python -m pytest $ARGS --cov-fail-under 75 {args}"
+test = "python -m pytest -vv --cov nbformat --cov-branch --cov-report term-missing:skip-covered {args}"
+nowarn = "test -W default {args}"
 
 [tool.black]
 line_length = 100
@@ -114,9 +114,7 @@ warn_redundant_casts = true
 module = [
     "fastjsonschema",
     "jsonschema",
-    "jupyter_core.*",
     "pysqlite2",
-    "traitlets.*",
     "testpath"
 ]
 ignore_missing_imports = true

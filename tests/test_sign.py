@@ -265,4 +265,4 @@ class SignatureStoreTests(unittest.TestCase):
 
 class SQLiteSignatureStoreTests(SignatureStoreTests):
     def setUp(self):
-        self.store = sign.SQLiteSignatureStore(":memory:")
+        self.store = sign.SQLiteSignatureStore(":memory:")  # type:ignore[assignment]
