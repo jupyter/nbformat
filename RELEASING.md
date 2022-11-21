@@ -2,8 +2,6 @@
 
 ## Prerequisites
 
-- First check that the docs/changelog.rst is up to date for the next release version
-
 - If you have a schema version change, you need to bump the schema version manually:
   First copy `nbformat/v4/nbformat/.v4.schema.json` to `nbformat/v4/nbformat/.v4.<new_minor_version_here>schema.json`.
   Then edit the top of `nbformat/v4/nbbase.py`:
@@ -29,7 +27,14 @@
 
   If you do one of these steps but not the others it will fail many tests.
 
-## Update version
+## Automated Release
+
+The recommended way to make a release is to use [`jupyter_releaser`](https://github.com/jupyter-server/jupyter_releaser) from this repository.
+
+- Run the "Step 1: Prep Release" workflow with the appropriate inputs.
+- Review the changelog in the draft GitHub release created in Step 1.
+
+## Manual Release
 
 We use [hatch](https://hatch.pypa.io/latest/version/) to manage versions.
 
@@ -47,12 +52,6 @@ git tag -a <new_version> -m "<new_version>"
 git push upstream master
 git push upstream --tags
 ```
-
-## Publish packages
-
-PyPI and NPM packages will be built and published on CI when a tag is pushed.
-
-## Manual publish procedure
 
 ### Push to PyPI
 
