@@ -74,7 +74,9 @@ def reads(s, **kwargs):
         try:
             return versions[major].to_notebook_json(nb_dict, minor=minor)
         except AttributeError as e:
-            raise ValidationError(f"The notebook is invalid and is missing an expected key: {e}")
+            raise ValidationError(
+                f"The notebook is invalid and is missing an expected key: {e}"
+            ) from None
     else:
         raise NBFormatError("Unsupported nbformat version %s" % major)
 

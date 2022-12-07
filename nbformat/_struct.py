@@ -102,7 +102,7 @@ class Struct(dict):
         try:
             self.__setitem__(key, value)
         except KeyError as e:
-            raise AttributeError(e)
+            raise AttributeError(e) from None
 
     def __getattr__(self, key):
         """Get an attr by calling :meth:`dict.__getitem__`.
@@ -127,7 +127,7 @@ class Struct(dict):
         try:
             result = self[key]
         except KeyError:
-            raise AttributeError(key)
+            raise AttributeError(key) from None
         else:
             return result
 

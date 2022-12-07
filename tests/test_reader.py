@@ -17,6 +17,7 @@ from nbformat.validator import ValidationError
 
 from .base import TestsBase
 
+
 # -----------------------------------------------------------------------------
 # Classes and functions
 # -----------------------------------------------------------------------------

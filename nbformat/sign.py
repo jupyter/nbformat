@@ -23,18 +23,7 @@ except ImportError:
 from base64 import encodebytes
 
 from jupyter_core.application import JupyterApp, base_flags
-from traitlets import (
-    Any,
-    Bool,
-    Bytes,
-    Callable,
-    Enum,
-    Instance,
-    Integer,
-    Unicode,
-    default,
-    observe,
-)
+from traitlets import Any, Bool, Bytes, Callable, Enum, Instance, Integer, Unicode, default, observe
 from traitlets.config import LoggingConfigurable, MultipleInstanceError
 
 from . import NO_CONVERT, __version__, read, reads
@@ -139,9 +128,9 @@ class SQLiteSignatureStore(SignatureStore, LoggingConfigurable):
             self.db.close()
 
     def _connect_db(self, db_file):
-        kwargs: t.Dict[str, t.Any] = dict(
-            detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES
-        )
+        kwargs: t.Dict[str, t.Any] = {
+            "detect_types": sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES
+        }
         db = None
         try:
             db = sqlite3.connect(db_file, **kwargs)

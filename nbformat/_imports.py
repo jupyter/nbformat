@@ -33,7 +33,7 @@ def import_item(name):
         try:
             pak = getattr(module, obj)
         except AttributeError:
-            raise ImportError("No module named %s" % obj)
+            raise ImportError("No module named %s" % obj) from None
         return pak
     else:
         # called with un-dotted string
