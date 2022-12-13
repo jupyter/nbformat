@@ -47,7 +47,7 @@ class FastJsonSchemaValidator(JsonSchemaValidator):
         try:
             self._validator(data)
         except _JsonSchemaException as error:
-            raise ValidationError(str(error), schema_path=error.path)
+            raise ValidationError(str(error), schema_path=error.path) from error
 
     def iter_errors(self, data, schema=None):
         if schema is not None:

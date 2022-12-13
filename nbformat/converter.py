@@ -62,7 +62,7 @@ def convert(nb, to_version):
         except AttributeError as e:
             raise ValidationError(
                 f"Notebook could not be converted from version {version} to version {step_version} because it's missing a key: {e}"
-            )
+            ) from None
 
         # Recursively convert until target version is reached.
         return convert(converted, to_version)
