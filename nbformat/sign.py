@@ -528,7 +528,7 @@ class NotebookNotary(LoggingConfigurable):
         return trusted
 
 
-trust_flags = {
+trust_flags: dict = {
     "reset": (
         {"TrustNotebookApp": {"reset": True}},
         """Delete the trusted notebook cache.

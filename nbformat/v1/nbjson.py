@@ -21,7 +21,6 @@ import json
 from .nbbase import from_dict
 from .rwbase import NotebookReader, NotebookWriter
 
-
 # -----------------------------------------------------------------------------
 # Code
 # -----------------------------------------------------------------------------
