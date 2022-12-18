@@ -29,6 +29,7 @@ __all__ = [
     "write",
     "version_info",
     "__version__",
+    "Sentinel",
 ]
 
 versions = {
