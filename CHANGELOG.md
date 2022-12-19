@@ -2,14 +2,43 @@
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 5.7.1
+
+([Full Changelog](https://github.com/jupyter/nbformat/compare/5.7.0...45ff0cd6dbc5e46a3b620124deeda00aaeebfa29))
+
+### Maintenance and upkeep improvements
+
+- Expose more attributes for typing [#337](https://github.com/jupyter/nbformat/pull/337) ([@blink1073](https://github.com/blink1073))
+- Fix lint [#336](https://github.com/jupyter/nbformat/pull/336) ([@blink1073](https://github.com/blink1073))
+- Adopt ruff and address lint [#333](https://github.com/jupyter/nbformat/pull/333) ([@blink1073](https://github.com/blink1073))
+- Use base setup dependency type [#329](https://github.com/jupyter/nbformat/pull/329) ([@blink1073](https://github.com/blink1073))
+- Switch to using Jupyter Releaser [#326](https://github.com/jupyter/nbformat/pull/326) ([@blink1073](https://github.com/blink1073))
+- More maintenance cleanup [#325](https://github.com/jupyter/nbformat/pull/325) ([@blink1073](https://github.com/blink1073))
+- Handle warning from jupyter client [#322](https://github.com/jupyter/nbformat/pull/322) ([@blink1073](https://github.com/blink1073))
+- Add dependabot [#320](https://github.com/jupyter/nbformat/pull/320) ([@blink1073](https://github.com/blink1073))
+- Clean up docs and maintenance [#314](https://github.com/jupyter/nbformat/pull/314) ([@blink1073](https://github.com/blink1073))
+
+### Documentation improvements
+
+- Fix changelog target [#321](https://github.com/jupyter/nbformat/pull/321) ([@chrisjsewell](https://github.com/chrisjsewell))
+- Clean up docs and maintenance [#314](https://github.com/jupyter/nbformat/pull/314) ([@blink1073](https://github.com/blink1073))
+
+### Other merged PRs
+
+### Contributors to this release
+
+([GitHub contributors page for this release](https://github.com/jupyter/nbformat/graphs/contributors?from=2022-10-10&to=2022-12-19&type=c))
+
+[@blink1073](https://github.com/search?q=repo%3Ajupyter%2Fnbformat+involves%3Ablink1073+updated%3A2022-10-10..2022-12-19&type=Issues) | [@chrisjsewell](https://github.com/search?q=repo%3Ajupyter%2Fnbformat+involves%3Achrisjsewell+updated%3A2022-10-10..2022-12-19&type=Issues) | [@pre-commit-ci](https://github.com/search?q=repo%3Ajupyter%2Fnbformat+involves%3Apre-commit-ci+updated%3A2022-10-10..2022-12-19&type=Issues)
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 # Changes in nbformat
 
 ## 5.7.0
 
 - Always use jsonschema to handle error reporting.
 - Fix deprecation warning suggestion.
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 5.6.1
 
