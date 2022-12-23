@@ -1,9 +1,9 @@
-# Copyright (c) Jupyter Development Team.
-# Distributed under the terms of the Modified BSD License.
 """
 Common validator wrapper to provide a uniform usage of other schema validation
 libraries.
 """
+# Copyright (c) Jupyter Development Team.
+# Distributed under the terms of the Modified BSD License.
 
 import os
 
@@ -15,17 +15,22 @@ from jsonschema import ErrorTree, ValidationError
 
 
 class JsonSchemaValidator:
+    """A json schema validator."""
+
     name = "jsonschema"
 
     def __init__(self, schema):
+        """Initialize the validator."""
         self._schema = schema
         self._default_validator = _JsonSchemaValidator(schema)  # Default
         self._validator = self._default_validator
 
     def validate(self, data):
+        """Validate incoming data."""
         self._default_validator.validate(data)
 
     def iter_errors(self, data, schema=None):
+        """Iterate over errors in incoming data."""
         if schema is None:
             return self._default_validator.iter_errors(data)
         if hasattr(self._default_validator, "evolve"):
@@ -33,23 +38,29 @@ class JsonSchemaValidator:
         return self._default_validator.iter_errors(data, schema)
 
     def error_tree(self, errors):
+        """Create an error tree for the errors."""
         return ErrorTree(errors=errors)
 
 
 class FastJsonSchemaValidator(JsonSchemaValidator):
+    """A schema validator using fastjsonschema."""
+
     name = "fastjsonschema"
 
     def __init__(self, schema):
+        """Initialize the validator."""
         super().__init__(schema)
         self._validator = fastjsonschema.compile(schema)
 
     def validate(self, data):
+        """Validate incoming data."""
         try:
             self._validator(data)
         except _JsonSchemaException as error:
             raise ValidationError(str(error), schema_path=error.path) from error
 
     def iter_errors(self, data, schema=None):
+        """Iterate over errors in incoming data."""
         if schema is not None:
             return super().iter_errors(data, schema)
 
@@ -63,6 +74,7 @@ class FastJsonSchemaValidator(JsonSchemaValidator):
         return errors
 
     def error_tree(self, errors):
+        """Create an error tree for the errors."""
         # fastjsonschema's exceptions don't contain the same information that the jsonschema ValidationErrors
         # do. This method is primarily used for introspecting metadata schema failures so that we can strip
         # them if asked to do so in `nbformat.validate`.

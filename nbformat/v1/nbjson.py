@@ -27,7 +27,10 @@ from .rwbase import NotebookReader, NotebookWriter
 
 
 class JSONReader(NotebookReader):
+    """A JSON notebook reader."""
+
     def reads(self, s, **kwargs):
+        """Convert a string to a notebook object."""
         nb = json.loads(s, **kwargs)
         return self.to_notebook(nb, **kwargs)
 
@@ -37,7 +40,10 @@ class JSONReader(NotebookReader):
 
 
 class JSONWriter(NotebookWriter):
+    """A JSON notebook writer."""
+
     def writes(self, nb, **kwargs):
+        """Convert a notebook object to a string."""
         kwargs["indent"] = 4
         return json.dumps(nb, **kwargs)
 

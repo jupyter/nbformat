@@ -1,3 +1,4 @@
+"""Notebook format validators."""
 # Copyright (c) IPython Development Team.
 # Distributed under the terms of the Modified BSD License.
 
@@ -182,11 +183,13 @@ class NotebookValidationError(ValidationError):
     """
 
     def __init__(self, original, ref=None):
+        """Initialize the error class."""
         self.original = original
         self.ref = getattr(self.original, "ref", ref)
         self.message = self.original.message
 
     def __getattr__(self, key):
+        """Get an attribute from the error."""
         return getattr(self.original, key)
 
     def __unicode__(self):

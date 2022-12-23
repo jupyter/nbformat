@@ -22,6 +22,8 @@ Authors:
 
 
 class NotebookReader:
+    """The base notebook reader."""
+
     def reads(self, s, **kwargs):
         """Read a notebook from a string."""
         raise NotImplementedError("loads must be implemented in a subclass")
@@ -32,6 +34,8 @@ class NotebookReader:
 
 
 class NotebookWriter:
+    """The base notebook writer."""
+
     def writes(self, nb, **kwargs):
         """Write a notebook to a string."""
         raise NotImplementedError("loads must be implemented in a subclass")

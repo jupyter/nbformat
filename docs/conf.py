@@ -37,6 +37,13 @@ extensions = [
     "sphinx.ext.napoleon",
 ]
 
+try:
+    import enchant  # type:ignore  # noqa
+
+    extensions += ["sphinxcontrib.spelling"]
+except ImportError:
+    pass
+
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
 

@@ -24,10 +24,13 @@ nbformat_schema = {(3, 0): "nbformat.v3.schema.json"}
 
 
 class NotebookNode(Struct):
+    """A notebook node object."""
+
     pass
 
 
 def from_dict(d):
+    """Create notebook node(s) from an object."""
     if isinstance(d, dict):
         newd = NotebookNode()
         for k, v in d.items():
@@ -48,6 +51,7 @@ def str_passthrough(obj):
 
 
 def cast_str(obj):
+    """Cast an object as a string."""
     if isinstance(obj, bytes):
         # really this should never happend, it should
         # have been base64 encoded before.

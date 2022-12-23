@@ -30,14 +30,20 @@ _encoding_declaration_re = re.compile(r"^#.*coding[:=]\s*([-\w.]+)")
 
 
 class PyReaderError(Exception):
+    """An error raised by the PyReader."""
+
     pass
 
 
 class PyReader(NotebookReader):
+    """A Python notebook reader."""
+
     def reads(self, s, **kwargs):
+        """Convert a string to a notebook."""
         return self.to_notebook(s, **kwargs)
 
     def to_notebook(self, s, **kwargs):
+        """Convert a string to a notebook."""
         lines = s.splitlines()
         cells = []
         cell_lines: List[str] = []
@@ -74,6 +80,7 @@ class PyReader(NotebookReader):
         return nb
 
     def new_cell(self, state, lines):
+        """Create a new cell."""
         if state == "codecell":
             input = "\n".join(lines)
             input = input.strip("\n")
@@ -100,6 +107,7 @@ class PyReader(NotebookReader):
         return text
 
     def split_lines_into_blocks(self, lines):
+        """Split lines into code blocks."""
         if len(lines) == 1:
             yield lines[0]
             raise StopIteration()
@@ -114,7 +122,10 @@ class PyReader(NotebookReader):
 
 
 class PyWriter(NotebookWriter):
+    """A Python notebook writer."""
+
     def writes(self, nb, **kwargs):
+        """Convert a notebook object to a string."""
         lines = ["# -*- coding: utf-8 -*-"]
         lines.extend(["# <nbformat>2</nbformat>", ""])
         for ws in nb.worksheets:

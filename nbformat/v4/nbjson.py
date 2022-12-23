@@ -14,12 +14,15 @@ class BytesEncoder(json.JSONEncoder):
     """A JSON encoder that accepts b64 (and other *ascii*) bytestrings."""
 
     def default(self, obj):
+        """Get the default value of an object."""
         if isinstance(obj, bytes):
             return obj.decode("ascii")
         return json.JSONEncoder.default(self, obj)
 
 
 class JSONReader(NotebookReader):
+    """A JSON notebook reader."""
+
     def reads(self, s, **kwargs):
         """Read a JSON string into a Notebook object"""
         nb = json.loads(s, **kwargs)
@@ -38,6 +41,8 @@ class JSONReader(NotebookReader):
 
 
 class JSONWriter(NotebookWriter):
+    """A JSON notebook writer."""
+
     def writes(self, nb, **kwargs):
         """Serialize a NotebookNode object as a JSON string"""
         kwargs["cls"] = BytesEncoder

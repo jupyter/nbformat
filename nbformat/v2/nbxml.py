@@ -19,12 +19,15 @@ https://github.com/jupyter/nbformat/issues/132
 
 
 def reads(s, **kwargs):
+    """REMOVED"""
     raise Exception(REMOVED_MSG)
 
 
 def read(fp, **kwargs):
+    """REMOVED"""
     raise Exception(REMOVED_MSG)
 
 
 def to_notebook(root, **kwargs):
+    """REMOVED"""
     raise Exception(REMOVED_MSG)
