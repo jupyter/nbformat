@@ -73,11 +73,13 @@ class MemorySignatureStore(SignatureStore):
     cache_size = 65535
 
     def __init__(self):
+        """Initialize a memory signature store."""
         # We really only want an ordered set, but the stdlib has OrderedDict,
         # and it's easy to use a dict as a set.
         self.data = OrderedDict()
 
     def store_signature(self, digest, algorithm):
+        """Store a signature."""
         key = (digest, algorithm)
         # Pop it so it goes to the end when we reinsert it
         self.data.pop(key, None)
@@ -94,6 +96,7 @@ class MemorySignatureStore(SignatureStore):
             self.data.popitem(last=False)
 
     def check_signature(self, digest, algorithm):
+        """Check a signature."""
         key = (digest, algorithm)
         if key in self.data:
             # Move it to the end (.move_to_end() method is new in Py3)
@@ -103,6 +106,7 @@ class MemorySignatureStore(SignatureStore):
         return False
 
     def remove_signature(self, digest, algorithm):
+        """Remove a signature."""
         self.data.pop((digest, algorithm), None)
 
 
@@ -119,11 +123,13 @@ class SQLiteSignatureStore(SignatureStore, LoggingConfigurable):
     ).tag(config=True)
 
     def __init__(self, db_file, **kwargs):
+        """Initialize a sql signature store."""
         super().__init__(**kwargs)
         self.db_file = db_file
         self.db = self._connect_db(db_file)
 
     def close(self):
+        """Close the db."""
         if self.db is not None:
             self.db.close()
 
@@ -169,6 +175,7 @@ class SQLiteSignatureStore(SignatureStore, LoggingConfigurable):
         return db
 
     def init_db(self, db):
+        """Initialize the db."""
         db.execute(
             """
             CREATE TABLE IF NOT EXISTS nbsignatures
@@ -188,6 +195,7 @@ class SQLiteSignatureStore(SignatureStore, LoggingConfigurable):
         db.commit()
 
     def store_signature(self, digest, algorithm):
+        """Store a signature in the db."""
         if self.db is None:
             return
         if not self.check_signature(digest, algorithm):
@@ -214,6 +222,7 @@ class SQLiteSignatureStore(SignatureStore, LoggingConfigurable):
             self.cull_db()
 
     def check_signature(self, digest, algorithm):
+        """Check a signature against the db."""
         if self.db is None:
             return False
         r = self.db.execute(
@@ -236,6 +245,7 @@ class SQLiteSignatureStore(SignatureStore, LoggingConfigurable):
         return True
 
     def remove_signature(self, digest, algorithm):
+        """Remove a signature from the db."""
         self.db.execute(
             """DELETE FROM nbsignatures WHERE
                 algorithm = ? AND
@@ -395,6 +405,7 @@ class NotebookNotary(LoggingConfigurable):
             return secret
 
     def __init__(self, **kwargs):
+        """Initialize the notary."""
         super().__init__(**kwargs)
         self.store = self.store_factory()
 
@@ -540,6 +551,8 @@ trust_flags.update(base_flags)
 
 
 class TrustNotebookApp(JupyterApp):
+    """An application for handling notebook trust."""
+
     version = __version__
     description = """Sign one or more Jupyter notebooks with your key,
     to trust their dynamic (HTML, Javascript) output.
@@ -594,6 +607,7 @@ class TrustNotebookApp(JupyterApp):
         self.notary._write_secret_file(os.urandom(1024))
 
     def start(self):
+        """Start the trust notebook app."""
         if self.reset:
             if os.path.exists(self.notary.db_file):
                 print("Removing trusted signature cache: %s" % self.notary.db_file)

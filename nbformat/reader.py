@@ -9,6 +9,8 @@ from .validator import ValidationError
 
 
 class NotJSONError(ValueError):
+    """An error raised when an object is not valid JSON."""
+
     pass
 
 

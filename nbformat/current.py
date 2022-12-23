@@ -80,6 +80,8 @@ current_nbformat_module = _v_latest.__name__
 
 
 class NBFormatError(ValueError):
+    """An error raised for an nbformat error."""
+
     pass
 
 

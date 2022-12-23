@@ -1,3 +1,4 @@
+"""The version information for nbformat."""
 # Use "hatchling version xx.yy.zz" to handle version changes
 import re
 

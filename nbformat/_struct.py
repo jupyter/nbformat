@@ -1,8 +1,3 @@
-"""
-Vendoring of old ipython_genutils Struct
-"""
-
-
 """A dict subclass that supports attribute style access.
 
 Can probably be replaced by types.SimpleNamespace from Python 3.3
@@ -206,6 +201,7 @@ class Struct(dict):
         return outdict
 
     def dict(self):
+        """Get the dict representation of the struct."""
         return self
 
     def copy(self):

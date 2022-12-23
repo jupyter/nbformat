@@ -9,6 +9,7 @@ class NotebookNode(Struct):
     """A dict-like node with attribute-access"""
 
     def __setitem__(self, key, value):
+        """Set an item on the notebook."""
         if isinstance(value, Mapping) and not isinstance(value, NotebookNode):
             value = from_dict(value)
         super().__setitem__(key, value)

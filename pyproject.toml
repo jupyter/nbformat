@@ -46,7 +46,8 @@ docs = [
 "myst_parser",
 "pydata_sphinx_theme",
 "sphinx",
-"sphinxcontrib_github_alt"
+"sphinxcontrib_github_alt",
+"sphinxcontrib-spelling",
 ]
 test = [
     "testpath",
@@ -209,3 +210,12 @@ unfixable = [
 "tests/*" = ["B011", "F841", "C408", "E402", "T201", "B007", "N802", "RUF001", "RUF002"]
 # F401 `nbxml.to_notebook` imported but unused
 "nbformat/*__init__.py" = ["F401"]
+
+[tool.interrogate]
+ignore-init-module=true
+ignore-private=true
+ignore-semiprivate=true
+ignore-property-decorators=true
+ignore-nested-functions=true
+ignore-nested-classes=true
+fail-under=100

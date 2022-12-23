@@ -24,10 +24,13 @@ from .._struct import Struct
 
 
 class NotebookNode(Struct):
+    """A notebook node object."""
+
     pass
 
 
 def from_dict(d):
+    """Create notebook node(s) from an object."""
     if isinstance(d, dict):
         newd = NotebookNode()
         for k, v in d.items():
