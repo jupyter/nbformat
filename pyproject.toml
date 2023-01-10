@@ -219,3 +219,6 @@ ignore-property-decorators=true
 ignore-nested-functions=true
 ignore-nested-classes=true
 fail-under=100
+
+[tool.check-wheel-contents]
+ignore = ["W002"]
