@@ -4,6 +4,28 @@
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 5.7.2
+
+([Full Changelog](https://github.com/jupyter/nbformat/compare/v5.7.1...30f3d81e7113ad7628443fc4cd389ca16b2d186a))
+
+### Bugs fixed
+
+- Only require nbformat_minor for v4 [#342](https://github.com/jupyter/nbformat/pull/342) ([@minrk](https://github.com/minrk))
+
+### Maintenance and upkeep improvements
+
+- Fix check release [#341](https://github.com/jupyter/nbformat/pull/341) ([@blink1073](https://github.com/blink1073))
+- Add spell checker and enforce docstrings [#339](https://github.com/jupyter/nbformat/pull/339) ([@blink1073](https://github.com/blink1073))
+- Fix docs build [#338](https://github.com/jupyter/nbformat/pull/338) ([@blink1073](https://github.com/blink1073))
+
+### Contributors to this release
+
+([GitHub contributors page for this release](https://github.com/jupyter/nbformat/graphs/contributors?from=2022-12-19&to=2023-01-11&type=c))
+
+[@blink1073](https://github.com/search?q=repo%3Ajupyter%2Fnbformat+involves%3Ablink1073+updated%3A2022-12-19..2023-01-11&type=Issues) | [@minrk](https://github.com/search?q=repo%3Ajupyter%2Fnbformat+involves%3Aminrk+updated%3A2022-12-19..2023-01-11&type=Issues) | [@pre-commit-ci](https://github.com/search?q=repo%3Ajupyter%2Fnbformat+involves%3Apre-commit-ci+updated%3A2022-12-19..2023-01-11&type=Issues)
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 5.7.1
 
 ([Full Changelog](https://github.com/jupyter/nbformat/compare/5.7.0...45ff0cd6dbc5e46a3b620124deeda00aaeebfa29))
@@ -32,8 +54,6 @@
 ([GitHub contributors page for this release](https://github.com/jupyter/nbformat/graphs/contributors?from=2022-10-10&to=2022-12-19&type=c))
 
 [@blink1073](https://github.com/search?q=repo%3Ajupyter%2Fnbformat+involves%3Ablink1073+updated%3A2022-10-10..2022-12-19&type=Issues) | [@chrisjsewell](https://github.com/search?q=repo%3Ajupyter%2Fnbformat+involves%3Achrisjsewell+updated%3A2022-10-10..2022-12-19&type=Issues) | [@pre-commit-ci](https://github.com/search?q=repo%3Ajupyter%2Fnbformat+involves%3Apre-commit-ci+updated%3A2022-10-10..2022-12-19&type=Issues)
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 # Changes in nbformat
 
