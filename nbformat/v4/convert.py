@@ -40,10 +40,14 @@ def upgrade(nb, from_version=None, from_minor=None):
         from_version = nb["nbformat"]
     if not from_minor:
         if "nbformat_minor" not in nb:
-            raise validator.ValidationError(
-                "The notebook does not include the nbformat minor which is needed"
-            )
-        from_minor = nb["nbformat_minor"]
+            if from_version == 4:
+                raise validator.ValidationError(
+                    "The v4 notebook does not include the nbformat minor, which is needed."
+                )
+            else:
+                from_minor = 0
+        else:
+            from_minor = nb["nbformat_minor"]
 
     if from_version == 3:
         # Validate the notebook before conversion

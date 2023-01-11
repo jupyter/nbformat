@@ -355,6 +355,12 @@ def test_notebook_invalid_without_min_version():
         validate(nb)
 
 
+def test_notebook_v3_valid_without_min_version():
+    with TestsBase.fopen("test3_no_min_version.ipynb", "r") as f:
+        nb = read(f, as_version=4)
+    validate(nb)
+
+
 def test_notebook_invalid_without_main_version():
     pass
 
