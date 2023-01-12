@@ -4,6 +4,22 @@
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 5.7.3
+
+([Full Changelog](https://github.com/jupyter/nbformat/compare/v5.7.2...1eefc29edff5da06f78c0087e7c06e644a6abcc9))
+
+### Maintenance and upkeep improvements
+
+- Undeprecate validate(nb, relax_add_props=True) [#343](https://github.com/jupyter/nbformat/pull/343) ([@minrk](https://github.com/minrk))
+
+### Contributors to this release
+
+([GitHub contributors page for this release](https://github.com/jupyter/nbformat/graphs/contributors?from=2023-01-11&to=2023-01-12&type=c))
+
+[@minrk](https://github.com/search?q=repo%3Ajupyter%2Fnbformat+involves%3Aminrk+updated%3A2023-01-11..2023-01-12&type=Issues)
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 5.7.2
 
 ([Full Changelog](https://github.com/jupyter/nbformat/compare/v5.7.1...30f3d81e7113ad7628443fc4cd389ca16b2d186a))
@@ -23,8 +39,6 @@
 ([GitHub contributors page for this release](https://github.com/jupyter/nbformat/graphs/contributors?from=2022-12-19&to=2023-01-11&type=c))
 
 [@blink1073](https://github.com/search?q=repo%3Ajupyter%2Fnbformat+involves%3Ablink1073+updated%3A2022-12-19..2023-01-11&type=Issues) | [@minrk](https://github.com/search?q=repo%3Ajupyter%2Fnbformat+involves%3Aminrk+updated%3A2022-12-19..2023-01-11&type=Issues) | [@pre-commit-ci](https://github.com/search?q=repo%3Ajupyter%2Fnbformat+involves%3Apre-commit-ci+updated%3A2022-12-19..2023-01-11&type=Issues)
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 5.7.1
 
