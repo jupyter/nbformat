@@ -401,7 +401,7 @@ def validate(
     ref: Optional[str] = None,
     version: Optional[int] = None,
     version_minor: Optional[int] = None,
-    relax_add_props: bool = _deprecated,  # type: ignore
+    relax_add_props: bool = False,
     nbjson: Any = None,
     repair_duplicate_cell_ids: bool = _deprecated,  # type: ignore
     strip_invalid_metadata: bool = _deprecated,  # type: ignore
@@ -420,11 +420,10 @@ def validate(
     version : int
     version_minor : int
     relax_add_props : bool
-        Deprecated since 5.5.0 - will be removed in the future.
-        Wether to allow extra property in the Json schema validating the
-        notebook.
+        Wether to allow extra properties in the JSON schema validating the notebook.
+        When True, all known fields are validated, but unknown fields are ignored.
     nbjson
-    repair_duplicate_cell_ids : boolny
+    repair_duplicate_cell_ids : bool
         Deprecated since 5.5.0 - will be removed in the future.
     strip_invalid_metadata : bool
         Deprecated since 5.5.0 - will be removed in the future.
@@ -446,11 +445,6 @@ def validate(
     Please explicitly call `normalize` if you need to normalize notebooks.
     """
     assert isinstance(ref, str) or ref is None
-
-    if relax_add_props is _deprecated:
-        relax_add_props = False
-    else:
-        _dep_warn("relax_add_props")
 
     if strip_invalid_metadata is _deprecated:
         strip_invalid_metadata = False
