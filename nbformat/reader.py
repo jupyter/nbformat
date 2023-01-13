@@ -19,8 +19,11 @@ def parse_json(s, **kwargs):
     try:
         nb_dict = json.loads(s, **kwargs)
     except ValueError as e:
+        message = f"Notebook does not appear to be JSON: {s!r}"
         # Limit the error message to 80 characters.  Display whatever JSON will fit.
-        raise NotJSONError(("Notebook does not appear to be JSON: %r" % s)[:77] + "...") from e
+        if len(message) > 80:
+            message = message[:77] + "..."
+        raise NotJSONError(message) from e
     return nb_dict
 
 
