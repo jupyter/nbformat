@@ -56,13 +56,11 @@ def convert(nb, to_version):
             # Convert and make sure version changed during conversion.
             converted = convert_function(nb)
             if converted.get("nbformat", 1) == version:
-                raise ValueError(
-                    "Failed to convert notebook from v%d to v%d." % (version, step_version)
-                )
+                msg = "Failed to convert notebook from v%d to v%d." % (version, step_version)
+                raise ValueError(msg)
         except AttributeError as e:
-            raise ValidationError(
-                f"Notebook could not be converted from version {version} to version {step_version} because it's missing a key: {e}"
-            ) from None
+            msg = f"Notebook could not be converted from version {version} to version {step_version} because it's missing a key: {e}"
+            raise ValidationError(msg) from None
 
         # Recursively convert until target version is reached.
         return convert(converted, to_version)

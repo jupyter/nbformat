@@ -20,6 +20,7 @@ __all__ = [
     "upgrade",
 ]
 
+from .convert import downgrade, upgrade
 from .nbbase import (
     nbformat,
     nbformat_minor,
@@ -36,5 +37,3 @@ from .nbjson import reads, to_notebook, writes
 reads_json = reads
 writes_json = writes
 to_notebook_json = to_notebook
-
-from .convert import downgrade, upgrade

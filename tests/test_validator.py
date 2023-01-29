@@ -259,9 +259,8 @@ def test_validation_no_version(validator_name):
 def test_invalid_validator_raises_value_error():
     """Test that an invalid notebook with no version fails validation"""
     set_validator("foobar")
-    with pytest.raises(ValueError):
-        with TestsBase.fopen("test2.ipynb", "r") as f:
-            nb = read(f, as_version=4)
+    with pytest.raises(ValueError), TestsBase.fopen("test2.ipynb", "r") as f:
+        nb = read(f, as_version=4)
 
 
 def test_invalid_validator_raises_value_error_after_read():
@@ -292,13 +291,11 @@ def test_non_unique_cell_ids():
     with TestsBase.fopen("invalid_unique_cell_id.ipynb", "r") as f:
         # Avoids validate call from `.read`
         nb = nbformat.from_dict(json.load(f))
-    with pytest.raises(ValidationError):
-        with pytest.warns(DeprecationWarning):
-            validate(nb, repair_duplicate_cell_ids=False)
+    with pytest.raises(ValidationError), pytest.warns(DeprecationWarning):
+        validate(nb, repair_duplicate_cell_ids=False)
     # try again to verify that we didn't modify the content
-    with pytest.raises(ValidationError):
-        with pytest.warns(DeprecationWarning):
-            validate(nb, repair_duplicate_cell_ids=False)
+    with pytest.raises(ValidationError), pytest.warns(DeprecationWarning):
+        validate(nb, repair_duplicate_cell_ids=False)
 
 
 def test_repair_non_unique_cell_ids():
@@ -319,13 +316,11 @@ def test_no_cell_ids():
     with TestsBase.fopen("v4_5_no_cell_id.ipynb", "r") as f:
         # Avoids validate call from `.read`
         nb = nbformat.from_dict(json.load(f))
-    with pytest.raises(ValidationError):
-        with pytest.warns(DeprecationWarning):
-            validate(nb, repair_duplicate_cell_ids=False)
+    with pytest.raises(ValidationError), pytest.warns(DeprecationWarning):
+        validate(nb, repair_duplicate_cell_ids=False)
     # try again to verify that we didn't modify the content
-    with pytest.raises(ValidationError):
-        with pytest.warns(DeprecationWarning):
-            validate(nb, repair_duplicate_cell_ids=False)
+    with pytest.raises(ValidationError), pytest.warns(DeprecationWarning):
+        validate(nb, repair_duplicate_cell_ids=False)
 
 
 @pytest.mark.filterwarnings("ignore::nbformat.warnings.MissingIDFieldWarning")

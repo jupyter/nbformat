@@ -8,9 +8,14 @@ Use this module to read or write notebook files as particular nbformat versions.
 
 from traitlets.log import get_logger
 
-from . import v1, v2, v3, v4
+from . import reader, v1, v2, v3, v4
 from ._version import __version__, version_info
+from .converter import convert
+from .notebooknode import NotebookNode, from_dict
 from .sentinel import Sentinel
+from .v4 import nbformat as current_nbformat
+from .v4 import nbformat_minor as current_nbformat_minor
+from .validator import ValidationError, validate
 
 __all__ = [
     "versions",
@@ -38,13 +43,6 @@ versions = {
     3: v3,
     4: v4,
 }
-
-from . import reader
-from .converter import convert
-from .notebooknode import NotebookNode, from_dict
-from .v4 import nbformat as current_nbformat
-from .v4 import nbformat_minor as current_nbformat_minor
-from .validator import ValidationError, validate
 
 
 class NBFormatError(ValueError):

@@ -50,7 +50,7 @@ class PyReader(NotebookReader):
         """Convert a string to a notebook"""
         return self.to_notebook(s, **kwargs)
 
-    def to_notebook(self, s, **kwargs):
+    def to_notebook(self, s, **kwargs):  # noqa
         """Convert a string to a notebook"""
         lines = s.splitlines()
         cells = []
@@ -113,13 +113,13 @@ class PyReader(NotebookReader):
         nb = new_notebook(worksheets=[ws])
         return nb
 
-    def new_cell(self, state, lines, **kwargs):
+    def new_cell(self, state, lines, **kwargs):  # noqa
         """Create a new cell."""
         if state == "codecell":
-            input = "\n".join(lines)
-            input = input.strip("\n")
-            if input:
-                return new_code_cell(input=input)
+            input_ = "\n".join(lines)
+            input_ = input_.strip("\n")
+            if input_:
+                return new_code_cell(input=input_)
         elif state == "htmlcell":
             text = self._remove_comments(lines)
             if text:
@@ -167,7 +167,7 @@ class PyReader(NotebookReader):
 class PyWriter(NotebookWriter):
     """A Python notebook writer."""
 
-    def writes(self, nb, **kwargs):
+    def writes(self, nb, **kwargs):  # noqa
         """Convert a notebook to a string."""
         lines = ["# -*- coding: utf-8 -*-"]
         lines.extend(
@@ -179,35 +179,35 @@ class PyWriter(NotebookWriter):
         for ws in nb.worksheets:
             for cell in ws.cells:
                 if cell.cell_type == "code":
-                    input = cell.get("input")
-                    if input is not None:
+                    input_ = cell.get("input")
+                    if input_ is not None:
                         lines.extend(["# <codecell>", ""])
-                        lines.extend(input.splitlines())
+                        lines.extend(input_.splitlines())
                         lines.append("")
                 elif cell.cell_type == "html":
-                    input = cell.get("source")
-                    if input is not None:
+                    input_ = cell.get("source")
+                    if input_ is not None:
                         lines.extend(["# <htmlcell>", ""])
-                        lines.extend(["# " + line for line in input.splitlines()])
+                        lines.extend(["# " + line for line in input_.splitlines()])
                         lines.append("")
                 elif cell.cell_type == "markdown":
-                    input = cell.get("source")
-                    if input is not None:
+                    input_ = cell.get("source")
+                    if input_ is not None:
                         lines.extend(["# <markdowncell>", ""])
-                        lines.extend(["# " + line for line in input.splitlines()])
+                        lines.extend(["# " + line for line in input_.splitlines()])
                         lines.append("")
                 elif cell.cell_type == "raw":
-                    input = cell.get("source")
-                    if input is not None:
+                    input_ = cell.get("source")
+                    if input_ is not None:
                         lines.extend(["# <rawcell>", ""])
-                        lines.extend(["# " + line for line in input.splitlines()])
+                        lines.extend(["# " + line for line in input_.splitlines()])
                         lines.append("")
                 elif cell.cell_type == "heading":
-                    input = cell.get("source")
+                    input_ = cell.get("source")
                     level = cell.get("level", 1)
-                    if input is not None:
+                    if input_ is not None:
                         lines.extend(["# <headingcell level=%s>" % level, ""])
-                        lines.extend(["# " + line for line in input.splitlines()])
+                        lines.extend(["# " + line for line in input_.splitlines()])
                         lines.append("")
         lines.append("")
         return "\n".join(lines)

@@ -11,15 +11,6 @@
 import re
 import warnings
 
-warnings.warn(
-    """nbformat.current is deprecated since before nbformat 3.0
-
-- use nbformat for read/write/validate public API
-- use nbformat.vX directly to composing notebooks of a particular version
-""",
-    DeprecationWarning,
-)
-
 from traitlets.log import get_logger
 
 from nbformat import v3 as _v_latest
@@ -44,6 +35,15 @@ from . import versions
 from .converter import convert
 from .reader import reads as reader_reads
 from .validator import ValidationError, validate
+
+warnings.warn(
+    """nbformat.current is deprecated since before nbformat 3.0
+
+- use nbformat for read/write/validate public API
+- use nbformat.vX directly to composing notebooks of a particular version
+""",
+    DeprecationWarning,
+)
 
 __all__ = [
     "NotebookNode",
@@ -148,7 +148,7 @@ def writes_py(nb, **kwargs):
 # High level API
 
 
-def reads(s, format="DEPRECATED", version=current_nbformat, **kwargs):
+def reads(s, format="DEPRECATED", version=current_nbformat, **kwargs):  # noqa
     """Read a notebook from a string and return the NotebookNode object.
 
     This function properly handles notebooks of any version. The notebook
@@ -177,7 +177,7 @@ def reads(s, format="DEPRECATED", version=current_nbformat, **kwargs):
     return nb
 
 
-def writes(nb, format="DEPRECATED", version=current_nbformat, **kwargs):
+def writes(nb, format="DEPRECATED", version=current_nbformat, **kwargs):  # noqa
     """Write a notebook to a string in a given format in the current nbformat version.
 
     This function always writes the notebook in the current nbformat version.
@@ -207,7 +207,7 @@ def writes(nb, format="DEPRECATED", version=current_nbformat, **kwargs):
     return versions[version].writes_json(nb, **kwargs)
 
 
-def read(fp, format="DEPRECATED", **kwargs):
+def read(fp, format="DEPRECATED", **kwargs):  # noqa
     """Read a notebook from a file and return the NotebookNode object.
 
     This function properly handles notebooks of any version. The notebook
@@ -226,7 +226,7 @@ def read(fp, format="DEPRECATED", **kwargs):
     return reads(fp.read(), **kwargs)
 
 
-def write(nb, fp, format="DEPRECATED", **kwargs):
+def write(nb, fp, format="DEPRECATED", **kwargs):  # noqa
     """Write a notebook to a file in a given format in the current nbformat version.
 
     This function always writes the notebook in the current nbformat version.

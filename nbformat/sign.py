@@ -9,7 +9,7 @@ import sys
 import typing as t
 from collections import OrderedDict
 from contextlib import contextmanager
-from datetime import datetime
+from datetime import datetime, timezone
 from hmac import HMAC
 
 try:
@@ -204,7 +204,7 @@ class SQLiteSignatureStore(SignatureStore, LoggingConfigurable):
                 INSERT INTO nbsignatures (algorithm, signature, last_seen)
                 VALUES (?, ?, ?)
                 """,
-                (algorithm, digest, datetime.utcnow()),
+                (algorithm, digest, datetime.now(tz=timezone.utc)),
             )
         else:
             self.db.execute(
@@ -212,7 +212,7 @@ class SQLiteSignatureStore(SignatureStore, LoggingConfigurable):
                 algorithm = ? AND
                 signature = ?;
                 """,
-                (datetime.utcnow(), algorithm, digest),
+                (datetime.now(tz=timezone.utc), algorithm, digest),
             )
         self.db.commit()
 
@@ -239,7 +239,7 @@ class SQLiteSignatureStore(SignatureStore, LoggingConfigurable):
             algorithm = ? AND
             signature = ?;
             """,
-            (datetime.utcnow(), algorithm, digest),
+            (datetime.now(tz=timezone.utc), algorithm, digest),
         )
         self.db.commit()
         return True
@@ -276,7 +276,7 @@ def yield_everything(obj):
     if isinstance(obj, dict):
         for key in sorted(obj):
             value = obj[key]
-            assert isinstance(key, str)
+            assert isinstance(key, str)  # noqa
             yield key.encode()
             yield from yield_everything(value)
     elif isinstance(obj, (list, tuple)):
@@ -293,11 +293,11 @@ def yield_code_cells(nb):
 
     nbformat version independent
     """
-    if nb.nbformat >= 4:
+    if nb.nbformat >= 4:  # noqa
         for cell in nb["cells"]:
             if cell["cell_type"] == "code":
                 yield cell
-    elif nb.nbformat == 3:
+    elif nb.nbformat == 3:  # noqa
         for ws in nb["worksheets"]:
             for cell in ws["cells"]:
                 if cell["cell_type"] == "code":
@@ -448,7 +448,7 @@ class NotebookNotary(LoggingConfigurable):
         - the requested scheme is available from hashlib
         - the computed hash from notebook_signature matches the stored hash
         """
-        if nb.nbformat < 3:
+        if nb.nbformat < 3:  # noqa
             return False
         signature = self.compute_signature(nb)
         return self.store.check_signature(signature, self.algorithm)
@@ -458,7 +458,7 @@ class NotebookNotary(LoggingConfigurable):
 
         Stores hash algorithm and hmac digest in a local database of trusted notebooks.
         """
-        if nb.nbformat < 3:
+        if nb.nbformat < 3:  # noqa
             return
         signature = self.compute_signature(nb)
         self.store.store_signature(signature, self.algorithm)
@@ -480,7 +480,7 @@ class NotebookNotary(LoggingConfigurable):
 
         This function is the inverse of check_cells
         """
-        if nb.nbformat < 3:
+        if nb.nbformat < 3:  # noqa
             return
 
         for cell in yield_code_cells(nb):
@@ -502,7 +502,7 @@ class NotebookNotary(LoggingConfigurable):
             return True
 
         # explicitly safe output
-        if nbformat_version >= 4:
+        if nbformat_version >= 4:  # noqa
             unsafe_output_types = ["execute_result", "display_data"]
             safe_keys = {"output_type", "execution_count", "metadata"}
         else:  # v3
@@ -528,7 +528,7 @@ class NotebookNotary(LoggingConfigurable):
 
         This function is the inverse of mark_cells.
         """
-        if nb.nbformat < 3:
+        if nb.nbformat < 3:  # noqa
             return False
         trusted = True
         for cell in yield_code_cells(nb):
@@ -596,28 +596,28 @@ class TrustNotebookApp(JupyterApp):
     def sign_notebook(self, nb, notebook_path="<stdin>"):
         """Sign a notebook that's been loaded"""
         if self.notary.check_signature(nb):
-            print("Notebook already signed: %s" % notebook_path)
+            print("Notebook already signed: %s" % notebook_path)  # noqa
         else:
-            print("Signing notebook: %s" % notebook_path)
+            print("Signing notebook: %s" % notebook_path)  # noqa
             self.notary.sign(nb)
 
     def generate_new_key(self):
         """Generate a new notebook signature key"""
-        print("Generating new notebook key: %s" % self.notary.secret_file)
+        print("Generating new notebook key: %s" % self.notary.secret_file)  # noqa
         self.notary._write_secret_file(os.urandom(1024))
 
     def start(self):
         """Start the trust notebook app."""
         if self.reset:
             if os.path.exists(self.notary.db_file):
-                print("Removing trusted signature cache: %s" % self.notary.db_file)
+                print("Removing trusted signature cache: %s" % self.notary.db_file)  # noqa
                 os.remove(self.notary.db_file)
             self.generate_new_key()
             return
         if not self.extra_args:
             self.log.debug("Reading notebook from stdin")
             nb_s = sys.stdin.read()
-            assert isinstance(nb_s, str)
+            assert isinstance(nb_s, str)  # noqa
             nb = reads(nb_s, NO_CONVERT)
             self.sign_notebook(nb, "<stdin>")
         else:

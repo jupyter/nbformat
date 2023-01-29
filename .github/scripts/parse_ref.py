@@ -22,10 +22,10 @@ def parse_ref(current_ref):
         The github reference string.
     """
     if not current_ref.startswith("refs/tags/"):
-        raise Exception(f"Invalid ref `{current_ref}`!")
+        raise Exception(f"Invalid ref `{current_ref}`!")  # noqa
 
     tag_name = current_ref.replace("refs/tags/", "")
-    print(tag_name)
+    print(tag_name)  # noqa
 
 
 if __name__ == "__main__":

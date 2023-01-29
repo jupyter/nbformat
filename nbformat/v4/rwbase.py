@@ -46,9 +46,8 @@ def rejoin_lines(nb):
                 output_type = output.get("output_type", "")
                 if output_type in {"execute_result", "display_data"}:
                     _rejoin_mimebundle(output.get("data", {}))
-                elif output_type:
-                    if isinstance(output.get("text", ""), list):
-                        output.text = "".join(output.text)
+                elif output_type and isinstance(output.get("text", ""), list):
+                    output.text = "".join(output.text)
     return nb
 
 
@@ -87,9 +86,8 @@ def split_lines(nb):
             for output in cell.outputs:
                 if output.output_type in {"execute_result", "display_data"}:
                     _split_mimebundle(output.get("data", {}))
-                elif output.output_type == "stream":
-                    if isinstance(output.text, str):
-                        output.text = output.text.splitlines(True)
+                elif output.output_type == "stream" and isinstance(output.text, str):
+                    output.text = output.text.splitlines(True)
     return nb
 
 
@@ -111,7 +109,8 @@ class NotebookReader:
 
     def reads(self, s, **kwargs):
         """Read a notebook from a string."""
-        raise NotImplementedError("reads must be implemented in a subclass")
+        msg = "reads must be implemented in a subclass"
+        raise NotImplementedError(msg)
 
     def read(self, fp, **kwargs):
         """Read a notebook from a file like object"""
@@ -124,7 +123,8 @@ class NotebookWriter:
 
     def writes(self, nb, **kwargs):
         """Write a notebook to a string."""
-        raise NotImplementedError("writes must be implemented in a subclass")
+        msg = "writes must be implemented in a subclass"
+        raise NotImplementedError(msg)
 
     def write(self, nb, fp, **kwargs):
         """Write a notebook to a file like object"""

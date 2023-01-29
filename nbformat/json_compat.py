@@ -81,7 +81,8 @@ class FastJsonSchemaValidator(JsonSchemaValidator):
         # Another way forward for compatibility: we could distill both validator errors into a custom collection
         # for this data. Since implementation details of ValidationError is used elsewhere, we would probably
         # just use this data for schema introspection.
-        raise NotImplementedError("JSON schema error introspection not enabled for fastjsonschema")
+        msg = "JSON schema error introspection not enabled for fastjsonschema"
+        raise NotImplementedError(msg)
 
 
 _VALIDATOR_MAP = [
@@ -93,15 +94,15 @@ VALIDATORS = [item[0] for item in _VALIDATOR_MAP]
 
 def _validator_for_name(validator_name):
     if validator_name not in VALIDATORS:
-        raise ValueError(
-            f"Invalid validator '{validator_name}' value!\nValid values are: {VALIDATORS}"
-        )
+        msg = f"Invalid validator '{validator_name}' value!\nValid values are: {VALIDATORS}"
+        raise ValueError(msg)
 
     for (name, module, validator_cls) in _VALIDATOR_MAP:
         if module and validator_name == name:
             return validator_cls
     # we always return something.
-    raise ValueError(f"Missing validator for {repr(validator_name)}")
+    msg = f"Missing validator for {repr(validator_name)}"
+    raise ValueError(msg)
 
 
 def get_current_validator():

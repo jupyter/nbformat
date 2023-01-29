@@ -19,6 +19,7 @@
 
 import os
 import shutil
+from importlib.metadata import version as get_version
 
 HERE = os.path.abspath(os.path.dirname(__file__))
 
@@ -60,7 +61,7 @@ master_doc = "index"
 
 # General information about the project.
 project = "nbformat"
-copyright = "2015, Jupyter Development Team"
+copyright = "2015, Jupyter Development Team"  # noqa
 author = "Jupyter Development Team"
 
 # numpydoc configuration
@@ -72,8 +73,6 @@ numpydoc_class_members_toctree = False
 # built documents.
 #
 # The short X.Y version.
-from importlib.metadata import version as get_version
-
 version = ".".join(get_version("nbformat").split(".")[:2])
 # The full version, including alpha/beta/rc tags.
 release = version

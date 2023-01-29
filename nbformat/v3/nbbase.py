@@ -11,7 +11,7 @@ helpers to build the structs in the right form.
 
 import warnings
 
-from .._struct import Struct
+from nbformat.struct import Struct
 
 # -----------------------------------------------------------------------------
 # Code
@@ -46,7 +46,8 @@ def str_passthrough(obj):
     """
     Used to be cast_unicode, add this temporarily to make sure no further breakage.
     """
-    assert isinstance(obj, str)
+    if not isinstance(obj, str):
+        raise AssertionError
     return obj
 
 
@@ -63,11 +64,12 @@ def cast_str(obj):
         )
         return obj.decode("ascii", "replace")
     else:
-        assert isinstance(obj, str)
+        if not isinstance(obj, str):
+            raise AssertionError
         return obj
 
 
-def new_output(
+def new_output(  # noqa
     output_type,
     output_text=None,
     output_png=None,
@@ -91,7 +93,8 @@ def new_output(
     if metadata is None:
         metadata = {}
     if not isinstance(metadata, dict):
-        raise TypeError("metadata must be dict")
+        msg = "metadata must be dict"
+        raise TypeError(msg)
 
     if output_type in {"pyout", "display_data"}:
         output.metadata = metadata
@@ -114,9 +117,8 @@ def new_output(
         if output_javascript is not None:
             output.javascript = str_passthrough(output_javascript)
 
-    if output_type == "pyout":
-        if prompt_number is not None:
-            output.prompt_number = int(prompt_number)
+    if output_type == "pyout" and prompt_number is not None:
+        output.prompt_number = int(prompt_number)
 
     if output_type == "pyerr":
         if ename is not None:
@@ -133,7 +135,7 @@ def new_output(
 
 
 def new_code_cell(
-    input=None,
+    input=None,  # noqa
     prompt_number=None,
     outputs=None,
     language="python",
@@ -214,7 +216,9 @@ def new_notebook(name=None, metadata=None, worksheets=None):
     return nb
 
 
-def new_metadata(name=None, authors=None, license=None, created=None, modified=None, gistid=None):
+def new_metadata(
+    name=None, authors=None, license=None, created=None, modified=None, gistid=None  # noqa
+):
     """Create a new metadata node."""
     metadata = NotebookNode()
     if name is not None:

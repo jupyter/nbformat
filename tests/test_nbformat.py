@@ -8,9 +8,8 @@ def test_read_invalid_iowrapper(tmpdir):
     ipynb_filepath = tmpdir.join("empty.ipynb")
     ipynb_filepath.write("{}")
 
-    with pytest.raises(ValidationError) as excinfo:
-        with ipynb_filepath.open() as fp:
-            read(fp, as_version=4)
+    with pytest.raises(ValidationError) as excinfo, ipynb_filepath.open() as fp:
+        read(fp, as_version=4)
     assert "cells" in str(excinfo.value)
 
 

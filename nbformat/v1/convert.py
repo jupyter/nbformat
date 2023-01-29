@@ -14,4 +14,5 @@
 
 def upgrade(nb, orig_version=None):
     """Upgrade a notebook."""
-    raise ValueError("Cannot convert to v1 notebook format")
+    msg = "Cannot convert to v1 notebook format"
+    raise ValueError(msg)

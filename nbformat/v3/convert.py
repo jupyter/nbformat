@@ -35,7 +35,7 @@ def upgrade(nb, from_version=2, from_minor=0):
     from_minor : int
         The original minor version of the notebook to convert (only relevant for v >= 3).
     """
-    if from_version == 2:
+    if from_version == 2:  # noqa
         # Mark the original nbformat so consumers know it has been converted.
         nb.nbformat = nbformat
         nb.nbformat_minor = nbformat_minor
@@ -46,16 +46,17 @@ def upgrade(nb, from_version=2, from_minor=0):
             for cell in ws["cells"]:
                 cell.setdefault("metadata", {})
         return nb
-    elif from_version == 3:
+    elif from_version == 3:  # noqa
         if from_minor != nbformat_minor:
             nb.orig_nbformat_minor = from_minor
         nb.nbformat_minor = nbformat_minor
         return nb
     else:
-        raise ValueError(
+        msg = (
             "Cannot convert a notebook directly from v%s to v3.  "
             "Try using the nbformat.convert module." % from_version
         )
+        raise ValueError(msg)
 
 
 def heading_to_md(cell):
@@ -78,7 +79,7 @@ def downgrade(nb):
     nb : NotebookNode
         The Python representation of the notebook to convert.
     """
-    if nb.nbformat != 3:
+    if nb.nbformat != 3:  # noqa
         return nb
     nb.nbformat = 2
     for ws in nb.worksheets:

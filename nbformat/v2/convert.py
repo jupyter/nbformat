@@ -59,4 +59,5 @@ def downgrade(nb):
     nb : NotebookNode
         The Python representation of the notebook to convert.
     """
-    raise Exception("Downgrade from notebook v2 to v1 is not supported.")
+    msg = "Downgrade from notebook v2 to v1 is not supported."
+    raise Exception(msg)

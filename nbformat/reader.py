@@ -21,7 +21,7 @@ def parse_json(s, **kwargs):
     except ValueError as e:
         message = f"Notebook does not appear to be JSON: {s!r}"
         # Limit the error message to 80 characters.  Display whatever JSON will fit.
-        if len(message) > 80:
+        if len(message) > 80:  # noqa
             message = message[:77] + "..."
         raise NotJSONError(message) from e
     return nb_dict
@@ -79,9 +79,8 @@ def reads(s, **kwargs):
         try:
             return versions[major].to_notebook_json(nb_dict, minor=minor)
         except AttributeError as e:
-            raise ValidationError(
-                f"The notebook is invalid and is missing an expected key: {e}"
-            ) from None
+            msg = f"The notebook is invalid and is missing an expected key: {e}"
+            raise ValidationError(msg) from None
     else:
         raise NBFormatError("Unsupported nbformat version %s" % major)
 

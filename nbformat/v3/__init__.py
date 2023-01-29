@@ -87,13 +87,13 @@ def parse_filename(fname):
     """
     basename, ext = os.path.splitext(fname)
     if ext == ".ipynb":
-        format = "json"
+        format_ = "json"
     elif ext == ".json":
-        format = "json"
+        format_ = "json"
     elif ext == ".py":
-        format = "py"
+        format_ = "py"
     else:
         basename = fname
         fname = fname + ".ipynb"
-        format = "json"
-    return fname, basename, format
+        format_ = "json"
+    return fname, basename, format_

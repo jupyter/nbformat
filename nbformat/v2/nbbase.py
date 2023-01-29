@@ -21,7 +21,7 @@ Authors:
 # Imports
 # -----------------------------------------------------------------------------
 
-from .._struct import Struct
+from nbformat._struct import Struct
 
 # -----------------------------------------------------------------------------
 # Code
@@ -47,7 +47,7 @@ def from_dict(d):
         return d
 
 
-def new_output(
+def new_output(  # noqa
     output_type=None,
     output_text=None,
     output_png=None,
@@ -85,9 +85,8 @@ def new_output(
         if output_javascript is not None:
             output.javascript = str(output_javascript)
 
-    if output_type == "pyout":
-        if prompt_number is not None:
-            output.prompt_number = int(prompt_number)
+    if output_type == "pyout" and prompt_number is not None:
+        output.prompt_number = int(prompt_number)
 
     if output_type == "pyerr":
         if etype is not None:
@@ -100,7 +99,9 @@ def new_output(
     return output
 
 
-def new_code_cell(input=None, prompt_number=None, outputs=None, language="python", collapsed=False):
+def new_code_cell(
+    input=None, prompt_number=None, outputs=None, language="python", collapsed=False  # noqa
+):
     """Create a new code cell with input and output"""
     cell = NotebookNode()
     cell.cell_type = "code"
@@ -158,7 +159,9 @@ def new_notebook(metadata=None, worksheets=None):
     return nb
 
 
-def new_metadata(name=None, authors=None, license=None, created=None, modified=None, gistid=None):
+def new_metadata(
+    name=None, authors=None, license=None, created=None, modified=None, gistid=None  # noqa
+):
     """Create a new metadata node."""
     metadata = NotebookNode()
     if name is not None:
