@@ -9,8 +9,8 @@ in the right form.
 # Copyright (c) IPython Development Team.
 # Distributed under the terms of the Modified BSD License.
 
-from ..corpus.words import generate_corpus_id as random_cell_id
-from ..notebooknode import NotebookNode
+from nbformat.corpus.words import generate_corpus_id as random_cell_id
+from nbformat.notebooknode import NotebookNode
 
 # Change the nbformat_minor and nbformat_schema variables when incrementing the
 # nbformat version
@@ -35,7 +35,7 @@ nbformat_schema = {
 
 def validate(node, ref=None):
     """validate a v4 node"""
-    from .. import validate as validate_orig
+    from nbformat import validate as validate_orig
 
     return validate_orig(node, ref=ref, version=nbformat)
 

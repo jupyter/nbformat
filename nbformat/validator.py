@@ -25,10 +25,7 @@ def _relax_additional_properties(obj):
     """relax any `additionalProperties`"""
     if isinstance(obj, dict):
         for key, value in obj.items():
-            if key == "additionalProperties":
-                value = True
-            else:
-                value = _relax_additional_properties(value)
+            value = True if key == "additionalProperties" else _relax_additional_properties(value)
             obj[key] = value
     elif isinstance(obj, list):
         for i, value in enumerate(obj):
@@ -54,10 +51,7 @@ def get_validator(version=None, version_minor=None, relax_add_props=False, name=
     if version_minor is None:
         version_minor = current_minor
 
-    if name:
-        current_validator = _validator_for_name(name)
-    else:
-        current_validator = get_current_validator()
+    current_validator = _validator_for_name(name) if name else get_current_validator()
 
     version_tuple = (current_validator.name, version, version_minor)
 
@@ -101,7 +95,8 @@ def _get_schema_json(v, version=None, version_minor=None):
         # load the latest schema
         schema_path = os.path.join(os.path.dirname(v.__file__), v.nbformat_schema[(None, None)])
     else:
-        raise AttributeError("Cannot find appropriate nbformat schema file.")
+        msg = "Cannot find appropriate nbformat schema file."
+        raise AttributeError(msg)
     with open(schema_path) as f:
         schema_json = json.load(f)
     return schema_json
@@ -126,7 +121,8 @@ def isvalid(nbjson, ref=None, version=None, version_minor=None):
     else:
         return True
     finally:
-        assert nbjson == orig
+        if nbjson != orig:
+            raise AssertionError
 
 
 def _format_as_index(indices):
@@ -219,7 +215,7 @@ class NotebookValidationError(ValidationError):
     __str__ = __unicode__
 
 
-def better_validation_error(error, version, version_minor):
+def better_validation_error(error, version, version_minor):  # noqa
     """Get better ValidationError on oneOf failures
 
     oneOf errors aren't informative.
@@ -257,7 +253,7 @@ def better_validation_error(error, version, version_minor):
             except Exception:
                 # if it fails for some reason,
                 # let the original error through
-                pass
+                pass  # noqa
     return NotebookValidationError(error, ref)
 
 
@@ -371,7 +367,8 @@ def _normalize(
                         stacklevel=3,
                     )
                 else:
-                    raise ValidationError(f"Non-unique cell id '{cell_id}' detected.")
+                    msg = f"Non-unique cell id '{cell_id}' detected."
+                    raise ValidationError(msg)
             seen_ids.add(cell_id)
     if strip_invalid_metadata:
         changes += _strip_invalida_metadata(
@@ -396,7 +393,7 @@ def _dep_warn(field):
     )
 
 
-def validate(
+def validate(  # noqa
     nbdict: Any = None,
     ref: Optional[str] = None,
     version: Optional[int] = None,
@@ -444,7 +441,7 @@ def validate(
 
     Please explicitly call `normalize` if you need to normalize notebooks.
     """
-    assert isinstance(ref, str) or ref is None
+    assert isinstance(ref, str) or ref is None  # noqa
 
     if strip_invalid_metadata is _deprecated:
         strip_invalid_metadata = False
@@ -464,7 +461,8 @@ def validate(
     elif nbjson is not None:
         nbdict = nbjson
     else:
-        raise TypeError("validate() missing 1 required argument: 'nbdict'")
+        msg = "validate() missing 1 required argument: 'nbdict'"
+        raise TypeError(msg)
 
     if ref is None:
         # if ref is not specified, we have a whole notebook, so we can get the version
@@ -479,8 +477,8 @@ def validate(
             version, version_minor = 1, 0
 
     if ref is None:
-        assert isinstance(version, int)
-        assert isinstance(version_minor, int)
+        assert isinstance(version, int)  # noqa
+        assert isinstance(version_minor, int)  # noqa
         _normalize(
             nbdict,
             version,
@@ -507,7 +505,8 @@ def _get_errors(
 ) -> Any:
     validator = get_validator(version, version_minor, relax_add_props=relax_add_props)
     if not validator:
-        raise ValidationError(f"No schema for validating v{version}.{version_minor} notebooks")
+        msg = f"No schema for validating v{version}.{version_minor} notebooks"
+        raise ValidationError(msg)
     iter_errors = validator.iter_errors(nbdict, *args)
     errors = list(iter_errors)
     # jsonschema gives the best error messages.
@@ -522,7 +521,7 @@ def _get_errors(
     return iter(errors)
 
 
-def _strip_invalida_metadata(
+def _strip_invalida_metadata(  # noqa
     nbdict: Any, version: int, version_minor: int, relax_add_props: bool
 ) -> int:
     """
@@ -557,9 +556,8 @@ def _strip_invalida_metadata(
             name="jsonschema",
         )
         if not validator:
-            raise ValidationError(
-                f"No jsonschema for validating v{version}.{version_minor} notebooks"
-            )
+            msg = f"No jsonschema for validating v{version}.{version_minor} notebooks"
+            raise ValidationError(msg)
         errors = validator.iter_errors(nbdict)
         error_tree = validator.error_tree(errors)
         if "metadata" in error_tree:
@@ -587,7 +585,7 @@ def _strip_invalida_metadata(
                             rel_path = error.relative_path
                             error_for_intended_schema = error.schema_path[0] == schema_index
                             is_top_level_metadata_key = (
-                                len(rel_path) == 2 and rel_path[0] == "metadata"
+                                len(rel_path) == 2 and rel_path[0] == "metadata"  # noqa
                             )
                             if error_for_intended_schema and is_top_level_metadata_key:
                                 nbdict["cells"][cell_idx]["metadata"].pop(rel_path[1], None)
@@ -596,7 +594,7 @@ def _strip_invalida_metadata(
     return changes
 
 
-def iter_validate(
+def iter_validate(  # noqa
     nbdict=None,
     ref=None,
     version=None,
@@ -622,7 +620,8 @@ def iter_validate(
     elif nbjson is not None:
         nbdict = nbjson
     else:
-        raise TypeError("iter_validate() missing 1 required argument: 'nbdict'")
+        msg = "iter_validate() missing 1 required argument: 'nbdict'"
+        raise TypeError(msg)
 
     if version is None:
         version, version_minor = get_version(nbdict)

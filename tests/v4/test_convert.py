@@ -8,7 +8,7 @@ from nbformat import ValidationError, v3, v4, validate
 from nbformat.v4 import convert
 from nbformat.v4.nbjson import reads
 
-from ..v3 import nbexamples as v3examples
+from ..v3 import nbexamples as v3examples  # noqa
 from . import nbexamples
 
 
@@ -29,26 +29,27 @@ def test_downgrade_notebook():
 def test_upgrade_heading():
     # Fake the uuid generation for ids
     cell_ids = ["cell-1", "cell-2", "cell-3"]
-    with mock.patch("nbformat.v4.convert.random_cell_id", side_effect=cell_ids):
-        with mock.patch("nbformat.v4.nbbase.random_cell_id", side_effect=cell_ids):
-            v3h = v3.new_heading_cell
-            v4m = v4.new_markdown_cell
-            for v3cell, expected in [
-                (
-                    v3h(source="foo", level=1),
-                    v4m(source="# foo"),
-                ),
-                (
-                    v3h(source="foo\nbar\nmulti-line\n", level=4),
-                    v4m(source="#### foo bar multi-line"),
-                ),
-                (
-                    v3h(source="ünìcö∂e–cønvërsioñ", level=4),
-                    v4m(source="#### ünìcö∂e–cønvërsioñ"),
-                ),
-            ]:
-                upgraded = convert.upgrade_cell(v3cell)
-                assert upgraded == expected
+    with mock.patch("nbformat.v4.convert.random_cell_id", side_effect=cell_ids), mock.patch(
+        "nbformat.v4.nbbase.random_cell_id", side_effect=cell_ids
+    ):
+        v3h = v3.new_heading_cell
+        v4m = v4.new_markdown_cell
+        for v3cell, expected in [
+            (
+                v3h(source="foo", level=1),
+                v4m(source="# foo"),
+            ),
+            (
+                v3h(source="foo\nbar\nmulti-line\n", level=4),
+                v4m(source="#### foo bar multi-line"),
+            ),
+            (
+                v3h(source="ünìcö∂e–cønvërsioñ", level=4),
+                v4m(source="#### ünìcö∂e–cønvërsioñ"),
+            ),
+        ]:
+            upgraded = convert.upgrade_cell(v3cell)
+            assert upgraded == expected
 
 
 def test_downgrade_heading():

@@ -87,7 +87,7 @@ class Struct(dict):
         you can't set a class member
         """
         # If key is an str it might be a class member or instance var
-        if isinstance(key, str):
+        if isinstance(key, str):  # noqa
             # I can't simply call hasattr here because it calls getattr, which
             # calls self.__getattr__, which returns True for keys in
             # self._data.  But I only want keys in the class and in
@@ -181,7 +181,7 @@ class Struct(dict):
         >>> s1
         {'b': 30}
         """
-        for k in other.keys():
+        for k in other:
             if k in self:
                 del self[k]
         return self
@@ -200,7 +200,7 @@ class Struct(dict):
                 outdict[entry] = k
         return outdict
 
-    def dict(self):
+    def dict(self):  # noqa
         """Get the dict representation of the struct."""
         return self
 
@@ -216,7 +216,7 @@ class Struct(dict):
         """
         return Struct(dict.copy(self))
 
-    def hasattr(self, key):
+    def hasattr(self, key):  # noqa
         """hasattr function available as a method.
 
         Implemented like has_key.
@@ -352,7 +352,7 @@ class Struct(dict):
                 ("add_flip", add_flip),
                 ("add_s", add_s),
             ]:
-                if name in inv_conflict_solve_user.keys():
+                if name in inv_conflict_solve_user:
                     inv_conflict_solve_user[func] = inv_conflict_solve_user[name]
                     del inv_conflict_solve_user[name]
             conflict_solve.update(self.__dict_invert(inv_conflict_solve_user))

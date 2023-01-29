@@ -8,9 +8,8 @@ import re
 
 from traitlets.log import get_logger
 
-from nbformat import v3
+from nbformat import v3, validator
 
-from .. import validator
 from .nbbase import NotebookNode, nbformat, nbformat_minor, random_cell_id
 
 
@@ -24,7 +23,7 @@ def _warn_if_invalid(nb, version):
         get_logger().error("Notebook JSON is not valid v%i: %s", version, e)
 
 
-def upgrade(nb, from_version=None, from_minor=None):
+def upgrade(nb, from_version=None, from_minor=None):  # noqa
     """Convert a notebook to latest v4.
 
     Parameters
@@ -40,16 +39,15 @@ def upgrade(nb, from_version=None, from_minor=None):
         from_version = nb["nbformat"]
     if not from_minor:
         if "nbformat_minor" not in nb:
-            if from_version == 4:
-                raise validator.ValidationError(
-                    "The v4 notebook does not include the nbformat minor, which is needed."
-                )
+            if from_version == 4:  # noqa
+                msg = "The v4 notebook does not include the nbformat minor, which is needed."
+                raise validator.ValidationError(msg)
             else:
                 from_minor = 0
         else:
             from_minor = nb["nbformat_minor"]
 
-    if from_version == 3:
+    if from_version == 3:  # noqa
         # Validate the notebook before conversion
         _warn_if_invalid(nb, from_version)
 
@@ -77,7 +75,7 @@ def upgrade(nb, from_version=None, from_minor=None):
         # Validate the converted notebook before returning it
         _warn_if_invalid(nb, nbformat)
         return nb
-    elif from_version == 4:
+    elif from_version == 4:  # noqa
         if from_minor == nbformat_minor:
             return nb
 
@@ -85,7 +83,7 @@ def upgrade(nb, from_version=None, from_minor=None):
         # if from_minor < 3:
         # if from_minor < 4:
 
-        if from_minor < 5:
+        if from_minor < 5:  # noqa
             for cell in nb.cells:
                 cell.id = random_cell_id()
 
@@ -154,7 +152,7 @@ def downgrade_cell(cell):
         source = cell.get("source", "")
         if "\n" not in source and source.startswith("#"):
             match = re.match(r"(#+)\s*(.*)", source)
-            assert match is not None
+            assert match is not None  # noqa
             prefix, text = match.groups()
             cell.cell_type = "heading"
             cell.source = text

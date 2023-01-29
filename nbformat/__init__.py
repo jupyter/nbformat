@@ -39,12 +39,12 @@ versions = {
     4: v4,
 }
 
-from . import reader
-from .converter import convert
-from .notebooknode import NotebookNode, from_dict
-from .v4 import nbformat as current_nbformat
-from .v4 import nbformat_minor as current_nbformat_minor
-from .validator import ValidationError, validate
+from . import reader  # noqa
+from .converter import convert  # noqa
+from .notebooknode import NotebookNode, from_dict  # noqa
+from .v4 import nbformat as current_nbformat  # noqa
+from .v4 import nbformat_minor as current_nbformat_minor  # noqa
+from .validator import ValidationError, validate  # noqa
 
 
 class NBFormatError(ValueError):

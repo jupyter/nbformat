@@ -162,7 +162,8 @@ class NotebookReader:
 
     def reads(self, s, **kwargs):
         """Read a notebook from a string."""
-        raise NotImplementedError("loads must be implemented in a subclass")
+        msg = "loads must be implemented in a subclass"
+        raise NotImplementedError(msg)
 
     def read(self, fp, **kwargs):
         """Read a notebook from a file like object"""
@@ -175,7 +176,8 @@ class NotebookWriter:
 
     def writes(self, nb, **kwargs):
         """Write a notebook to a string."""
-        raise NotImplementedError("loads must be implemented in a subclass")
+        msg = "loads must be implemented in a subclass"
+        raise NotImplementedError(msg)
 
     def write(self, nb, fp, **kwargs):
         """Write a notebook to a file like object"""

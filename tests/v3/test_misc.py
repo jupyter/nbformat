@@ -6,10 +6,10 @@ from nbformat.v3 import parse_filename
 
 class MiscTests(TestCase):
     def check_filename(self, path, exp_fname, exp_bname, exp_format):
-        fname, bname, format = parse_filename(path)
+        fname, bname, fmt = parse_filename(path)
         self.assertEqual(fname, exp_fname)
         self.assertEqual(bname, exp_bname)
-        self.assertEqual(format, exp_format)
+        self.assertEqual(fmt, exp_format)
 
     def test_parse_filename(self):
 

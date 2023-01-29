@@ -27,7 +27,7 @@ class NotebookNode(Struct):
                 for key in other:
                     self[key] = other[key]
             elif hasattr(other, "keys"):
-                for key in other.keys():
+                for key in other:
                     self[key] = other[key]
             else:
                 for key, value in other:
