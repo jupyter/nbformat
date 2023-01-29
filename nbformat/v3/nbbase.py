@@ -11,7 +11,7 @@ helpers to build the structs in the right form.
 
 import warnings
 
-from nbformat.struct import Struct
+from nbformat._struct import Struct
 
 # -----------------------------------------------------------------------------
 # Code
