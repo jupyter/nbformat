@@ -1,4 +1,4 @@
-# The Jupyter Notebook Format
+# nbformat: Jupyter Notebook Format
 
 [![codecov.io](https://codecov.io/github/jupyter/nbformat/coverage.svg?branch=master)](https://codecov.io/github/jupyter/nbformat?branch=master)
 ![CI Tests](https://github.com/jupyter/nbformat/workflows/Run%20tests/badge.svg)
@@ -6,7 +6,7 @@
 `nbformat` contains the reference implementation of the [Jupyter Notebook format],
 and Python APIs for working with notebooks.
 
-There is also a JSON schema for notebook format versions >= 3.
+There is also a JSON Schema for nbformat versions >= 3.
 
 ## Installation
 
