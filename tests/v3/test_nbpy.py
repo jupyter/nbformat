@@ -7,7 +7,6 @@ from .nbexamples import nb0_py
 
 
 class TestPy(formattest.NBFormatTest, TestCase):
-
     nb0_ref = nb0_py
     ext = "py"
     mod = nbpy

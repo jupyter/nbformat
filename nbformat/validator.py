@@ -227,7 +227,6 @@ def better_validation_error(error, version, version_minor):  # noqa
     key = error.schema_path[-1]
     ref = None
     if key.endswith("Of"):
-
         if isinstance(error.instance, dict):
             if "cell_type" in error.instance:
                 ref = error.instance["cell_type"] + "_cell"
@@ -403,7 +402,6 @@ def validate(  # noqa
     repair_duplicate_cell_ids: bool = _deprecated,  # type: ignore
     strip_invalid_metadata: bool = _deprecated,  # type: ignore
 ) -> None:
-
     """Checks whether the given notebook dict-like object
     conforms to the relevant notebook format schema.
 
@@ -496,7 +494,6 @@ def validate(  # noqa
         relax_add_props=relax_add_props,
         strip_invalid_metadata=strip_invalid_metadata,
     ):
-
         raise error
 
 

@@ -97,7 +97,7 @@ def _validator_for_name(validator_name):
         msg = f"Invalid validator '{validator_name}' value!\nValid values are: {VALIDATORS}"
         raise ValueError(msg)
 
-    for (name, module, validator_cls) in _VALIDATOR_MAP:
+    for name, module, validator_cls in _VALIDATOR_MAP:
         if module and validator_name == name:
             return validator_cls
     # we always return something.
