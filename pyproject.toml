@@ -171,14 +171,14 @@ ignore = [
   "E501",
   # SIM105 Use `contextlib.suppress(...)`
   "SIM105",
+  # PLR0913 Too many arguments to function call
+  "PLR0913",
 ]
 unfixable = [
   # Don't touch print statements
   "T201",
   # Don't touch noqa lines
   "RUF100",
-  # PLR0913 Too many arguments to function call
-  "PLR0913",
 ]
 
 [tool.ruff.per-file-ignores]
