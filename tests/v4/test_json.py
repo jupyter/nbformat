@@ -14,7 +14,6 @@ BASE_PATH = os.path.join(sys.modules["nbformat"].__path__[0], "v4")
 
 
 class TestJSON(formattest.NBFormatTest, TestCase):
-
     nb0_ref = None
     ext = "ipynb"
     mod = nbjson

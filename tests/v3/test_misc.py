@@ -12,7 +12,6 @@ class MiscTests(TestCase):
         self.assertEqual(fmt, exp_format)
 
     def test_parse_filename(self):
-
         # check format detection
         self.check_filename("test.ipynb", "test.ipynb", "test", "json")
         self.check_filename("test.json", "test.json", "test", "json")
