@@ -6,7 +6,7 @@ build-backend = "hatchling.build"
 name = "nbformat"
 dynamic = ["version"]
 description = "The Jupyter Notebook format"
-license = { file = "COPYING.md" }
+license = { file = "LICENSE" }
 keywords = ["Interactive", "Interpreter", "Shell", "Web"]
 classifiers = [
     "Intended Audience :: Developers",
