@@ -28,8 +28,6 @@ This library supported Python 2.7 and Python 3.5+ for `4.x.x` releases. With Pyt
 
 Read [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines on how to setup a local development environment and make code changes back to nbformat.
 
-[jupyter notebook format]: https://nbformat.readthedocs.org/en/latest/format_description.html
-
 ## About the Jupyter Development Team
 
 The Jupyter Development Team is the set of all contributors to the Jupyter project.
@@ -57,3 +55,5 @@ to indicate the copyright and license terms:
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
 ```
+
+[jupyter notebook format]: https://nbformat.readthedocs.org/en/latest/format_description.html
