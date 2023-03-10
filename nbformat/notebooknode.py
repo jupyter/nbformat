@@ -23,7 +23,7 @@ class NotebookNode(Struct):
             raise TypeError("update expected at most 1 arguments, got %d" % len(args))
         if args:
             other = args[0]
-            if isinstance(other, Mapping):
+            if isinstance(other, Mapping):  # noqa
                 for key in other:
                     self[key] = other[key]
             elif hasattr(other, "keys"):
