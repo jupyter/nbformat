@@ -25,7 +25,9 @@ def _relax_additional_properties(obj):
     """relax any `additionalProperties`"""
     if isinstance(obj, dict):
         for key, value in obj.items():
-            value = True if key == "additionalProperties" else _relax_additional_properties(value)
+            value = (  # noqa
+                True if key == "additionalProperties" else _relax_additional_properties(value)
+            )
             obj[key] = value
     elif isinstance(obj, list):
         for i, value in enumerate(obj):
@@ -215,7 +217,7 @@ class NotebookValidationError(ValidationError):
     __str__ = __unicode__
 
 
-def better_validation_error(error, version, version_minor):  # noqa
+def better_validation_error(error, version, version_minor):
     """Get better ValidationError on oneOf failures
 
     oneOf errors aren't informative.
@@ -249,10 +251,10 @@ def better_validation_error(error, version, version_minor):  # noqa
                 if better.ref is None:
                     better.ref = ref
                 return better
-            except Exception:
+            except Exception:  # noqa
                 # if it fails for some reason,
                 # let the original error through
-                pass  # noqa
+                pass
     return NotebookValidationError(error, ref)
 
 
@@ -471,7 +473,7 @@ def validate(  # noqa
             version_minor = nbdict_version_minor
     else:
         # if ref is specified, and we don't have a version number, assume we're validating against 1.0
-        if version is None:
+        if version is None:  # noqa
             version, version_minor = 1, 0
 
     if ref is None:
@@ -518,7 +520,7 @@ def _get_errors(
     return iter(errors)
 
 
-def _strip_invalida_metadata(  # noqa
+def _strip_invalida_metadata(
     nbdict: Any, version: int, version_minor: int, relax_add_props: bool
 ) -> int:
     """
@@ -591,7 +593,7 @@ def _strip_invalida_metadata(  # noqa
     return changes
 
 
-def iter_validate(  # noqa
+def iter_validate(
     nbdict=None,
     ref=None,
     version=None,

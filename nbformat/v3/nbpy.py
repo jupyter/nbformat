@@ -113,7 +113,7 @@ class PyReader(NotebookReader):
         nb = new_notebook(worksheets=[ws])
         return nb
 
-    def new_cell(self, state, lines, **kwargs):  # noqa
+    def new_cell(self, state, lines, **kwargs):
         """Create a new cell."""
         if state == "codecell":
             input_ = "\n".join(lines)
@@ -167,7 +167,7 @@ class PyReader(NotebookReader):
 class PyWriter(NotebookWriter):
     """A Python notebook writer."""
 
-    def writes(self, nb, **kwargs):  # noqa
+    def writes(self, nb, **kwargs):
         """Convert a notebook to a string."""
         lines = ["# -*- coding: utf-8 -*-"]
         lines.extend(
