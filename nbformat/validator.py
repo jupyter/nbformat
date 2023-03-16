@@ -264,6 +264,7 @@ def normalize(
     version_minor: Optional[int] = None,
     *,
     relax_add_props: bool = False,
+    strip_invalid_metadata: bool = False,
 ) -> Tuple[int, Any]:
     """
     Normalise a notebook prior to validation.
@@ -282,8 +283,11 @@ def normalize(
     version : int
     version_minor : int
     relax_add_props : bool
-        Wether to allow extra property in the Json schema validating the
+        Whether to allow extra property in the Json schema validating the
         notebook.
+    strip_invalid_metadata : bool
+        Whether to strip metadata that does not exist in the Json schema when
+        validating the notebook.
 
     Returns
     -------
@@ -305,7 +309,7 @@ def normalize(
         version_minor,
         True,
         relax_add_props=relax_add_props,
-        strip_invalid_metadata=False,
+        strip_invalid_metadata=strip_invalid_metadata,
     )
 
 
