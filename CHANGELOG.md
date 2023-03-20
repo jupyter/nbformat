@@ -4,6 +4,33 @@
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 5.8.0
+
+([Full Changelog](https://github.com/jupyter/nbformat/compare/v5.7.3...85917af9c77beae326531e1923e0ec47725e590b))
+
+### Enhancements made
+
+- Add strip_invalid_metadata argument to validator normalize method [#355](https://github.com/jupyter/nbformat/pull/355) ([@jonabc](https://github.com/jonabc))
+
+### Maintenance and upkeep improvements
+
+- Fix codecov badge [#352](https://github.com/jupyter/nbformat/pull/352) ([@blink1073](https://github.com/blink1073))
+- Add license [#348](https://github.com/jupyter/nbformat/pull/348) ([@dcsaba89](https://github.com/dcsaba89))
+- Add more linting [#345](https://github.com/jupyter/nbformat/pull/345) ([@blink1073](https://github.com/blink1073))
+- Only add ellipsis to NotJSONError message if message is truncated [#344](https://github.com/jupyter/nbformat/pull/344) ([@rschroll](https://github.com/rschroll))
+
+### Documentation improvements
+
+- DOC: README: capitalization, title [#346](https://github.com/jupyter/nbformat/pull/346) ([@westurner](https://github.com/westurner))
+
+### Contributors to this release
+
+([GitHub contributors page for this release](https://github.com/jupyter/nbformat/graphs/contributors?from=2023-01-12&to=2023-03-20&type=c))
+
+[@blink1073](https://github.com/search?q=repo%3Ajupyter%2Fnbformat+involves%3Ablink1073+updated%3A2023-01-12..2023-03-20&type=Issues) | [@dcsaba89](https://github.com/search?q=repo%3Ajupyter%2Fnbformat+involves%3Adcsaba89+updated%3A2023-01-12..2023-03-20&type=Issues) | [@jonabc](https://github.com/search?q=repo%3Ajupyter%2Fnbformat+involves%3Ajonabc+updated%3A2023-01-12..2023-03-20&type=Issues) | [@pre-commit-ci](https://github.com/search?q=repo%3Ajupyter%2Fnbformat+involves%3Apre-commit-ci+updated%3A2023-01-12..2023-03-20&type=Issues) | [@rschroll](https://github.com/search?q=repo%3Ajupyter%2Fnbformat+involves%3Arschroll+updated%3A2023-01-12..2023-03-20&type=Issues) | [@westurner](https://github.com/search?q=repo%3Ajupyter%2Fnbformat+involves%3Awesturner+updated%3A2023-01-12..2023-03-20&type=Issues)
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 5.7.3
 
 ([Full Changelog](https://github.com/jupyter/nbformat/compare/v5.7.2...1eefc29edff5da06f78c0087e7c06e644a6abcc9))
@@ -17,8 +44,6 @@
 ([GitHub contributors page for this release](https://github.com/jupyter/nbformat/graphs/contributors?from=2023-01-11&to=2023-01-12&type=c))
 
 [@minrk](https://github.com/search?q=repo%3Ajupyter%2Fnbformat+involves%3Aminrk+updated%3A2023-01-11..2023-01-12&type=Issues)
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 5.7.2
 
