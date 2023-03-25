@@ -22,7 +22,6 @@ except ImportError:
 
 from base64 import encodebytes
 
-
 from traitlets import Any, Bool, Bytes, Callable, Enum, Instance, Integer, Unicode, default, observe
 from traitlets.config import LoggingConfigurable, MultipleInstanceError
 
