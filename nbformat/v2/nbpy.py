@@ -42,7 +42,7 @@ class PyReader(NotebookReader):
         """Convert a string to a notebook."""
         return self.to_notebook(s, **kwargs)
 
-    def to_notebook(self, s, **kwargs):
+    def to_notebook(self, s, **kwargs):  # noqa
         """Convert a string to a notebook."""
         lines = s.splitlines()
         cells = []
