@@ -42,7 +42,7 @@ warnings.warn(
 - use nbformat for read/write/validate public API
 - use nbformat.vX directly to composing notebooks of a particular version
 """,
-    DeprecationWarning,
+    DeprecationWarning, stacklevel=2
 )
 
 __all__ = [
@@ -88,7 +88,7 @@ class NBFormatError(ValueError):
 def _warn_format():
     warnings.warn(
         """Non-JSON file support in nbformat is deprecated since nbformat 1.0.
-    Use nbconvert to create files of other formats."""
+    Use nbconvert to create files of other formats.""", stacklevel=2
     )
 
 

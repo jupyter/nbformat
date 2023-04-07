@@ -596,21 +596,21 @@ class TrustNotebookApp(JupyterApp):
     def sign_notebook(self, nb, notebook_path="<stdin>"):
         """Sign a notebook that's been loaded"""
         if self.notary.check_signature(nb):
-            print("Notebook already signed: %s" % notebook_path)
+            print("Notebook already signed: %s" % notebook_path)  # noqa
         else:
-            print("Signing notebook: %s" % notebook_path)
+            print("Signing notebook: %s" % notebook_path)  # noqa
             self.notary.sign(nb)
 
     def generate_new_key(self):
         """Generate a new notebook signature key"""
-        print("Generating new notebook key: %s" % self.notary.secret_file)
+        print("Generating new notebook key: %s" % self.notary.secret_file)  # noqa
         self.notary._write_secret_file(os.urandom(1024))
 
     def start(self):
         """Start the trust notebook app."""
         if self.reset:
             if os.path.exists(self.notary.db_file):
-                print("Removing trusted signature cache: %s" % self.notary.db_file)
+                print("Removing trusted signature cache: %s" % self.notary.db_file)  # noqa
                 os.remove(self.notary.db_file)
             self.generate_new_key()
             return

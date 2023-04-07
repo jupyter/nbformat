@@ -524,7 +524,7 @@ def _get_errors(
     return iter(errors)
 
 
-def _strip_invalida_metadata(
+def _strip_invalida_metadata(  # noqa
     nbdict: Any, version: int, version_minor: int, relax_add_props: bool
 ) -> int:
     """
