@@ -78,9 +78,7 @@ def parse_filename(fname):
         The filename, notebook name and format.
     """
     basename, ext = os.path.splitext(fname)
-    if ext == ".ipynb":
-        format_ = "json"
-    elif ext == ".json":
+    if ext in [".ipynb", ".json"]:
         format_ = "json"
     elif ext == ".py":
         format_ = "py"

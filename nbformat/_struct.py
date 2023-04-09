@@ -195,7 +195,7 @@ class Struct(dict):
         outdict = {}
         for k, lst in data.items():
             if isinstance(lst, str):
-                lst = lst.split()
+                lst = lst.split()  # noqa
             for entry in lst:
                 outdict[entry] = k
         return outdict
