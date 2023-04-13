@@ -198,6 +198,10 @@ unfixable = [
 # F401 `nbxml.to_notebook` imported but unused
 "nbformat/*__init__.py" = ["F401"]
 
+[tool.coverage.run]
+relative_files = true
+source = ["nbformat"]
+
 [tool.interrogate]
 ignore-init-module=true
 ignore-private=true

@@ -1,6 +1,5 @@
 # nbformat: Jupyter Notebook Format
 
-[![codecov.io](https://codecov.io/github/jupyter/nbformat/coverage.svg?branch=main)](https://codecov.io/github/jupyter/nbformat/coverage.svg?branch=main)
 ![CI Tests](https://github.com/jupyter/nbformat/workflows/Run%20tests/badge.svg)
 
 `nbformat` contains the reference implementation of the [Jupyter Notebook format],
