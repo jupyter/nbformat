@@ -202,8 +202,7 @@ class NotebookValidationError(ValidationError):
             [
                 error.message,
                 "",
-                "Failed validating %r in %s%s:"
-                % (
+                "Failed validating {!r} in {}{}:".format(
                     error.validator,
                     self.ref or "notebook",
                     _format_as_index(list(error.relative_schema_path)[:-1]),
