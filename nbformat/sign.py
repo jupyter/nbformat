@@ -14,6 +14,19 @@ from hmac import HMAC
 
 try:
     import sqlite3
+
+    # Use adapters recommended by Python 3.12 stdlib docs.
+    # https://docs.python.org/3.12/library/sqlite3.html#default-adapters-and-converters-deprecated
+    def adapt_datetime_iso(val):
+        """Adapt datetime.datetime to timezone-naive ISO 8601 date."""
+        return val.isoformat()
+
+    def convert_datetime(val):
+        """Convert ISO 8601 datetime to datetime.datetime object."""
+        return datetime.fromisoformat(val.decode())
+
+    sqlite3.register_adapter(datetime, adapt_datetime_iso)
+    sqlite3.register_converter("datetime", convert_datetime)
 except ImportError:
     try:
         from pysqlite2 import dbapi2 as sqlite3  # type:ignore[no-redef]
