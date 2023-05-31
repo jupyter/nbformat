@@ -4,6 +4,24 @@
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 5.9.0
+
+([Full Changelog](https://github.com/jupyter/nbformat/compare/v5.8.0...1b5e8e4e9af98f9c9b0843ba155b8756103d094d))
+
+### Maintenance and upkeep improvements
+
+- Support Python 3.12 [#363](https://github.com/jupyter/nbformat/pull/363) ([@blink1073](https://github.com/blink1073))
+- Use local coverage [#360](https://github.com/jupyter/nbformat/pull/360) ([@blink1073](https://github.com/blink1073))
+- Bump actions/checkout from 2 to 3 [#350](https://github.com/jupyter/nbformat/pull/350) ([@dependabot](https://github.com/dependabot))
+
+### Contributors to this release
+
+([GitHub contributors page for this release](https://github.com/jupyter/nbformat/graphs/contributors?from=2023-03-20&to=2023-05-31&type=c))
+
+[@blink1073](https://github.com/search?q=repo%3Ajupyter%2Fnbformat+involves%3Ablink1073+updated%3A2023-03-20..2023-05-31&type=Issues) | [@dependabot](https://github.com/search?q=repo%3Ajupyter%2Fnbformat+involves%3Adependabot+updated%3A2023-03-20..2023-05-31&type=Issues) | [@pre-commit-ci](https://github.com/search?q=repo%3Ajupyter%2Fnbformat+involves%3Apre-commit-ci+updated%3A2023-03-20..2023-05-31&type=Issues)
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 5.8.0
 
 ([Full Changelog](https://github.com/jupyter/nbformat/compare/v5.7.3...85917af9c77beae326531e1923e0ec47725e590b))
@@ -28,8 +46,6 @@
 ([GitHub contributors page for this release](https://github.com/jupyter/nbformat/graphs/contributors?from=2023-01-12&to=2023-03-20&type=c))
 
 [@blink1073](https://github.com/search?q=repo%3Ajupyter%2Fnbformat+involves%3Ablink1073+updated%3A2023-01-12..2023-03-20&type=Issues) | [@dcsaba89](https://github.com/search?q=repo%3Ajupyter%2Fnbformat+involves%3Adcsaba89+updated%3A2023-01-12..2023-03-20&type=Issues) | [@jonabc](https://github.com/search?q=repo%3Ajupyter%2Fnbformat+involves%3Ajonabc+updated%3A2023-01-12..2023-03-20&type=Issues) | [@pre-commit-ci](https://github.com/search?q=repo%3Ajupyter%2Fnbformat+involves%3Apre-commit-ci+updated%3A2023-01-12..2023-03-20&type=Issues) | [@rschroll](https://github.com/search?q=repo%3Ajupyter%2Fnbformat+involves%3Arschroll+updated%3A2023-01-12..2023-03-20&type=Issues) | [@westurner](https://github.com/search?q=repo%3Ajupyter%2Fnbformat+involves%3Awesturner+updated%3A2023-01-12..2023-03-20&type=Issues)
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 5.7.3
 
