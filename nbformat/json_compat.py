@@ -101,7 +101,7 @@ def _validator_for_name(validator_name):
         if module and validator_name == name:
             return validator_cls
     # we always return something.
-    msg = f"Missing validator for {repr(validator_name)}"
+    msg = f"Missing validator for {validator_name!r}"
     raise ValueError(msg)
 
 
