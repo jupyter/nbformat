@@ -55,7 +55,7 @@ class FastJsonSchemaValidator(JsonSchemaValidator):
     def validate(self, data):
         """Validate incoming data."""
         try:
-            self._validator(data)
+            self._validator(data)  # type:ignore[operator]
         except _JsonSchemaException as error:
             raise ValidationError(str(error), schema_path=error.path) from error
 
@@ -67,7 +67,7 @@ class FastJsonSchemaValidator(JsonSchemaValidator):
         errors = []
         validate_func = self._validator
         try:
-            validate_func(data)
+            validate_func(data)  # type:ignore[operator]
         except _JsonSchemaException as error:
             errors = [ValidationError(str(error), schema_path=error.path)]
 
