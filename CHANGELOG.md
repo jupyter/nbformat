@@ -4,6 +4,22 @@
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 5.9.1
+
+([Full Changelog](https://github.com/jupyter/nbformat/compare/v5.9.0...c348f9d12f05b4e0350413c74f58cd9e4f54a550))
+
+### Maintenance and upkeep improvements
+
+- Fix deprecation warning when importing from jsonschema [#368](https://github.com/jupyter/nbformat/pull/368) ([@eladkal](https://github.com/eladkal))
+
+### Contributors to this release
+
+([GitHub contributors page for this release](https://github.com/jupyter/nbformat/graphs/contributors?from=2023-05-31&to=2023-07-10&type=c))
+
+[@eladkal](https://github.com/search?q=repo%3Ajupyter%2Fnbformat+involves%3Aeladkal+updated%3A2023-05-31..2023-07-10&type=Issues) | [@pre-commit-ci](https://github.com/search?q=repo%3Ajupyter%2Fnbformat+involves%3Apre-commit-ci+updated%3A2023-05-31..2023-07-10&type=Issues)
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 5.9.0
 
 ([Full Changelog](https://github.com/jupyter/nbformat/compare/v5.8.0...1b5e8e4e9af98f9c9b0843ba155b8756103d094d))
@@ -19,8 +35,6 @@
 ([GitHub contributors page for this release](https://github.com/jupyter/nbformat/graphs/contributors?from=2023-03-20&to=2023-05-31&type=c))
 
 [@blink1073](https://github.com/search?q=repo%3Ajupyter%2Fnbformat+involves%3Ablink1073+updated%3A2023-03-20..2023-05-31&type=Issues) | [@dependabot](https://github.com/search?q=repo%3Ajupyter%2Fnbformat+involves%3Adependabot+updated%3A2023-03-20..2023-05-31&type=Issues) | [@pre-commit-ci](https://github.com/search?q=repo%3Ajupyter%2Fnbformat+involves%3Apre-commit-ci+updated%3A2023-03-20..2023-05-31&type=Issues)
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 5.8.0
 
