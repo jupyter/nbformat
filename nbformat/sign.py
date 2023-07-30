@@ -602,7 +602,7 @@ class TrustNotebookApp(JupyterApp):
         if not os.path.exists(notebook_path):
             self.log.error("Notebook missing: %s" % notebook_path)
             self.exit(1)
-        with open(notebook_path, encoding="utf8") as f:
+        with open(notebook_path, encoding="utf-8") as f:
             nb = read(f, NO_CONVERT)
         self.sign_notebook(nb, notebook_path)
 

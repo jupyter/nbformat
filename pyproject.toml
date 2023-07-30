@@ -69,7 +69,7 @@ build = "make -C docs html SPHINXOPTS='-W'"
 [tool.hatch.envs.test]
 features = ["test"]
 [tool.hatch.envs.test.scripts]
-test = "python -m pytest -vv {args}"
+test = "PYTHONWARNDEFAULTENCODING=1 python -m pytest -vv {args}"
 nowarn = "test -W default {args}"
 
 [tool.hatch.envs.cov]

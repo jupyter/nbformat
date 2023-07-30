@@ -40,7 +40,7 @@ class TestNotary(TestsBase):
 
     def test_invalid_db_file(self):
         invalid_sql_file = os.path.join(self.data_dir, "invalid_db_file.db")
-        with open(invalid_sql_file, "w") as tempfile:
+        with open(invalid_sql_file, "w", encoding="utf-8") as tempfile:
             tempfile.write("[invalid data]")
 
         invalid_notary = sign.NotebookNotary(

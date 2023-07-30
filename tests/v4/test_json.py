@@ -108,7 +108,9 @@ class TestJSON(formattest.NBFormatTest, TestCase):
 
     def test_base_version_matches_latest(self):
         """Test to ensure latest version file matches latest verison"""
-        with open(os.path.join(BASE_PATH, "nbformat.v4.schema.json")) as schema_file:
+        with open(
+            os.path.join(BASE_PATH, "nbformat.v4.schema.json"), encoding='utf-8'
+        ) as schema_file:
             latest_schema = json.load(schema_file)
             with open(
                 os.path.join(
@@ -117,13 +119,16 @@ class TestJSON(formattest.NBFormatTest, TestCase):
                         major=nbformat, minor=nbformat_minor
                     ),
                 ),
+                encoding='utf-8',
             ) as schema_file:  # noqa
                 ver_schema = json.load(schema_file)
             assert latest_schema == ver_schema
 
     def test_latest_matches_nbformat(self):
         """Test to ensure that the nbformat version matches the description of the latest schema"""
-        with open(os.path.join(BASE_PATH, "nbformat.v4.schema.json")) as schema_file:
+        with open(
+            os.path.join(BASE_PATH, "nbformat.v4.schema.json"), encoding='utf-8'
+        ) as schema_file:
             schema = json.load(schema_file)
         assert schema["description"] == "Jupyter Notebook v{major}.{minor} JSON schema.".format(
             major=nbformat, minor=nbformat_minor
