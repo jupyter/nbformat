@@ -304,6 +304,7 @@ intersphinx_mapping = {
     "jupyterclient": ("https://jupyter-client.readthedocs.io/en/stable", None),
     "nbconvert": ("https://nbconvert.readthedocs.org/en/stable", None),
     "notebook": ("https://jupyter-notebook.readthedocs.org/en/stable", None),
+    "server": ("https://jupyter-server.readthedocs.org/en/stable", None),
 }
 
 
