@@ -410,7 +410,7 @@ class NotebookNotary(LoggingConfigurable):
     def _secret_default(self):
         # note : this assumes an Application is running
         if os.path.exists(self.secret_file):
-            with open(self.secret_file, "rb") as f:
+            with open(self.secret_file, "rb", encoding='utf-8') as f:
                 return f.read()
         else:
             secret = encodebytes(os.urandom(1024))
@@ -425,7 +425,7 @@ class NotebookNotary(LoggingConfigurable):
     def _write_secret_file(self, secret):
         """write my secret to my secret_file"""
         self.log.info("Writing notebook-signing key to %s", self.secret_file)
-        with open(self.secret_file, "wb") as f:
+        with open(self.secret_file, "wb", encoding='utf-8') as f:
             f.write(secret)
         try:
             os.chmod(self.secret_file, 0o600)
@@ -602,7 +602,7 @@ class TrustNotebookApp(JupyterApp):
         if not os.path.exists(notebook_path):
             self.log.error("Notebook missing: %s" % notebook_path)
             self.exit(1)
-        with open(notebook_path, encoding="utf8") as f:
+        with open(notebook_path, encoding="utf-8") as f:
             nb = read(f, NO_CONVERT)
         self.sign_notebook(nb, notebook_path)
 
