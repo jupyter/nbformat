@@ -81,7 +81,7 @@ Notebook signatures
 
 This machinery is used by the notebook web application to record which notebooks
 are *trusted*, and may show dynamic output as soon as they're loaded. See
-:ref:`notebook:notebook_security` for more information.
+:ref:`server:server_security` for more information.
 
 .. autoclass:: NotebookNotary
 
