@@ -1,13 +1,9 @@
 """The version information for nbformat."""
 # Use "hatchling version xx.yy.zz" to handle version changes
 import re
+from importlib.metadata import version
 
-try:
-    from importlib.metadata import version
-except ImportError:
-    from importlib_metadata import version  # type:ignore
-
-__version__ = version("nbformat")
+__version__ = version("nbformat") or "0.0.0"
 
 # matches tbump regex in pyproject.toml
 _version_regex = re.compile(
