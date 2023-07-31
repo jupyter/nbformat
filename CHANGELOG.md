@@ -4,6 +4,31 @@
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 5.9.2
+
+([Full Changelog](https://github.com/jupyter/nbformat/compare/v5.9.1...80dd726ec87218e0b428a857b4cc656e7e9950d3))
+
+### Bugs fixed
+
+- Fix version handling [#372](https://github.com/jupyter/nbformat/pull/372) ([@blink1073](https://github.com/blink1073))
+
+### Maintenance and upkeep improvements
+
+- Fix encoding warnings [#371](https://github.com/jupyter/nbformat/pull/371) ([@blink1073](https://github.com/blink1073))
+- Update link to notebook security [#370](https://github.com/jupyter/nbformat/pull/370) ([@blink1073](https://github.com/blink1073))
+
+### Documentation improvements
+
+- Update link to notebook security [#370](https://github.com/jupyter/nbformat/pull/370) ([@blink1073](https://github.com/blink1073))
+
+### Contributors to this release
+
+([GitHub contributors page for this release](https://github.com/jupyter/nbformat/graphs/contributors?from=2023-07-10&to=2023-07-31&type=c))
+
+[@blink1073](https://github.com/search?q=repo%3Ajupyter%2Fnbformat+involves%3Ablink1073+updated%3A2023-07-10..2023-07-31&type=Issues)
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 5.9.1
 
 ([Full Changelog](https://github.com/jupyter/nbformat/compare/v5.9.0...c348f9d12f05b4e0350413c74f58cd9e4f54a550))
@@ -17,8 +42,6 @@
 ([GitHub contributors page for this release](https://github.com/jupyter/nbformat/graphs/contributors?from=2023-05-31&to=2023-07-10&type=c))
 
 [@eladkal](https://github.com/search?q=repo%3Ajupyter%2Fnbformat+involves%3Aeladkal+updated%3A2023-05-31..2023-07-10&type=Issues) | [@pre-commit-ci](https://github.com/search?q=repo%3Ajupyter%2Fnbformat+involves%3Apre-commit-ci+updated%3A2023-05-31..2023-07-10&type=Issues)
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 5.9.0
 
