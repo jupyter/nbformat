@@ -115,9 +115,7 @@ class TestJSON(formattest.NBFormatTest, TestCase):
             with open(
                 os.path.join(
                     BASE_PATH,
-                    "nbformat.v{major}.{minor}.schema.json".format(
-                        major=nbformat, minor=nbformat_minor
-                    ),
+                    f"nbformat.v{nbformat}.{nbformat_minor}.schema.json",
                 ),
                 encoding='utf-8',
             ) as schema_file:  # noqa
