@@ -474,10 +474,9 @@ def validate(  # noqa
             version = nbdict_version
         if version_minor is None:
             version_minor = nbdict_version_minor
-    else:
-        # if ref is specified, and we don't have a version number, assume we're validating against 1.0
-        if version is None:  # noqa
-            version, version_minor = 1, 0
+    # if ref is specified, and we don't have a version number, assume we're validating against 1.0
+    elif version is None:
+        version, version_minor = 1, 0
 
     if ref is None:
         assert isinstance(version, int)  # noqa
