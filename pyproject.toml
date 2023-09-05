@@ -39,6 +39,10 @@ content-type = "text/plain"
 
 [project.urls]
 Homepage = "https://jupyter.org"
+Changelog = "https://github.com/jupyter/nbformat/blob/main/CHANGELOG.md"
+Documentation = "https://nbformat.readthedocs.io/"
+Repository = "https://github.com/jupyter/nbformat.git"
+
 
 [project.optional-dependencies]
 docs = [
