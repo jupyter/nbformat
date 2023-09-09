@@ -420,7 +420,7 @@ def validate(  # noqa
     version : int
     version_minor : int
     relax_add_props : bool
-        Wether to allow extra properties in the JSON schema validating the notebook.
+        Whether to allow extra properties in the JSON schema validating the notebook.
         When True, all known fields are validated, but unknown fields are ignored.
     nbjson
     repair_duplicate_cell_ids : bool
@@ -537,7 +537,7 @@ def _strip_invalida_metadata(  # noqa
     version : int
     version_minor : int
     relax_add_props : bool
-        Wether to allow extra property in the Json schema validating the
+        Whether to allow extra property in the Json schema validating the
         notebook.
 
     Returns

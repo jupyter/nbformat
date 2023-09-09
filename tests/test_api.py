@@ -38,7 +38,7 @@ class TestAPI(TestsBase):
         self.assertEqual(major, current_nbformat)
 
     def test_write_downgrade_2(self):
-        """dowgrade a v3 notebook to v2"""
+        """downgrade a v3 notebook to v2"""
         # Open a version 3 notebook.
         with self.fopen("test3.ipynb", "r") as f:
             nb = read(f, as_version=3)

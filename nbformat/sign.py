@@ -175,7 +175,7 @@ class SQLiteSignatureStore(SignatureStore, LoggingConfigurable):
                     if db is not None:
                         db.close()
                     self.log.warning(
-                        "Failed commiting signatures database to disk. "
+                        "Failed committing signatures database to disk. "
                         "You may need to move the database file to a non-networked file system, "
                         "using config option `NotebookNotary.db_file`. "
                         "Using in-memory signatures database for the remainder of this session."

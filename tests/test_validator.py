@@ -38,7 +38,7 @@ def set_validator(validator_name):
 
 @pytest.mark.parametrize("validator_name", VALIDATORS)
 def test_should_warn(validator_name):
-    """Test that a v4 notebook witout id emit a warning"""
+    """Test that a v4 notebook without id emit a warning"""
     set_validator(validator_name)
     with TestsBase.fopen("test4.5.ipynb", "r") as f:
         nb = read(f, as_version=4)

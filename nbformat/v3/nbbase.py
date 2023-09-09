@@ -54,7 +54,7 @@ def str_passthrough(obj):
 def cast_str(obj):
     """Cast an object as a string."""
     if isinstance(obj, bytes):
-        # really this should never happend, it should
+        # really this should never happened, it should
         # have been base64 encoded before.
         warnings.warn(
             "A notebook got bytes instead of likely base64 encoded values."
