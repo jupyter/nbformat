@@ -362,9 +362,9 @@ class NotebookNotary(LoggingConfigurable):
     def _store_factory_default(self):
         def factory():
             if sqlite3 is None:
-                self.log.warning(
+                self.log.warning(  # type:ignore[unreachable]
                     "Missing SQLite3, all notebooks will be untrusted!"
-                )  # type:ignore[unreachable]
+                )
                 return MemorySignatureStore()
             return SQLiteSignatureStore(self.db_file)
 
