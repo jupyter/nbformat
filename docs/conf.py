@@ -74,7 +74,7 @@ numpydoc_class_members_toctree = False
 # built documents.
 #
 # The short X.Y version.
-version = ".".join(nbformat.__version__).split(".")[:2]
+version = nbformat.__version__.split(".")[:2]
 # The full version, including alpha/beta/rc tags.
 release = version
 
