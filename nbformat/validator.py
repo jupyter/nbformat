@@ -21,6 +21,18 @@ validators = {}
 _deprecated = object()
 
 
+__all__ = [
+    "ValidationError",
+    "get_validator",
+    "isvalid",
+    "NotebookValidationError",
+    "better_validation_error",
+    "normalize",
+    "validate",
+    "iter_validate",
+]
+
+
 def _relax_additional_properties(obj):
     """relax any `additionalProperties`"""
     if isinstance(obj, dict):
@@ -404,8 +416,8 @@ def validate(  # noqa
     version_minor: Optional[int] = None,
     relax_add_props: bool = False,
     nbjson: Any = None,
-    repair_duplicate_cell_ids: bool = _deprecated,  # type: ignore
-    strip_invalid_metadata: bool = _deprecated,  # type: ignore
+    repair_duplicate_cell_ids: bool = _deprecated,  # type: ignore[assignment]
+    strip_invalid_metadata: bool = _deprecated,  # type: ignore[assignment]
 ) -> None:
     """Checks whether the given notebook dict-like object
     conforms to the relevant notebook format schema.

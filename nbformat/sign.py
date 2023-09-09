@@ -2,6 +2,7 @@
 
 # Copyright (c) IPython Development Team.
 # Distributed under the terms of the Modified BSD License.
+from __future__ import annotations
 
 import hashlib
 import os
@@ -29,7 +30,7 @@ try:
     sqlite3.register_converter("datetime", convert_datetime)
 except ImportError:
     try:
-        from pysqlite2 import dbapi2 as sqlite3  # type:ignore[no-redef]
+        from pysqlite2 import dbapi2 as sqlite3  # type:ignore[no-redef, import]
     except ImportError:
         sqlite3 = None  # type:ignore[assignment]
 
@@ -147,7 +148,7 @@ class SQLiteSignatureStore(SignatureStore, LoggingConfigurable):
             self.db.close()
 
     def _connect_db(self, db_file):
-        kwargs: t.Dict[str, t.Any] = {
+        kwargs: dict[str, t.Any] = {
             "detect_types": sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES
         }
         db = None
@@ -361,7 +362,9 @@ class NotebookNotary(LoggingConfigurable):
     def _store_factory_default(self):
         def factory():
             if sqlite3 is None:
-                self.log.warning("Missing SQLite3, all notebooks will be untrusted!")
+                self.log.warning(
+                    "Missing SQLite3, all notebooks will be untrusted!"
+                )  # type:ignore[unreachable]
                 return MemorySignatureStore()
             return SQLiteSignatureStore(self.db_file)
 
@@ -552,7 +555,7 @@ class NotebookNotary(LoggingConfigurable):
         return trusted
 
 
-trust_flags: dict = {
+trust_flags: dict[str, t.Any] = {
     "reset": (
         {"TrustNotebookApp": {"reset": True}},
         """Delete the trusted notebook cache.
@@ -560,7 +563,7 @@ trust_flags: dict = {
         """,
     ),
 }
-trust_flags.update(base_flags)
+trust_flags.update(base_flags)  # type:ignore[arg-type]
 
 
 class TrustNotebookApp(JupyterApp):
@@ -582,7 +585,7 @@ class TrustNotebookApp(JupyterApp):
     jupyter trust mynotebook.ipynb and_this_one.ipynb
     """
 
-    flags = trust_flags
+    flags = trust_flags  # type:ignore[assignment]
 
     reset = Bool(
         False,

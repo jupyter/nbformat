@@ -7,11 +7,19 @@ libraries.
 
 import os
 
-import fastjsonschema
+import fastjsonschema  # type:ignore[import]
 import jsonschema
 from fastjsonschema import JsonSchemaException as _JsonSchemaException
 from jsonschema import Draft4Validator as _JsonSchemaValidator
 from jsonschema.exceptions import ErrorTree, ValidationError
+
+__all__ = [
+    "ValidationError",
+    "JsonSchemaValidator",
+    "FastJsonSchemaValidator",
+    "get_current_validator",
+    "VALIDATORS",
+]
 
 
 class JsonSchemaValidator:
