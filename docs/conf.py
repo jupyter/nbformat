@@ -19,7 +19,8 @@
 
 import os
 import shutil
-from importlib.metadata import version as get_version
+
+import nbformat
 
 HERE = os.path.abspath(os.path.dirname(__file__))
 
@@ -73,7 +74,7 @@ numpydoc_class_members_toctree = False
 # built documents.
 #
 # The short X.Y version.
-version = ".".join(get_version("nbformat").split(".")[:2])
+version = ".".join(nbformat.__version__).split(".")[:2]
 # The full version, including alpha/beta/rc tags.
 release = version
 
