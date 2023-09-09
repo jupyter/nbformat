@@ -563,7 +563,7 @@ trust_flags: dict[str, t.Any] = {
         """,
     ),
 }
-trust_flags.update(base_flags)  # type:ignore[arg-type]
+trust_flags.update(base_flags)
 
 
 class TrustNotebookApp(JupyterApp):
