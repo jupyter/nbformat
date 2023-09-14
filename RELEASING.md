@@ -14,14 +14,14 @@
   nbformat = 4
 
   # current minor version
-  nbformat_minor = <new_minor_version_here>
+  nbformat_minor = new_minor_version_here
 
   # schema files for (major, minor) version tuples. (None, None) means the current version
   nbformat_schema = {
-      (None, None): 'nbformat.v4.schema.json',
-      (4, 0): 'nbformat.v4.0.schema.json',
-      ...
-      (4, <new_minor_version_here>): 'nbformat.v4.<new_minor_version_here>.schema.json'
+      (None, None): "nbformat.v4.schema.json",
+      (4, 0): "nbformat.v4.0.schema.json",
+      # ...
+      (4, new_minor_version_here): "nbformat.v4.<new_minor_version_here>.schema.json",
   }
   ```
 
@@ -59,7 +59,7 @@ git push upstream --tags
 rm -rf dist/*
 rm -rf build/*
 pipx run build .
-# Double check the dist/* files have the right verison (no `.dev`) and install the wheel to ensure it's good
+# Double check the dist/* files have the right version (no `.dev`) and install the wheel to ensure it's good
 pip install dist/*
 pipx run twine upload dist/*
 ```

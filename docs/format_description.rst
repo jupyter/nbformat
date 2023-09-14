@@ -31,23 +31,23 @@ At the highest level, a Jupyter notebook is a dictionary with a few keys:
 .. sourcecode:: python
 
     {
-      "metadata" : {
-        "kernel_info": {
-            # if kernel_info is defined, its name field is required.
-            "name" : "the name of the kernel"
+        "metadata": {
+            "kernel_info": {
+                # if kernel_info is defined, its name field is required.
+                "name": "the name of the kernel"
+            },
+            "language_info": {
+                # if language_info is defined, its name field is required.
+                "name": "the programming language of the kernel",
+                "version": "the version of the language",
+                "codemirror_mode": "The name of the codemirror mode to use [optional]",
+            },
         },
-        "language_info": {
-            # if language_info is defined, its name field is required.
-            "name" : "the programming language of the kernel",
-            "version": "the version of the language",
-            "codemirror_mode": "The name of the codemirror mode to use [optional]"
-        }
-      },
-      "nbformat": 4,
-      "nbformat_minor": 0,
-      "cells" : [
-          # list of cell dictionaries, see below
-      ],
+        "nbformat": 4,
+        "nbformat_minor": 0,
+        "cells": [
+            # list of cell dictionaries, see below
+        ],
     }
 
 Some fields, such as code input and text output, are characteristically multi-line strings.
@@ -68,9 +68,9 @@ All cells have the following basic structure:
 .. sourcecode:: python
 
     {
-      "cell_type" : "type",
-      "metadata" : {},
-      "source" : "single string or [list, of, strings]",
+        "cell_type": "type",
+        "metadata": {},
+        "source": "single string or [list, of, strings]",
     }
 
 .. note::
@@ -91,9 +91,9 @@ as defined in `GitHub-flavored markdown`_, and implemented in marked_.
 .. sourcecode:: python
 
     {
-      "cell_type" : "markdown",
-      "metadata" : {},
-      "source" : "[multi-line *markdown*]",
+        "cell_type": "markdown",
+        "metadata": {},
+        "source": "[multi-line *markdown*]",
     }
 
 .. versionchanged:: nbformat 4.0
@@ -112,18 +112,20 @@ They also have an execution_count, which must be an integer or ``null``.
 .. sourcecode:: python
 
     {
-      "cell_type" : "code",
-      "execution_count": 1, # integer or null
-      "metadata" : {
-          "collapsed" : True, # whether the output of the cell is collapsed
-          "scrolled": False, # any of true, false or "auto"
-      },
-      "source" : "[some multi-line code]",
-      "outputs": [{
-          # list of output dicts (described below)
-          "output_type": "stream",
-          ...
-      }],
+        "cell_type": "code",
+        "execution_count": 1,  # integer or null
+        "metadata": {
+            "collapsed": True,  # whether the output of the cell is collapsed
+            "scrolled": False,  # any of true, false or "auto"
+        },
+        "source": "[some multi-line code]",
+        "outputs": [
+            {
+                # list of output dicts (described below)
+                "output_type": "stream",
+                # ...
+            }
+        ],
     }
 
 .. versionchanged:: nbformat 4.0
@@ -150,9 +152,9 @@ stream output
 .. sourcecode:: python
 
     {
-      "output_type" : "stream",
-      "name" : "stdout", # or stderr
-      "text" : "[multiline stream text]",
+        "output_type": "stream",
+        "name": "stdout",  # or stderr
+        "text": "[multiline stream text]",
     }
 
 .. versionchanged:: nbformat 4.0
@@ -175,29 +177,29 @@ The metadata of these messages may be keyed by mime-type as well.
 .. sourcecode:: python
 
     {
-      "output_type" : "display_data",
-      "data" : {
-        "text/plain" : "[multiline text data]",
-        "image/png": "[base64-encoded-multiline-png-data]",
-        "application/json": {
-          # JSON data is included as-is
-          "key1": "data",
-          "key2": ["some", "values"],
-          "key3": {"more": "data"}
+        "output_type": "display_data",
+        "data": {
+            "text/plain": "[multiline text data]",
+            "image/png": "[base64-encoded-multiline-png-data]",
+            "application/json": {
+                # JSON data is included as-is
+                "key1": "data",
+                "key2": ["some", "values"],
+                "key3": {"more": "data"},
+            },
+            "application/vnd.exampleorg.type+json": {
+                # JSON data, included as-is, when the mime-type key ends in +json
+                "key1": "data",
+                "key2": ["some", "values"],
+                "key3": {"more": "data"},
+            },
         },
-        "application/vnd.exampleorg.type+json": {
-          # JSON data, included as-is, when the mime-type key ends in +json
-          "key1": "data",
-          "key2": ["some", "values"],
-          "key3": {"more": "data"}
-        }
-      },
-      "metadata" : {
-        "image/png": {
-          "width": 640,
-          "height": 480,
+        "metadata": {
+            "image/png": {
+                "width": 640,
+                "height": 480,
+            },
         },
-      },
     }
 
 
@@ -217,28 +219,28 @@ execute_result
 
 Results of executing a cell (as created by ``displayhook`` in Python)
 are stored in ``execute_result`` outputs.
-`execute_result` outputs are identical to ``display_data``,
+``execute_result`` outputs are identical to ``display_data``,
 adding only a ``execution_count`` field, which must be an integer.
 
 .. sourcecode:: python
 
     {
-      "output_type" : "execute_result",
-      "execution_count": 42,
-      "data" : {
-        "text/plain" : "[multiline text data]",
-        "image/png": "[base64-encoded-multiline-png-data]",
-        "application/json": {
-          # JSON data is included as-is
-          "json": "data",
+        "output_type": "execute_result",
+        "execution_count": 42,
+        "data": {
+            "text/plain": "[multiline text data]",
+            "image/png": "[base64-encoded-multiline-png-data]",
+            "application/json": {
+                # JSON data is included as-is
+                "json": "data",
+            },
         },
-      },
-      "metadata" : {
-        "image/png": {
-          "width": 640,
-          "height": 480,
+        "metadata": {
+            "image/png": {
+                "width": 640,
+                "height": 480,
+            },
         },
-      },
     }
 
 .. versionchanged:: nbformat 4.0
@@ -283,7 +285,7 @@ or restructured text for use in Sphinx documentation.
 
 The notebook authoring environment does not render raw cells.
 
-The only logic in a raw cell is the `format` metadata field.
+The only logic in a raw cell is the ``format`` metadata field.
 If defined, it specifies which nbconvert output format is the intended target
 for the raw cell. When outputting to any other format,
 the raw cell's contents will be excluded.
@@ -294,13 +296,13 @@ regardless of format.
 .. sourcecode:: python
 
     {
-      "cell_type" : "raw",
-      "metadata" : {
-        # the mime-type of the target nbconvert format.
-        # nbconvert to formats other than this will exclude this cell.
-        "format" : "mime/type"
-      },
-      "source" : "[some nbformat output text]"
+        "cell_type": "raw",
+        "metadata": {
+            # the mime-type of the target nbconvert format.
+            # nbconvert to formats other than this will exclude this cell.
+            "format": "mime/type"
+        },
+        "source": "[some nbformat output text]",
     }
 
 
@@ -320,14 +322,10 @@ keyed by filename that represents the files attached to the cell.
 .. sourcecode:: python
 
     {
-      "cell_type" : "markdown",
-      "metadata" : {},
-      "source" : ["Here is an *inline* image ![inline image](attachment:test.png)"],
-      "attachments" : {
-        "test.png": {
-            "image/png" : "base64-encoded-png-data"
-        }
-      }
+        "cell_type": "markdown",
+        "metadata": {},
+        "source": ["Here is an *inline* image ![inline image](attachment:test.png)"],
+        "attachments": {"test.png": {"image/png": "base64-encoded-png-data"}},
     }
 
 
@@ -335,13 +333,13 @@ Cell ids
 --------
 
 Since the 4.5 schema release, all cells have an ``id`` field which must be a string of length
-1-64 with alphanumeric, `-`, and `_` as legal characters to use. These ids must be unique to
+1-64 with alphanumeric, ``-``, and ``_`` as legal characters to use. These ids must be unique to
 any given Notebook following the nbformat spec.
 
 The full rules and guidelines for using cells ids is captured in the corresponding
 `JEP Proposal <https://github.com/jupyter/enhancement-proposals/blob/master/62-cell-id/cell-id.md>`_.
 
-If attempting to add similiar support to other languages supporting notebooks specs, this
+If attempting to add similar support to other languages supporting notebooks specs, this
 `Example PR <https://github.com/jupyter/nbformat/pull/189>`_ can be used as a reference to follow.
 
 
@@ -380,7 +378,7 @@ Metadata
 Metadata is a place that you can put arbitrary JSONable information about
 your notebook, cell, or output. Because it is a shared namespace,
 any custom metadata should use a sufficiently unique namespace,
-such as `metadata.kaylees_md.foo = "bar"`.
+such as ``metadata.kaylees_md.foo = "bar"``.
 
 Metadata fields officially defined for Jupyter notebooks are listed here:
 
@@ -404,10 +402,10 @@ Additional fields may be added.
 
     nb.metadata.authors = [
         {
-            'name': 'Fernando Perez',
+            "name": "Fernando Perez",
         },
         {
-            'name': 'Brian Granger',
+            "name": "Brian Granger",
         },
     ]
 
@@ -415,7 +413,7 @@ Cell metadata
 -------------
 
 Official Jupyter metadata, as used by Jupyter frontends should be placed in the
-`metadata.jupyter` namespace, for example `metadata.jupyter.foo = "bar"`.
+``metadata.jupyter`` namespace, for example ``metadata.jupyter.foo = "bar"``.
 
 The following metadata keys are defined at the cell level:
 
@@ -433,7 +431,7 @@ jupyter     dict            A namespace holding jupyter specific fields. See doc
 execution   dict            A namespace holding execution specific fields. See docs below for more details
 =========== =============== ==============
 
-The following metadata keys are defined at the cell level within the `jupyter` namespace
+The following metadata keys are defined at the cell level within the ``jupyter`` namespace
 
 =============== =============== ==============
 Key             Value           Interpretation
@@ -442,7 +440,7 @@ source_hidden   bool            Whether the cell's source should be shown
 outputs_hidden  bool            Whether the cell's outputs should be shown
 =============== =============== ==============
 
-The following metadata keys are defined at the cell level within the `execution` namespace.
+The following metadata keys are defined at the cell level within the ``execution`` namespace.
 These are lower level fields capturing common kernel message timestamps for better visibility
 in applications where needed. Most users will not look at these directly.
 

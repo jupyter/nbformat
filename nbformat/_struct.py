@@ -2,11 +2,12 @@
 
 Can probably be replaced by types.SimpleNamespace from Python 3.3
 """
+from typing import Any, Dict
 
 __all__ = ["Struct"]
 
 
-class Struct(dict):
+class Struct(Dict[Any, Any]):
     """A dict subclass with attribute style access.
 
     This dict subclass has a a few extra features:

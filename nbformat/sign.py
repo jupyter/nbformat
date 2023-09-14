@@ -2,6 +2,7 @@
 
 # Copyright (c) IPython Development Team.
 # Distributed under the terms of the Modified BSD License.
+from __future__ import annotations
 
 import hashlib
 import os
@@ -29,7 +30,7 @@ try:
     sqlite3.register_converter("datetime", convert_datetime)
 except ImportError:
     try:
-        from pysqlite2 import dbapi2 as sqlite3  # type:ignore[no-redef]
+        from pysqlite2 import dbapi2 as sqlite3  # type:ignore[no-redef, import]
     except ImportError:
         sqlite3 = None  # type:ignore[assignment]
 
@@ -147,7 +148,7 @@ class SQLiteSignatureStore(SignatureStore, LoggingConfigurable):
             self.db.close()
 
     def _connect_db(self, db_file):
-        kwargs: t.Dict[str, t.Any] = {
+        kwargs: dict[str, t.Any] = {
             "detect_types": sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES
         }
         db = None
@@ -175,7 +176,7 @@ class SQLiteSignatureStore(SignatureStore, LoggingConfigurable):
                     if db is not None:
                         db.close()
                     self.log.warning(
-                        "Failed commiting signatures database to disk. "
+                        "Failed committing signatures database to disk. "
                         "You may need to move the database file to a non-networked file system, "
                         "using config option `NotebookNotary.db_file`. "
                         "Using in-memory signatures database for the remainder of this session."
@@ -361,7 +362,9 @@ class NotebookNotary(LoggingConfigurable):
     def _store_factory_default(self):
         def factory():
             if sqlite3 is None:
-                self.log.warning("Missing SQLite3, all notebooks will be untrusted!")
+                self.log.warning(  # type:ignore[unreachable]
+                    "Missing SQLite3, all notebooks will be untrusted!"
+                )
                 return MemorySignatureStore()
             return SQLiteSignatureStore(self.db_file)
 
@@ -552,7 +555,7 @@ class NotebookNotary(LoggingConfigurable):
         return trusted
 
 
-trust_flags: dict = {
+trust_flags: dict[str, t.Any] = {
     "reset": (
         {"TrustNotebookApp": {"reset": True}},
         """Delete the trusted notebook cache.

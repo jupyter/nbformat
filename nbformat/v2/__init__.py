@@ -69,7 +69,7 @@ def parse_filename(fname):
     ----------
     fname : unicode
         The notebook filename. The filename can use a specific filename
-        extention (.ipynb, .json, .py) or none, in which case .ipynb will
+        extension (.ipynb, .json, .py) or none, in which case .ipynb will
         be assumed.
 
     Returns

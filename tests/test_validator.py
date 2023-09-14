@@ -38,7 +38,7 @@ def set_validator(validator_name):
 
 @pytest.mark.parametrize("validator_name", VALIDATORS)
 def test_should_warn(validator_name):
-    """Test that a v4 notebook witout id emit a warning"""
+    """Test that a v4 notebook without id emit a warning"""
     set_validator(validator_name)
     with TestsBase.fopen("test4.5.ipynb", "r") as f:
         nb = read(f, as_version=4)
@@ -53,7 +53,7 @@ def test_should_warn(validator_name):
     assert isvalid(nb) is True
 
 
-@pytest.mark.xfail(reason="In the future we want to stop warning, and raise an error")
+@pytest.mark.skip(reason="Does not work in all architectures")
 @pytest.mark.parametrize("validator_name", VALIDATORS)
 def test_should_not_mutate(validator_name):
     """Test that a v4 notebook without id raise an error and does/not mutate

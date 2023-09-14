@@ -85,9 +85,9 @@ nowarn = "test -W default {args}"
 
 [tool.hatch.envs.typing]
 features = ["test"]
-dependencies = ["mypy>=0.990"]
+dependencies = ["mypy>=1.5.1"]
 [tool.hatch.envs.typing.scripts]
-test = "mypy --install-types --non-interactive {args:nbformat tests}"
+test = "mypy --install-types --non-interactive {args}"
 
 [tool.hatch.envs.lint]
 dependencies = ["black[jupyter]==23.3.0", "mdformat>0.7", "ruff==0.0.281"]
@@ -105,7 +105,13 @@ fmt = [
 ]
 
 [tool.pytest.ini_options]
-addopts = "-raXs --durations 10 --color=yes --doctest-modules"
+minversion = "6.0"
+xfail_strict = true
+log_cli_level = "info"
+addopts = [
+  "-raXs", "--durations=10", "--color=yes", "--doctest-modules",
+   "--showlocals", "--strict-markers", "--strict-config"
+]
 testpaths = [
     "tests/",
 ]
@@ -132,26 +138,13 @@ exclude_lines = [
 ]
 
 [tool.mypy]
-check_untyped_defs = true
-disallow_incomplete_defs = true
-disallow_untyped_decorators = true
-no_implicit_optional = true
-pretty = true
-show_error_context = true
+files = "nbformat"
+python_version = "3.8"
+strict = true
 show_error_codes = true
-strict_equality = true
-warn_unused_configs = true
-warn_unused_ignores = true
-warn_redundant_casts = true
-
-[[tool.mypy.overrides]]
-module = [
-    "fastjsonschema",
-    "jsonschema",
-    "pysqlite2",
-    "testpath"
-]
-ignore_missing_imports = true
+enable_error_code = ["ignore-without-code", "redundant-expr", "truthy-bool"]
+disable_error_code = ["no-untyped-def", "no-untyped-call"]
+warn_unreachable = true
 
 [tool.black]
 line-length = 100
@@ -218,3 +211,9 @@ fail-under=100
 
 [tool.check-wheel-contents]
 ignore = ["W002"]
+
+[tool.repo-review]
+ignore = ["PY007", "PP308", "GH102", "PC140"]
+
+[tool.codespell]
+skip = "*.ipynb"

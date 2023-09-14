@@ -107,7 +107,7 @@ class TestJSON(formattest.NBFormatTest, TestCase):
         assert nbformat_minor == 5
 
     def test_base_version_matches_latest(self):
-        """Test to ensure latest version file matches latest verison"""
+        """Test to ensure latest version file matches latest version"""
         with open(
             os.path.join(BASE_PATH, "nbformat.v4.schema.json"), encoding='utf-8'
         ) as schema_file:
