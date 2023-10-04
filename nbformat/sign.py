@@ -585,7 +585,7 @@ class TrustNotebookApp(JupyterApp):
     jupyter trust mynotebook.ipynb and_this_one.ipynb
     """
 
-    flags = trust_flags  # type:ignore[assignment]
+    flags = trust_flags
 
     reset = Bool(
         False,
