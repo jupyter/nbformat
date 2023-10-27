@@ -211,7 +211,7 @@
               "description": "Official Jupyter Metadata for Code Cells",
               "type": "object",
               "additionalProperties": true,
-              "properties: {
+              "properties": {
                 "source_hidden": {
                   "description": "Whether the source is hidden.",
                   "type": "boolean"
