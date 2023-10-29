@@ -111,7 +111,7 @@ def _get_schema_json(v, version=None, version_minor=None):
     else:
         msg = "Cannot find appropriate nbformat schema file."
         raise AttributeError(msg)
-    with open(schema_path, encoding='utf-8') as f:
+    with open(schema_path, encoding="utf-8") as f:
         schema_json = json.load(f)
     return schema_json
 
