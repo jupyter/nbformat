@@ -100,7 +100,11 @@ def new_output(  # noqa
 
 
 def new_code_cell(
-    input=None, prompt_number=None, outputs=None, language="python", collapsed=False  # noqa
+    input=None,  # noqa: A002
+    prompt_number=None,
+    outputs=None,
+    language="python",
+    collapsed=False,
 ):
     """Create a new code cell with input and output"""
     cell = NotebookNode()
@@ -160,7 +164,12 @@ def new_notebook(metadata=None, worksheets=None):
 
 
 def new_metadata(
-    name=None, authors=None, license=None, created=None, modified=None, gistid=None  # noqa
+    name=None,
+    authors=None,
+    license=None,  # noqa: A002
+    created=None,
+    modified=None,
+    gistid=None,
 ):
     """Create a new metadata node."""
     metadata = NotebookNode()

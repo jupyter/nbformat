@@ -217,7 +217,12 @@ def new_notebook(name=None, metadata=None, worksheets=None):
 
 
 def new_metadata(
-    name=None, authors=None, license=None, created=None, modified=None, gistid=None  # noqa
+    name=None,
+    authors=None,
+    license=None,  # noqa: A002
+    created=None,
+    modified=None,
+    gistid=None,
 ):
     """Create a new metadata node."""
     metadata = NotebookNode()
