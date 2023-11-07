@@ -351,7 +351,7 @@ def _normalize(
         for cell in nbdict["cells"]:
             if "id" not in cell:
                 warnings.warn(
-                    "Code cell is missing an id field, this will become"
+                    "Cell is missing an id field, this will become"
                     " a hard error in future nbformat versions. You may want"
                     " to use `normalize()` on your notebooks before validations"
                     " (available since nbformat 5.1.4). Previous versions of nbformat"
