@@ -21,7 +21,7 @@ repos:
       - id: trailing-whitespace
 
   - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 0.27.0
+    rev: 0.27.1
     hooks:
       - id: check-github-workflows
 
@@ -65,11 +65,15 @@ repos:
           ["jsonschema>=2.6", "traitlets>=5.13", "jupyter_core>5.4"]
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.1.3
+    rev: v0.1.5
     hooks:
       - id: ruff
+        types_or: [python, jupyter]
+        exclude: "tests/.*.ipynb"
         args: ["--fix", "--show-fixes"]
       - id: ruff-format
+        exclude: "tests/.*.ipynb"
+        types_or: [python, jupyter]
 
   - repo: https://github.com/scientific-python/cookie
     rev: "2023.10.27"
