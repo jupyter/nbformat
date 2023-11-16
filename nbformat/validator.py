@@ -111,7 +111,7 @@ def _get_schema_json(v, version=None, version_minor=None):
     else:
         msg = "Cannot find appropriate nbformat schema file."
         raise AttributeError(msg)
-    with open(schema_path, encoding='utf-8') as f:
+    with open(schema_path, encoding="utf-8") as f:
         schema_json = json.load(f)
     return schema_json
 
@@ -186,7 +186,7 @@ def _truncate_obj(obj):
         return obj
 
 
-class NotebookValidationError(ValidationError):
+class NotebookValidationError(ValidationError):  # type:ignore[misc]
     """Schema ValidationError with truncated representation
 
     to avoid massive verbose tracebacks.
@@ -351,7 +351,7 @@ def _normalize(
         for cell in nbdict["cells"]:
             if "id" not in cell:
                 warnings.warn(
-                    "Code cell is missing an id field, this will become"
+                    "Cell is missing an id field, this will become"
                     " a hard error in future nbformat versions. You may want"
                     " to use `normalize()` on your notebooks before validations"
                     " (available since nbformat 5.1.4). Previous versions of nbformat"

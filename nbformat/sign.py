@@ -30,7 +30,7 @@ try:
     sqlite3.register_converter("datetime", convert_datetime)
 except ImportError:
     try:
-        from pysqlite2 import dbapi2 as sqlite3  # type:ignore[no-redef, import]
+        from pysqlite2 import dbapi2 as sqlite3  # type:ignore[no-redef]
     except ImportError:
         sqlite3 = None  # type:ignore[assignment]
 

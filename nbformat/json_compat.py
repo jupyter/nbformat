@@ -7,7 +7,7 @@ libraries.
 
 import os
 
-import fastjsonschema  # type:ignore[import]
+import fastjsonschema
 import jsonschema
 from fastjsonschema import JsonSchemaException as _JsonSchemaException
 from jsonschema import Draft4Validator as _JsonSchemaValidator
@@ -63,7 +63,7 @@ class FastJsonSchemaValidator(JsonSchemaValidator):
     def validate(self, data):
         """Validate incoming data."""
         try:
-            self._validator(data)  # type:ignore[operator]
+            self._validator(data)
         except _JsonSchemaException as error:
             raise ValidationError(str(error), schema_path=error.path) from error
 
@@ -75,7 +75,7 @@ class FastJsonSchemaValidator(JsonSchemaValidator):
         errors = []
         validate_func = self._validator
         try:
-            validate_func(data)  # type:ignore[operator]
+            validate_func(data)
         except _JsonSchemaException as error:
             errors = [ValidationError(str(error), schema_path=error.path)]
 
