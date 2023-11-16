@@ -37,8 +37,9 @@ except ImportError:
 from base64 import encodebytes
 
 from jupyter_core.application import JupyterApp, base_flags
+from jupyter_core.paths import jupyter_data_dir
 from traitlets import Any, Bool, Bytes, Callable, Enum, Instance, Integer, Unicode, default, observe
-from traitlets.config import LoggingConfigurable, MultipleInstanceError
+from traitlets.config import LoggingConfigurable
 
 from . import NO_CONVERT, __version__, read, reads
 
@@ -341,17 +342,7 @@ class NotebookNotary(LoggingConfigurable):
 
     @default("data_dir")
     def _data_dir_default(self):
-        app = None
-        try:
-            if JupyterApp.initialized():
-                app = JupyterApp.instance()
-        except MultipleInstanceError:
-            pass
-        if app is None:
-            # create an app, without the global instance
-            app = JupyterApp()
-            app.initialize(argv=[])
-        return app.data_dir
+        return jupyter_data_dir()
 
     store_factory = Callable(
         help="""A callable returning the storage backend for notebook signatures.
