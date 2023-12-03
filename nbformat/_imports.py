@@ -6,6 +6,7 @@ Vendored form ipython_genutils
 
 # Copyright (c) IPython Development Team.
 # Distributed under the terms of the Modified BSD License.
+from __future__ import annotations
 
 
 def import_item(name):
@@ -26,7 +27,7 @@ def import_item(name):
     """
 
     parts = name.rsplit(".", 1)
-    if len(parts) == 2:  # noqa
+    if len(parts) == 2:
         # called with 'foo.bar....'
         package, obj = parts
         module = __import__(package, fromlist=[obj])
@@ -35,6 +36,5 @@ def import_item(name):
         except AttributeError:
             raise ImportError("No module named %s" % obj) from None
         return pak
-    else:
-        # called with un-dotted string
-        return __import__(parts[0])
+    # called with un-dotted string
+    return __import__(parts[0])

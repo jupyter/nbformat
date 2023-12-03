@@ -2,12 +2,13 @@
 
 # Copyright (c) IPython Development Team.
 # Distributed under the terms of the Modified BSD License.
+from __future__ import annotations
 
 import json
 import os
 import pathlib
 from tempfile import TemporaryDirectory
-from typing import Any, Dict
+from typing import Any
 
 from jsonschema import ValidationError
 from pep440 import is_canonical
@@ -70,7 +71,7 @@ class TestAPI(TestsBase):
 
     def test_capture_validation_error(self):
         """Test that validation error can be captured on read() and write()"""
-        validation_error: Dict[str, Any] = {}
+        validation_error: dict[str, Any] = {}
         path = os.path.join(self._get_files_path(), "invalid.ipynb")
         nb = read(path, as_version=4, capture_validation_error=validation_error)
         assert not isvalid(nb)

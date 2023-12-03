@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+from pathlib import Path
+
 import pytest
 
 from nbformat import read
@@ -6,16 +10,18 @@ from nbformat.validator import ValidationError
 
 def test_read_invalid_iowrapper(tmpdir):
     ipynb_filepath = tmpdir.join("empty.ipynb")
-    ipynb_filepath.write("{}")
+    Path(ipynb_filepath).write_text("{}", encoding="utf8")
 
-    with pytest.raises(ValidationError) as excinfo, ipynb_filepath.open() as fp:
+    with pytest.raises(ValidationError) as excinfo, Path(ipynb_filepath).open(
+        encoding="utf8"
+    ) as fp:
         read(fp, as_version=4)
     assert "cells" in str(excinfo.value)
 
 
 def test_read_invalid_filepath(tmpdir):
     ipynb_filepath = tmpdir.join("empty.ipynb")
-    ipynb_filepath.write("{}")
+    Path(ipynb_filepath).write_text("{}", encoding="utf8")
 
     with pytest.raises(ValidationError) as excinfo:
         read(str(ipynb_filepath), as_version=4)
@@ -24,10 +30,10 @@ def test_read_invalid_filepath(tmpdir):
 
 def test_read_invalid_pathlikeobj(tmpdir):
     ipynb_filepath = tmpdir.join("empty.ipynb")
-    ipynb_filepath.write("{}")
+    Path(ipynb_filepath).write_text("{}", encoding="utf8")
 
     with pytest.raises(ValidationError) as excinfo:
-        read(ipynb_filepath, as_version=4)
+        read(str(ipynb_filepath), as_version=4)
     assert "cells" in str(excinfo.value)
 
 

@@ -2,6 +2,7 @@
 
 # Copyright (c) IPython Development Team.
 # Distributed under the terms of the Modified BSD License.
+from __future__ import annotations
 
 import json
 
@@ -11,8 +12,6 @@ from .validator import ValidationError
 class NotJSONError(ValueError):
     """An error raised when an object is not valid JSON."""
 
-    pass
-
 
 def parse_json(s, **kwargs):
     """Parse a JSON string into a dict."""
@@ -21,7 +20,7 @@ def parse_json(s, **kwargs):
     except ValueError as e:
         message = f"Notebook does not appear to be JSON: {s!r}"
         # Limit the error message to 80 characters.  Display whatever JSON will fit.
-        if len(message) > 80:  # noqa
+        if len(message) > 80:
             message = message[:77] + "..."
         raise NotJSONError(message) from e
     return nb_dict

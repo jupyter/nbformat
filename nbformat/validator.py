@@ -1,15 +1,15 @@
 """Notebook format validators."""
 # Copyright (c) IPython Development Team.
 # Distributed under the terms of the Modified BSD License.
-
+from __future__ import annotations
 
 import json
-import os
 import pprint
 import warnings
 from copy import deepcopy
+from pathlib import Path
 from textwrap import dedent
-from typing import Any, Optional, Tuple
+from typing import Any, Optional
 
 from ._imports import import_item
 from .corpus.words import generate_corpus_id
@@ -37,7 +37,7 @@ def _relax_additional_properties(obj):
     """relax any `additionalProperties`"""
     if isinstance(obj, dict):
         for key, value in obj.items():
-            value = (  # noqa
+            value = (  # noqa: PLW2901
                 True if key == "additionalProperties" else _relax_additional_properties(value)
             )
             obj[key] = value
@@ -102,18 +102,16 @@ def _get_schema_json(v, version=None, version_minor=None):
     Gets the json schema from a given imported library and nbformat version.
     """
     if (version, version_minor) in v.nbformat_schema:
-        schema_path = os.path.join(
-            os.path.dirname(v.__file__), v.nbformat_schema[(version, version_minor)]
-        )
+        schema_path = str(Path(v.__file__).parent / v.nbformat_schema[(version, version_minor)])
     elif version_minor > v.nbformat_minor:
         # load the latest schema
-        schema_path = os.path.join(os.path.dirname(v.__file__), v.nbformat_schema[(None, None)])
+        schema_path = str(Path(v.__file__).parent / v.nbformat_schema[(None, None)])
     else:
         msg = "Cannot find appropriate nbformat schema file."
         raise AttributeError(msg)
-    with open(schema_path, encoding="utf-8") as f:
+    with Path(schema_path).open(encoding="utf8") as f:
         schema_json = json.load(f)
-    return schema_json
+    return schema_json  # noqa: RET504
 
 
 def isvalid(nbjson, ref=None, version=None, version_minor=None):
@@ -172,18 +170,17 @@ def _truncate_obj(obj):
         if len(obj) > _ITEM_LIMIT:
             truncated_dict["..."] = "%i keys truncated" % (len(obj) - _ITEM_LIMIT)
         return truncated_dict
-    elif isinstance(obj, list):
+    if isinstance(obj, list):
         truncated_list = [_truncate_obj(item) for item in obj[:_ITEM_LIMIT]]
         if len(obj) > _ITEM_LIMIT:
             truncated_list.append("...%i items truncated..." % (len(obj) - _ITEM_LIMIT))
         return truncated_list
-    elif isinstance(obj, str):
+    if isinstance(obj, str):
         truncated_str = obj[:_STR_LIMIT]
         if len(obj) > _STR_LIMIT:
             truncated_str += "..."
         return truncated_str
-    else:
-        return obj
+    return obj
 
 
 class NotebookValidationError(ValidationError):  # type:ignore[misc]
@@ -262,7 +259,7 @@ def better_validation_error(error, version, version_minor):
                 if better.ref is None:
                     better.ref = ref
                 return better
-            except Exception:  # noqa
+            except Exception:  # noqa: S110
                 # if it fails for some reason,
                 # let the original error through
                 pass
@@ -276,7 +273,7 @@ def normalize(
     *,
     relax_add_props: bool = False,
     strip_invalid_metadata: bool = False,
-) -> Tuple[int, Any]:
+) -> tuple[int, Any]:
     """
     Normalise a notebook prior to validation.
 
@@ -331,7 +328,7 @@ def _normalize(
     repair_duplicate_cell_ids: bool,
     relax_add_props: bool,
     strip_invalid_metadata: bool,
-) -> Tuple[int, Any]:
+) -> tuple[int, Any]:
     """
     Private normalisation routine.
 
@@ -409,7 +406,7 @@ def _dep_warn(field):
     )
 
 
-def validate(  # noqa
+def validate(
     nbdict: Any = None,
     ref: Optional[str] = None,
     version: Optional[int] = None,
@@ -456,19 +453,17 @@ def validate(  # noqa
 
     Please explicitly call `normalize` if you need to normalize notebooks.
     """
-    assert isinstance(ref, str) or ref is None  # noqa
+    assert isinstance(ref, str) or ref is None
 
     if strip_invalid_metadata is _deprecated:
         strip_invalid_metadata = False
     else:
         _dep_warn("strip_invalid_metadata")
-        pass
 
     if repair_duplicate_cell_ids is _deprecated:
         repair_duplicate_cell_ids = True
     else:
         _dep_warn("repair_duplicate_cell_ids")
-        pass
 
     # backwards compatibility for nbjson argument
     if nbdict is not None:
@@ -491,8 +486,8 @@ def validate(  # noqa
         version, version_minor = 1, 0
 
     if ref is None:
-        assert isinstance(version, int)  # noqa
-        assert isinstance(version_minor, int)  # noqa
+        assert isinstance(version, int)
+        assert isinstance(version_minor, int)
         _normalize(
             nbdict,
             version,
@@ -534,7 +529,7 @@ def _get_errors(
     return iter(errors)
 
 
-def _strip_invalida_metadata(  # noqa
+def _strip_invalida_metadata(
     nbdict: Any, version: int, version_minor: int, relax_add_props: bool
 ) -> int:
     """
@@ -598,7 +593,7 @@ def _strip_invalida_metadata(  # noqa
                             rel_path = error.relative_path
                             error_for_intended_schema = error.schema_path[0] == schema_index
                             is_top_level_metadata_key = (
-                                len(rel_path) == 2 and rel_path[0] == "metadata"  # noqa
+                                len(rel_path) == 2 and rel_path[0] == "metadata"
                             )
                             if error_for_intended_schema and is_top_level_metadata_key:
                                 nbdict["cells"][cell_idx]["metadata"].pop(rel_path[1], None)

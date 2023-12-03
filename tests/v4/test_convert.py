@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import copy
 import os
 from unittest import mock
@@ -8,7 +10,7 @@ from nbformat import ValidationError, v3, v4, validate
 from nbformat.v4 import convert
 from nbformat.v4.nbjson import reads
 
-from ..v3 import nbexamples as v3examples  # noqa
+from ..v3 import nbexamples as v3examples
 from . import nbexamples
 
 
@@ -55,7 +57,7 @@ def test_upgrade_heading():
 def test_downgrade_heading():
     v3h = v3.new_heading_cell
     v4m = v4.new_markdown_cell
-    v3m = lambda source: v3.new_text_cell("markdown", source)  # noqa
+    v3m = lambda source: v3.new_text_cell("markdown", source)
     for v4cell, expected in [
         (
             v4m(source="# foo"),

@@ -2,6 +2,7 @@
 
 # Copyright (c) IPython Development Team.
 # Distributed under the terms of the Modified BSD License.
+from __future__ import annotations
 
 import json
 import re
@@ -25,7 +26,7 @@ def _warn_if_invalid(nb, version):
         get_logger().error("Notebook JSON is not valid v%i: %s", version, e)
 
 
-def upgrade(nb, from_version=None, from_minor=None):  # noqa
+def upgrade(nb, from_version=None, from_minor=None):
     """Convert a notebook to latest v4.
 
     Parameters
@@ -41,15 +42,14 @@ def upgrade(nb, from_version=None, from_minor=None):  # noqa
         from_version = nb["nbformat"]
     if not from_minor:
         if "nbformat_minor" not in nb:
-            if from_version == 4:  # noqa
+            if from_version == 4:
                 msg = "The v4 notebook does not include the nbformat minor, which is needed."
                 raise validator.ValidationError(msg)
-            else:
-                from_minor = 0
+            from_minor = 0
         else:
             from_minor = nb["nbformat_minor"]
 
-    if from_version == 3:  # noqa
+    if from_version == 3:
         # Validate the notebook before conversion
         _warn_if_invalid(nb, from_version)
 
@@ -77,7 +77,7 @@ def upgrade(nb, from_version=None, from_minor=None):  # noqa
         # Validate the converted notebook before returning it
         _warn_if_invalid(nb, nbformat)
         return nb
-    elif from_version == 4:  # noqa
+    if from_version == 4:
         if from_minor == nbformat_minor:
             return nb
 
@@ -85,7 +85,7 @@ def upgrade(nb, from_version=None, from_minor=None):  # noqa
         # if from_minor < 3:
         # if from_minor < 4:
 
-        if from_minor < 5:  # noqa
+        if from_minor < 5:
             for cell in nb.cells:
                 cell.id = random_cell_id()
 
@@ -93,11 +93,10 @@ def upgrade(nb, from_version=None, from_minor=None):  # noqa
         nb.nbformat_minor = nbformat_minor
 
         return nb
-    else:
-        raise ValueError(
-            "Cannot convert a notebook directly from v%s to v4.  "
-            "Try using the nbformat.convert module." % from_version
-        )
+    raise ValueError(
+        "Cannot convert a notebook directly from v%s to v4.  "
+        "Try using the nbformat.convert module." % from_version
+    )
 
 
 def upgrade_cell(cell):
@@ -154,7 +153,7 @@ def downgrade_cell(cell):
         source = cell.get("source", "")
         if "\n" not in source and source.startswith("#"):
             match = re.match(r"(#+)\s*(.*)", source)
-            assert match is not None  # noqa
+            assert match is not None
             prefix, text = match.groups()
             cell.cell_type = "heading"
             cell.source = text

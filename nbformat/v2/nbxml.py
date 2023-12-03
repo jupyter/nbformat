@@ -1,6 +1,6 @@
 """REMOVED: Read and write notebook files as XML.
 """
-
+from __future__ import annotations
 
 REMOVED_MSG = """\
 Reading notebooks as XML has been removed to harden security and avoid

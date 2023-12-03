@@ -2,6 +2,7 @@
 
 # Copyright (c) IPython Development Team.
 # Distributed under the terms of the Modified BSD License.
+from __future__ import annotations
 
 import copy
 import json
@@ -28,7 +29,7 @@ class JSONReader(NotebookReader):
         """Read a JSON string into a Notebook object"""
         nb = json.loads(s, **kwargs)
         nb = self.to_notebook(nb, **kwargs)
-        return nb
+        return nb  # noqa: RET504
 
     def to_notebook(self, d, **kwargs):
         """Convert a disk-format notebook dict to in-memory NotebookNode
@@ -38,7 +39,7 @@ class JSONReader(NotebookReader):
         nb = from_dict(d)
         nb = rejoin_lines(nb)
         nb = strip_transient(nb)
-        return nb
+        return nb  # noqa: RET504
 
 
 class JSONWriter(NotebookWriter):

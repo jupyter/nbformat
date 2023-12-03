@@ -11,6 +11,7 @@ Contains tests class for reader.py
 # -----------------------------------------------------------------------------
 # Imports
 # -----------------------------------------------------------------------------
+from __future__ import annotations
 
 from nbformat.reader import get_version, read
 from nbformat.validator import ValidationError

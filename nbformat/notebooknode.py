@@ -1,4 +1,5 @@
 """NotebookNode - adding attribute access to dicts"""
+from __future__ import annotations
 
 from collections.abc import Mapping
 
@@ -23,7 +24,7 @@ class NotebookNode(Struct):
             raise TypeError("update expected at most 1 arguments, got %d" % len(args))
         if args:
             other = args[0]
-            if isinstance(other, Mapping):  # noqa
+            if isinstance(other, Mapping):  # noqa: SIM114
                 for key in other:
                     self[key] = other[key]
             elif hasattr(other, "keys"):
@@ -45,7 +46,6 @@ def from_dict(d):
     """
     if isinstance(d, dict):
         return NotebookNode({k: from_dict(v) for k, v in d.items()})
-    elif isinstance(d, (tuple, list)):
+    if isinstance(d, (tuple, list)):
         return [from_dict(i) for i in d]
-    else:
-        return d
+    return d

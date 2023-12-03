@@ -2,6 +2,7 @@
 
 # Copyright (c) IPython Development Team.
 # Distributed under the terms of the Modified BSD License.
+from __future__ import annotations
 
 from . import versions
 from .reader import get_version
@@ -40,7 +41,7 @@ def convert(nb, to_version):
         return nb
 
     # If the version exist, try to convert to it one step at a time.
-    elif to_version in versions:
+    if to_version in versions:
         # Get the the version that this recursion will convert to as a step
         # closer to the final revision.  Make sure the newer of the conversion
         # functions is used to perform the conversion.
@@ -63,7 +64,6 @@ def convert(nb, to_version):
 
         # Recursively convert until target version is reached.
         return convert(converted, to_version)
-    else:
-        raise ValueError(
-            "Cannot convert notebook to v%d because that version doesn't exist" % (to_version)
-        )
+    raise ValueError(
+        "Cannot convert notebook to v%d because that version doesn't exist" % (to_version)
+    )

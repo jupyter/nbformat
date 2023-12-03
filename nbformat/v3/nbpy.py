@@ -15,9 +15,9 @@ Authors:
 # -----------------------------------------------------------------------------
 # Imports
 # -----------------------------------------------------------------------------
+from __future__ import annotations
 
 import re
-from typing import List
 
 from .nbbase import (
     nbformat,
@@ -40,8 +40,6 @@ _encoding_declaration_re = re.compile(r"^#.*coding[:=]\s*([-\w.]+)")
 class PyReaderError(Exception):
     """An error raised for a pyreader error."""
 
-    pass
-
 
 class PyReader(NotebookReader):
     """A python notebook reader."""
@@ -50,11 +48,11 @@ class PyReader(NotebookReader):
         """Convert a string to a notebook"""
         return self.to_notebook(s, **kwargs)
 
-    def to_notebook(self, s, **kwargs):  # noqa
+    def to_notebook(self, s, **kwargs):
         """Convert a string to a notebook"""
         lines = s.splitlines()
         cells = []
-        cell_lines: List[str] = []
+        cell_lines: list[str] = []
         kwargs = {}
         state = "codecell"
         for line in lines:
@@ -82,7 +80,7 @@ class PyReader(NotebookReader):
                 cell_lines = []
                 kwargs = {}
             # VERSIONHACK: plaintext -> raw
-            elif line.startswith("# <rawcell>") or line.startswith("# <plaintextcell>"):
+            elif line.startswith(("# <rawcell>", "# <plaintextcell>")):
                 cell = self.new_cell(state, cell_lines, **kwargs)
                 if cell is not None:
                     cells.append(cell)
@@ -110,10 +108,9 @@ class PyReader(NotebookReader):
             if cell is not None:
                 cells.append(cell)
         ws = new_worksheet(cells=cells)
-        nb = new_notebook(worksheets=[ws])
-        return nb
+        return new_notebook(worksheets=[ws])
 
-    def new_cell(self, state, lines, **kwargs):  # noqa
+    def new_cell(self, state, lines, **kwargs):
         """Create a new cell."""
         if state == "codecell":
             input_ = "\n".join(lines)
@@ -147,7 +144,7 @@ class PyReader(NotebookReader):
                 new_lines.append(line)
         text = "\n".join(new_lines)
         text = text.strip("\n")
-        return text
+        return text  # noqa: RET504
 
     def split_lines_into_blocks(self, lines):
         """Split lines into code blocks."""
@@ -167,7 +164,7 @@ class PyReader(NotebookReader):
 class PyWriter(NotebookWriter):
     """A Python notebook writer."""
 
-    def writes(self, nb, **kwargs):  # noqa
+    def writes(self, nb, **kwargs):
         """Convert a notebook to a string."""
         lines = ["# -*- coding: utf-8 -*-"]
         lines.extend(

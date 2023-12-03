@@ -15,6 +15,7 @@ Authors:
 # -----------------------------------------------------------------------------
 # Imports
 # -----------------------------------------------------------------------------
+from __future__ import annotations
 
 import copy
 import json
@@ -44,7 +45,7 @@ class JSONReader(NotebookReader):
         """Convert a string to a notebook."""
         nb = json.loads(s, **kwargs)
         nb = self.to_notebook(nb, **kwargs)
-        return nb
+        return nb  # noqa: RET504
 
     def to_notebook(self, d, **kwargs):
         """Convert a string to a notebook."""
