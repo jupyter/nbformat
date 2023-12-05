@@ -1,6 +1,7 @@
 """
 Warnings that can be emitted by nbformat.
 """
+from __future__ import annotations
 
 
 class MissingIDFieldWarning(FutureWarning):
@@ -15,8 +16,6 @@ class MissingIDFieldWarning(FutureWarning):
 
     """
 
-    pass
-
 
 class DuplicateCellId(FutureWarning):
     """
@@ -28,5 +27,3 @@ class DuplicateCellId(FutureWarning):
 
     We subclass FutureWarning as we will change the behavior in the future.
     """
-
-    pass

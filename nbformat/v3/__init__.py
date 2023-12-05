@@ -3,6 +3,7 @@
 
 # Copyright (c) IPython Development Team.
 # Distributed under the terms of the Modified BSD License.
+from __future__ import annotations
 
 __all__ = [
     "NotebookNode",
@@ -85,7 +86,7 @@ def parse_filename(fname):
     (fname, name, format) : (unicode, unicode, unicode)
         The filename, notebook name and format.
     """
-    basename, ext = os.path.splitext(fname)
+    basename, ext = os.path.splitext(fname)  # noqa: PTH122
     if ext in [".ipynb", ".json"]:
         format_ = "json"
     elif ext == ".py":

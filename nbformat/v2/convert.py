@@ -16,6 +16,7 @@ Authors:
 # -----------------------------------------------------------------------------
 # Imports
 # -----------------------------------------------------------------------------
+from __future__ import annotations
 
 from .nbbase import new_code_cell, new_notebook, new_text_cell, new_worksheet
 
@@ -47,8 +48,8 @@ def upgrade(nb, from_version=1):
             ws.cells.append(newcell)
         newnb.worksheets.append(ws)
         return newnb
-    else:
-        raise ValueError("Cannot convert a notebook from v%s to v2" % from_version)
+
+    raise ValueError("Cannot convert a notebook from v%s to v2" % from_version)
 
 
 def downgrade(nb):

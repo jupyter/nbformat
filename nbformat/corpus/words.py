@@ -1,4 +1,6 @@
 """Generate a corpus id."""
+from __future__ import annotations
+
 import uuid
 
 

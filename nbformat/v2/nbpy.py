@@ -15,9 +15,9 @@ Authors:
 # -----------------------------------------------------------------------------
 # Imports
 # -----------------------------------------------------------------------------
+from __future__ import annotations
 
 import re
-from typing import List
 
 from .nbbase import new_code_cell, new_notebook, new_text_cell, new_worksheet
 from .rwbase import NotebookReader, NotebookWriter
@@ -32,8 +32,6 @@ _encoding_declaration_re = re.compile(r"^#.*coding[:=]\s*([-\w.]+)")
 class PyReaderError(Exception):
     """An error raised by the PyReader."""
 
-    pass
-
 
 class PyReader(NotebookReader):
     """A Python notebook reader."""
@@ -42,11 +40,11 @@ class PyReader(NotebookReader):
         """Convert a string to a notebook."""
         return self.to_notebook(s, **kwargs)
 
-    def to_notebook(self, s, **kwargs):  # noqa
+    def to_notebook(self, s, **kwargs):
         """Convert a string to a notebook."""
         lines = s.splitlines()
         cells = []
-        cell_lines: List[str] = []
+        cell_lines: list[str] = []
         state = "codecell"
         for line in lines:
             if line.startswith("# <nbformat>") or _encoding_declaration_re.match(line):
@@ -76,8 +74,7 @@ class PyReader(NotebookReader):
             if cell is not None:
                 cells.append(cell)
         ws = new_worksheet(cells=cells)
-        nb = new_notebook(worksheets=[ws])
-        return nb
+        return new_notebook(worksheets=[ws])
 
     def new_cell(self, state, lines):
         """Create a new cell."""
@@ -104,7 +101,7 @@ class PyReader(NotebookReader):
                 new_lines.append(line)
         text = "\n".join(new_lines)
         text = text.strip("\n")
-        return text
+        return text  # noqa: RET504
 
     def split_lines_into_blocks(self, lines):
         """Split lines into code blocks."""

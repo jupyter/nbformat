@@ -2,7 +2,7 @@
 
 # Copyright (c) IPython Development Team.
 # Distributed under the terms of the Modified BSD License.
-
+from __future__ import annotations
 
 from base64 import decodebytes, encodebytes
 
@@ -40,9 +40,8 @@ def _join_lines(lines):
     if lines and lines[0].endswith(("\n", "\r")):
         # created by splitlines(True)
         return "".join(lines)
-    else:
-        # created by splitlines()
-        return "\n".join(lines)
+    # created by splitlines()
+    return "\n".join(lines)
 
 
 def rejoin_lines(nb):

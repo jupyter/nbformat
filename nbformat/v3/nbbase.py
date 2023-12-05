@@ -8,6 +8,7 @@ helpers to build the structs in the right form.
 
 # Copyright (c) IPython Development Team.
 # Distributed under the terms of the Modified BSD License.
+from __future__ import annotations
 
 import warnings
 
@@ -26,8 +27,6 @@ nbformat_schema = {(3, 0): "nbformat.v3.schema.json"}
 class NotebookNode(Struct):
     """A notebook node object."""
 
-    pass
-
 
 def from_dict(d):
     """Create notebook node(s) from an object."""
@@ -36,10 +35,9 @@ def from_dict(d):
         for k, v in d.items():
             newd[k] = from_dict(v)
         return newd
-    elif isinstance(d, (tuple, list)):
+    if isinstance(d, (tuple, list)):
         return [from_dict(i) for i in d]
-    else:
-        return d
+    return d
 
 
 def str_passthrough(obj):
@@ -63,13 +61,12 @@ def cast_str(obj):
             stacklevel=3,
         )
         return obj.decode("ascii", "replace")
-    else:
-        if not isinstance(obj, str):
-            raise AssertionError
-        return obj
+    if not isinstance(obj, str):
+        raise AssertionError
+    return obj
 
 
-def new_output(  # noqa
+def new_output(
     output_type,
     output_text=None,
     output_png=None,
@@ -135,7 +132,7 @@ def new_output(  # noqa
 
 
 def new_code_cell(
-    input=None,  # noqa
+    input=None,
     prompt_number=None,
     outputs=None,
     language="python",
@@ -219,7 +216,7 @@ def new_notebook(name=None, metadata=None, worksheets=None):
 def new_metadata(
     name=None,
     authors=None,
-    license=None,  # noqa: A002
+    license=None,
     created=None,
     modified=None,
     gistid=None,

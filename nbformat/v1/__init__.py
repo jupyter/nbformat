@@ -10,6 +10,7 @@
 # -----------------------------------------------------------------------------
 # Imports
 # -----------------------------------------------------------------------------
+from __future__ import annotations
 
 from .convert import upgrade
 from .nbbase import NotebookNode, new_code_cell, new_notebook, new_text_cell
