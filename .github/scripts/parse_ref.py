@@ -1,14 +1,15 @@
-#!/usr/bin/env python
-
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
 
 # Standard library imports
+from __future__ import annotations
+
 import os
+from pathlib import Path
 
 # Constants
-HERE = os.path.abspath(os.path.dirname(__file__))
-REPO_ROOT = os.path.dirname(os.path.dirname(HERE))
+HERE = Path(__file__).parent.resolve()
+REPO_ROOT = HERE.parent.parent
 
 
 def parse_ref(current_ref):
@@ -22,10 +23,11 @@ def parse_ref(current_ref):
         The github reference string.
     """
     if not current_ref.startswith("refs/tags/"):
-        raise Exception(f"Invalid ref `{current_ref}`!")  # noqa
+        msg = f"Invalid ref `{current_ref}`!"
+        raise Exception(msg)
 
     tag_name = current_ref.replace("refs/tags/", "")
-    print(tag_name)  # noqa
+    print(tag_name)  # noqa: T201
 
 
 if __name__ == "__main__":

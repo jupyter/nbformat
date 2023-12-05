@@ -2,6 +2,8 @@
 
 Can probably be replaced by types.SimpleNamespace from Python 3.3
 """
+from __future__ import annotations
+
 from typing import Any, Dict
 
 __all__ = ["Struct"]
@@ -88,7 +90,7 @@ class Struct(Dict[Any, Any]):
         you can't set a class member
         """
         # If key is an str it might be a class member or instance var
-        if isinstance(key, str):  # noqa
+        if isinstance(key, str):  # noqa: SIM102
             # I can't simply call hasattr here because it calls getattr, which
             # calls self.__getattr__, which returns True for keys in
             # self._data.  But I only want keys in the class and in
@@ -196,12 +198,12 @@ class Struct(Dict[Any, Any]):
         outdict = {}
         for k, lst in data.items():
             if isinstance(lst, str):
-                lst = lst.split()  # noqa
+                lst = lst.split()  # noqa: PLW2901
             for entry in lst:
                 outdict[entry] = k
         return outdict
 
-    def dict(self):  # noqa
+    def dict(self):
         """Get the dict representation of the struct."""
         return self
 
@@ -217,7 +219,7 @@ class Struct(Dict[Any, Any]):
         """
         return Struct(dict.copy(self))
 
-    def hasattr(self, key):  # noqa
+    def hasattr(self, key):
         """hasattr function available as a method.
 
         Implemented like has_key.
@@ -331,11 +333,11 @@ class Struct(Dict[Any, Any]):
 
         # policies for conflict resolution: two argument functions which return
         # the value that will go in the new struct
-        preserve = lambda old, new: old  # noqa
-        update = lambda old, new: new  # noqa
-        add = lambda old, new: old + new  # noqa
-        add_flip = lambda old, new: new + old  # noqa  # note change of order!
-        add_s = lambda old, new: old + " " + new  # noqa
+        preserve = lambda old, new: old
+        update = lambda old, new: new
+        add = lambda old, new: old + new
+        add_flip = lambda old, new: new + old  # note change of order!
+        add_s = lambda old, new: old + " " + new
 
         # default policy is to keep current keys when there's a conflict
         conflict_solve = dict.fromkeys(self, preserve)

@@ -1,4 +1,5 @@
 """Tests for the Python API for composing notebook elements"""
+from __future__ import annotations
 
 from nbformat.v4.nbbase import (
     NotebookNode,

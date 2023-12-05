@@ -15,6 +15,7 @@ Authors:
 # -----------------------------------------------------------------------------
 # Imports
 # -----------------------------------------------------------------------------
+from __future__ import annotations
 
 from nbformat._struct import Struct
 
@@ -26,8 +27,6 @@ from nbformat._struct import Struct
 class NotebookNode(Struct):
     """A notebook node object."""
 
-    pass
-
 
 def from_dict(d):
     """Create notebook node(s) from an object."""
@@ -36,10 +35,9 @@ def from_dict(d):
         for k, v in d.items():
             newd[k] = from_dict(v)
         return newd
-    elif isinstance(d, (tuple, list)):
+    if isinstance(d, (tuple, list)):
         return [from_dict(i) for i in d]
-    else:
-        return d
+    return d
 
 
 def new_code_cell(code=None, prompt_number=None):

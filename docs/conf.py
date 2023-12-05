@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-#
 # nbformat documentation build configuration file, created by
 # sphinx-quickstart on Thu May 14 17:26:52 2015.
 #
@@ -16,13 +14,14 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 # sys.path.insert(0, os.path.abspath('.'))
+from __future__ import annotations
 
-import os
 import shutil
+from pathlib import Path
 
 import nbformat
 
-HERE = os.path.abspath(os.path.dirname(__file__))
+HERE = Path(__file__).parent.resolve()
 
 # -- General configuration ------------------------------------------------
 
@@ -40,7 +39,7 @@ extensions = [
 ]
 
 try:
-    import enchant  # type:ignore  # noqa
+    import enchant  # noqa: F401
 
     extensions += ["sphinxcontrib.spelling"]
 except ImportError:
@@ -62,7 +61,7 @@ master_doc = "index"
 
 # General information about the project.
 project = "nbformat"
-copyright = "2015, Jupyter Development Team"  # noqa
+copyright = "2015, Jupyter Development Team"
 author = "Jupyter Development Team"
 
 # numpydoc configuration
@@ -313,5 +312,5 @@ intersphinx_mapping = {
 
 
 def setup(_):
-    dest = os.path.join(HERE, "changelog.md")
-    shutil.copy(os.path.join(HERE, "..", "CHANGELOG.md"), dest)
+    dest = Path(HERE, "changelog.md")
+    shutil.copy(Path(HERE, "..", "CHANGELOG.md"), dest)

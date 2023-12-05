@@ -8,6 +8,7 @@ in the right form.
 
 # Copyright (c) IPython Development Team.
 # Distributed under the terms of the Modified BSD License.
+from __future__ import annotations
 
 from nbformat.corpus.words import generate_corpus_id as random_cell_id
 from nbformat.notebooknode import NotebookNode
@@ -91,27 +92,26 @@ def output_from_msg(msg):
             data=content["data"],
             execution_count=content["execution_count"],
         )
-    elif msg_type == "stream":
+    if msg_type == "stream":
         return new_output(
             output_type=msg_type,
             name=content["name"],
             text=content["text"],
         )
-    elif msg_type == "display_data":
+    if msg_type == "display_data":
         return new_output(
             output_type=msg_type,
             metadata=content["metadata"],
             data=content["data"],
         )
-    elif msg_type == "error":
+    if msg_type == "error":
         return new_output(
             output_type=msg_type,
             ename=content["ename"],
             evalue=content["evalue"],
             traceback=content["traceback"],
         )
-    else:
-        raise ValueError("Unrecognized output msg type: %r" % msg_type)
+    raise ValueError("Unrecognized output msg type: %r" % msg_type)
 
 
 def new_code_cell(source="", **kwargs):

@@ -6,7 +6,7 @@
 
 # Copyright (c) IPython Development Team.
 # Distributed under the terms of the Modified BSD License.
-
+from __future__ import annotations
 
 import re
 import warnings
@@ -83,8 +83,6 @@ current_nbformat_module = _v_latest.__name__
 class NBFormatError(ValueError):
     """An error raised for an nbformat error."""
 
-    pass
-
 
 def _warn_format():
     warnings.warn(
@@ -150,7 +148,7 @@ def writes_py(nb, **kwargs):
 # High level API
 
 
-def reads(s, format="DEPRECATED", version=current_nbformat, **kwargs):  # noqa
+def reads(s, format="DEPRECATED", version=current_nbformat, **kwargs):
     """Read a notebook from a string and return the NotebookNode object.
 
     This function properly handles notebooks of any version. The notebook
@@ -179,7 +177,7 @@ def reads(s, format="DEPRECATED", version=current_nbformat, **kwargs):  # noqa
     return nb
 
 
-def writes(nb, format="DEPRECATED", version=current_nbformat, **kwargs):  # noqa
+def writes(nb, format="DEPRECATED", version=current_nbformat, **kwargs):
     """Write a notebook to a string in a given format in the current nbformat version.
 
     This function always writes the notebook in the current nbformat version.
@@ -209,7 +207,7 @@ def writes(nb, format="DEPRECATED", version=current_nbformat, **kwargs):  # noqa
     return versions[version].writes_json(nb, **kwargs)
 
 
-def read(fp, format="DEPRECATED", **kwargs):  # noqa
+def read(fp, format="DEPRECATED", **kwargs):
     """Read a notebook from a file and return the NotebookNode object.
 
     This function properly handles notebooks of any version. The notebook
@@ -228,7 +226,7 @@ def read(fp, format="DEPRECATED", **kwargs):  # noqa
     return reads(fp.read(), **kwargs)
 
 
-def write(nb, fp, format="DEPRECATED", **kwargs):  # noqa
+def write(nb, fp, format="DEPRECATED", **kwargs):
     """Write a notebook to a file in a given format in the current nbformat version.
 
     This function always writes the notebook in the current nbformat version.

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from nbformat.v1.nbbase import new_code_cell, new_notebook, new_text_cell
 
 nb0 = new_notebook()

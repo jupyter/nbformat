@@ -15,6 +15,7 @@ Authors:
 # -----------------------------------------------------------------------------
 # Imports
 # -----------------------------------------------------------------------------
+from __future__ import annotations
 
 import os
 
@@ -77,7 +78,7 @@ def parse_filename(fname):
     (fname, name, format) : (unicode, unicode, unicode)
         The filename, notebook name and format.
     """
-    basename, ext = os.path.splitext(fname)
+    basename, ext = os.path.splitext(fname)  # noqa: PTH122
     if ext in [".ipynb", ".json"]:
         format_ = "json"
     elif ext == ".py":

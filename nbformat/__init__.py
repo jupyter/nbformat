@@ -5,6 +5,9 @@ Use this module to read or write notebook files as particular nbformat versions.
 
 # Copyright (c) IPython Development Team.
 # Distributed under the terms of the Modified BSD License.
+from __future__ import annotations
+
+from pathlib import Path
 
 from traitlets.log import get_logger
 
@@ -39,12 +42,12 @@ versions = {
     4: v4,
 }
 
-from . import reader  # noqa
-from .converter import convert  # noqa
-from .notebooknode import NotebookNode, from_dict  # noqa
-from .v4 import nbformat as current_nbformat  # noqa
-from .v4 import nbformat_minor as current_nbformat_minor  # noqa
-from .validator import ValidationError, validate  # noqa
+from . import reader  # noqa: E402
+from .converter import convert  # noqa: E402
+from .notebooknode import NotebookNode, from_dict  # noqa: E402
+from .v4 import nbformat as current_nbformat  # noqa: E402
+from .v4 import nbformat_minor as current_nbformat_minor  # noqa: E402
+from .validator import ValidationError, validate  # noqa: E402
 
 
 class NBFormatError(ValueError):
@@ -165,7 +168,7 @@ def read(fp, as_version, capture_validation_error=None, **kwargs):
     try:
         buf = fp.read()
     except AttributeError:
-        with open(fp, encoding="utf-8") as f:
+        with open(fp, encoding="utf8") as f:  # noqa: PTH123
             return reads(f.read(), as_version, capture_validation_error, **kwargs)
 
     return reads(buf, as_version, capture_validation_error, **kwargs)
@@ -202,7 +205,7 @@ def write(nb, fp, version=NO_CONVERT, capture_validation_error=None, **kwargs):
         if not s.endswith("\n"):
             fp.write("\n")
     except AttributeError:
-        with open(fp, "w", encoding="utf-8") as f:
+        with Path(fp).open("w", encoding="utf8") as f:
             f.write(s)
             if not s.endswith("\n"):
                 f.write("\n")
