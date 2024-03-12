@@ -4,11 +4,25 @@
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 5.10.2
+
+([Full Changelog](https://github.com/jupyter/nbformat/compare/v5.10.1...cf61c0ef37312e33efe3ca61ba1f13a4cb5ca901))
+
+### Maintenance and upkeep improvements
+
+- Restore usage of npm token [#395](https://github.com/jupyter/nbformat/pull/395) ([@blink1073](https://github.com/blink1073))
+
+### Contributors to this release
+
+([GitHub contributors page for this release](https://github.com/jupyter/nbformat/graphs/contributors?from=2024-03-12&to=2024-03-12&type=c))
+
+[@blink1073](https://github.com/search?q=repo%3Ajupyter%2Fnbformat+involves%3Ablink1073+updated%3A2024-03-12..2024-03-12&type=Issues)
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 5.10.1
 
 No merged PRs
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 5.10.0
 
