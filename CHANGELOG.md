@@ -4,6 +4,40 @@
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 5.10.0
+
+([Full Changelog](https://github.com/jupyter/nbformat/compare/v5.9.2...e690de194660e7e4b3ac083001ce21633d418e3a))
+
+### Maintenance and upkeep improvements
+
+- Update Release Scripts [#394](https://github.com/jupyter/nbformat/pull/394) ([@blink1073](https://github.com/blink1073))
+- chore: update pre-commit hooks [#391](https://github.com/jupyter/nbformat/pull/391) ([@pre-commit-ci](https://github.com/pre-commit-ci))
+- chore: update pre-commit hooks [#390](https://github.com/jupyter/nbformat/pull/390) ([@pre-commit-ci](https://github.com/pre-commit-ci))
+- Update ruff and typings [#388](https://github.com/jupyter/nbformat/pull/388) ([@blink1073](https://github.com/blink1073))
+- update incorrect warning text [#386](https://github.com/jupyter/nbformat/pull/386) ([@Carreau](https://github.com/Carreau))
+- chore: update pre-commit hooks [#385](https://github.com/jupyter/nbformat/pull/385) ([@pre-commit-ci](https://github.com/pre-commit-ci))
+- Clean up lint handling [#384](https://github.com/jupyter/nbformat/pull/384) ([@blink1073](https://github.com/blink1073))
+- Adopt ruff format [#383](https://github.com/jupyter/nbformat/pull/383) ([@blink1073](https://github.com/blink1073))
+- Update typings for mypy 1.6 [#381](https://github.com/jupyter/nbformat/pull/381) ([@blink1073](https://github.com/blink1073))
+- chore: update pre-commit hooks [#380](https://github.com/jupyter/nbformat/pull/380) ([@pre-commit-ci](https://github.com/pre-commit-ci))
+- Fix typing error [#379](https://github.com/jupyter/nbformat/pull/379) ([@blink1073](https://github.com/blink1073))
+- Simplify NotebookNotary.\_data_dir_default [#378](https://github.com/jupyter/nbformat/pull/378) ([@cmd-ntrf](https://github.com/cmd-ntrf))
+- Adopt sp-repo-review [#377](https://github.com/jupyter/nbformat/pull/377) ([@blink1073](https://github.com/blink1073))
+- Bump actions/checkout from 3 to 4 [#375](https://github.com/jupyter/nbformat/pull/375) ([@dependabot](https://github.com/dependabot))
+
+### Documentation improvements
+
+- update incorrect warning text [#386](https://github.com/jupyter/nbformat/pull/386) ([@Carreau](https://github.com/Carreau))
+- Improve project URLs that display on PyPI [#374](https://github.com/jupyter/nbformat/pull/374) ([@pydanny](https://github.com/pydanny))
+
+### Contributors to this release
+
+([GitHub contributors page for this release](https://github.com/jupyter/nbformat/graphs/contributors?from=2023-07-31&to=2024-03-12&type=c))
+
+[@blink1073](https://github.com/search?q=repo%3Ajupyter%2Fnbformat+involves%3Ablink1073+updated%3A2023-07-31..2024-03-12&type=Issues) | [@Carreau](https://github.com/search?q=repo%3Ajupyter%2Fnbformat+involves%3ACarreau+updated%3A2023-07-31..2024-03-12&type=Issues) | [@cmd-ntrf](https://github.com/search?q=repo%3Ajupyter%2Fnbformat+involves%3Acmd-ntrf+updated%3A2023-07-31..2024-03-12&type=Issues) | [@dependabot](https://github.com/search?q=repo%3Ajupyter%2Fnbformat+involves%3Adependabot+updated%3A2023-07-31..2024-03-12&type=Issues) | [@pre-commit-ci](https://github.com/search?q=repo%3Ajupyter%2Fnbformat+involves%3Apre-commit-ci+updated%3A2023-07-31..2024-03-12&type=Issues) | [@pydanny](https://github.com/search?q=repo%3Ajupyter%2Fnbformat+involves%3Apydanny+updated%3A2023-07-31..2024-03-12&type=Issues)
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 5.9.2
 
 ([Full Changelog](https://github.com/jupyter/nbformat/compare/v5.9.1...80dd726ec87218e0b428a857b4cc656e7e9950d3))
@@ -26,8 +60,6 @@
 ([GitHub contributors page for this release](https://github.com/jupyter/nbformat/graphs/contributors?from=2023-07-10&to=2023-07-31&type=c))
 
 [@blink1073](https://github.com/search?q=repo%3Ajupyter%2Fnbformat+involves%3Ablink1073+updated%3A2023-07-10..2023-07-31&type=Issues)
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 5.9.1
 
