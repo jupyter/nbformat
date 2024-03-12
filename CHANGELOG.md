@@ -4,6 +4,12 @@
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 5.10.1
+
+No merged PRs
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 5.10.0
 
 ([Full Changelog](https://github.com/jupyter/nbformat/compare/v5.9.2...e690de194660e7e4b3ac083001ce21633d418e3a))
@@ -35,8 +41,6 @@
 ([GitHub contributors page for this release](https://github.com/jupyter/nbformat/graphs/contributors?from=2023-07-31&to=2024-03-12&type=c))
 
 [@blink1073](https://github.com/search?q=repo%3Ajupyter%2Fnbformat+involves%3Ablink1073+updated%3A2023-07-31..2024-03-12&type=Issues) | [@Carreau](https://github.com/search?q=repo%3Ajupyter%2Fnbformat+involves%3ACarreau+updated%3A2023-07-31..2024-03-12&type=Issues) | [@cmd-ntrf](https://github.com/search?q=repo%3Ajupyter%2Fnbformat+involves%3Acmd-ntrf+updated%3A2023-07-31..2024-03-12&type=Issues) | [@dependabot](https://github.com/search?q=repo%3Ajupyter%2Fnbformat+involves%3Adependabot+updated%3A2023-07-31..2024-03-12&type=Issues) | [@pre-commit-ci](https://github.com/search?q=repo%3Ajupyter%2Fnbformat+involves%3Apre-commit-ci+updated%3A2023-07-31..2024-03-12&type=Issues) | [@pydanny](https://github.com/search?q=repo%3Ajupyter%2Fnbformat+involves%3Apydanny+updated%3A2023-07-31..2024-03-12&type=Issues)
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 5.9.2
 
