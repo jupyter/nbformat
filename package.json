@@ -1,25 +1,25 @@
 {
-    "name": "nbformat-schema",
-    "version": "5.10.2",
-    "description": "JSON schemata for Jupyter notebook formats",
-    "main": "index.js",
-    "files": [
-        "nbformat/v3/nbformat.v3.schema.json",
-        "nbformat/v4/nbformat.v4.schema.json"
-    ],
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/jupyter/nbformat.git"
-    },
-    "keywords": [
-        "jupyter",
-        "notebook",
-        "json-schema"
-    ],
-    "author": "Project Jupyter Contributors",
-    "license": "BSD-3-Clause",
-    "bugs": {
-        "url": "https://github.com/jupyter/nbformat/issues"
-    },
-    "homepage": "https://nbformat.readthedocs.io"
+  "name": "nbformat-schema",
+  "version": "5.10.2",
+  "description": "JSON schemata for Jupyter notebook formats",
+  "main": "index.js",
+  "files": [
+    "nbformat/v3/nbformat.v3.schema.json",
+    "nbformat/v4/nbformat.v4.schema.json"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jupyter/nbformat.git"
+  },
+  "keywords": [
+    "jupyter",
+    "notebook",
+    "json-schema"
+  ],
+  "author": "Project Jupyter Contributors",
+  "license": "BSD-3-Clause",
+  "bugs": {
+    "url": "https://github.com/jupyter/nbformat/issues"
+  },
+  "homepage": "https://nbformat.readthedocs.io"
 }
