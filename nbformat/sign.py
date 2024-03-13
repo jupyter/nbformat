@@ -14,8 +14,6 @@ from datetime import datetime, timezone
 from hmac import HMAC
 from pathlib import Path
 
-from jupyter_core.paths import jupyter_data_dir
-
 try:
     import sqlite3
 
@@ -41,7 +39,7 @@ from base64 import encodebytes
 
 from jupyter_core.application import JupyterApp, base_flags
 from traitlets import Any, Bool, Bytes, Callable, Enum, Instance, Integer, Unicode, default, observe
-from traitlets.config import LoggingConfigurable
+from traitlets.config import LoggingConfigurable, MultipleInstanceError
 
 from . import NO_CONVERT, __version__, read, reads
 
@@ -343,7 +341,17 @@ class NotebookNotary(LoggingConfigurable):
 
     @default("data_dir")
     def _data_dir_default(self):
-        return jupyter_data_dir()
+        app = None
+        try:
+            if JupyterApp.initialized():
+                app = JupyterApp.instance()
+        except MultipleInstanceError:
+            pass
+        if app is None:
+            # create an app, without the global instance
+            app = JupyterApp()
+            app.initialize(argv=[])
+        return app.data_dir
 
     store_factory = Callable(
         help="""A callable returning the storage backend for notebook signatures.
