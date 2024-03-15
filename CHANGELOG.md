@@ -4,6 +4,22 @@
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 5.10.3
+
+([Full Changelog](https://github.com/jupyter/nbformat/compare/v5.10.2...c17a251a1b1c5e2a7b9fe1fce866d4c110dd12eb))
+
+### Bugs fixed
+
+- Revert PR #378 (Simplify NotebookNotary.\_data_dir_default) [#397](https://github.com/jupyter/nbformat/pull/397) ([@krassowski](https://github.com/krassowski))
+
+### Contributors to this release
+
+([GitHub contributors page for this release](https://github.com/jupyter/nbformat/graphs/contributors?from=2024-03-12&to=2024-03-15&type=c))
+
+[@krassowski](https://github.com/search?q=repo%3Ajupyter%2Fnbformat+involves%3Akrassowski+updated%3A2024-03-12..2024-03-15&type=Issues)
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 5.10.2
 
 ([Full Changelog](https://github.com/jupyter/nbformat/compare/v5.10.1...cf61c0ef37312e33efe3ca61ba1f13a4cb5ca901))
@@ -17,8 +33,6 @@
 ([GitHub contributors page for this release](https://github.com/jupyter/nbformat/graphs/contributors?from=2024-03-12&to=2024-03-12&type=c))
 
 [@blink1073](https://github.com/search?q=repo%3Ajupyter%2Fnbformat+involves%3Ablink1073+updated%3A2024-03-12..2024-03-12&type=Issues)
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 5.10.1
 
