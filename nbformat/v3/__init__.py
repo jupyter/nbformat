@@ -1,5 +1,4 @@
-"""The main API for the v3 notebook format.
-"""
+"""The main API for the v3 notebook format."""
 
 # Copyright (c) IPython Development Team.
 # Distributed under the terms of the Modified BSD License.

@@ -1,4 +1,5 @@
 """NotebookNode - adding attribute access to dicts"""
+
 from __future__ import annotations
 
 from collections.abc import Mapping

@@ -2,6 +2,7 @@
 
 Can probably be replaced by types.SimpleNamespace from Python 3.3
 """
+
 from __future__ import annotations
 
 from typing import Any, Dict

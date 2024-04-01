@@ -1,6 +1,7 @@
 """
 Warnings that can be emitted by nbformat.
 """
+
 from __future__ import annotations
 
 

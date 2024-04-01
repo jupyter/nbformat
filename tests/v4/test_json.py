@@ -130,6 +130,6 @@ class TestJSON(formattest.NBFormatTest, TestCase):
             os.path.join(BASE_PATH, "nbformat.v4.schema.json"), encoding="utf-8"
         ) as schema_file:
             schema = json.load(schema_file)
-        assert schema["description"] == "Jupyter Notebook v{major}.{minor} JSON schema.".format(
-            major=nbformat, minor=nbformat_minor
+        assert (
+            schema["description"] == f"Jupyter Notebook v{nbformat}.{nbformat_minor} JSON schema."
         )
