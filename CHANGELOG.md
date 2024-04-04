@@ -4,6 +4,23 @@
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 5.10.4
+
+([Full Changelog](https://github.com/jupyter/nbformat/compare/v5.10.3...be5ff0a81d544238599b9df4fcefa19e235a8898))
+
+### Maintenance and upkeep improvements
+
+- Set all min deps [#399](https://github.com/jupyter/nbformat/pull/399) ([@blink1073](https://github.com/blink1073))
+- chore: update pre-commit hooks [#398](https://github.com/jupyter/nbformat/pull/398) ([@pre-commit-ci](https://github.com/pre-commit-ci))
+
+### Contributors to this release
+
+([GitHub contributors page for this release](https://github.com/jupyter/nbformat/graphs/contributors?from=2024-03-15&to=2024-04-04&type=c))
+
+[@blink1073](https://github.com/search?q=repo%3Ajupyter%2Fnbformat+involves%3Ablink1073+updated%3A2024-03-15..2024-04-04&type=Issues) | [@pre-commit-ci](https://github.com/search?q=repo%3Ajupyter%2Fnbformat+involves%3Apre-commit-ci+updated%3A2024-03-15..2024-04-04&type=Issues)
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 5.10.3
 
 ([Full Changelog](https://github.com/jupyter/nbformat/compare/v5.10.2...c17a251a1b1c5e2a7b9fe1fce866d4c110dd12eb))
@@ -17,8 +34,6 @@
 ([GitHub contributors page for this release](https://github.com/jupyter/nbformat/graphs/contributors?from=2024-03-12&to=2024-03-15&type=c))
 
 [@krassowski](https://github.com/search?q=repo%3Ajupyter%2Fnbformat+involves%3Akrassowski+updated%3A2024-03-12..2024-03-15&type=Issues)
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 5.10.2
 
