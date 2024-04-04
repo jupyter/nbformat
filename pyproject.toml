@@ -23,9 +23,9 @@ classifiers = [
 ]
 requires-python = ">=3.8"
 dependencies = [
-    "fastjsonschema",
+    "fastjsonschema>=2.15",
     "jsonschema>=2.6",
-    "jupyter_core",
+    "jupyter_core>=4.12,!=5.0.*",
     "traitlets>=5.1"
 ]
 
