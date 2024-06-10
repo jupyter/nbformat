@@ -46,7 +46,7 @@ repos:
     rev: "v2.3.0"
     hooks:
       - id: codespell
-        args: ["-L", "sur,nd"]
+        args: ["-L", "sur,nd,assertin"]
 
   - repo: https://github.com/pre-commit/pygrep-hooks
     rev: "v1.10.0"
