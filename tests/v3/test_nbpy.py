@@ -12,7 +12,7 @@ class TestPy(formattest.NBFormatTest, TestCase):
     nb0_ref = nb0_py
     ext = "py"
     mod = nbpy
-    ignored_keys = ["collapsed", "outputs", "prompt_number", "metadata"]  # noqa
+    ignored_keys = ["collapsed", "outputs", "prompt_number", "metadata"]  # noqa: RUF012
 
     def assertSubset(self, da, db):
         """assert that da is a subset of db, ignoring self.ignored_keys.

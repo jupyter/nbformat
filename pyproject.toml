@@ -174,6 +174,7 @@ ignore = [
   "RET503", # Missing explicit `return` at the end of function able...
   "S101",   # Use of `assert` detected"
   "E731",   # Do not assign a `lambda` expression"
+  "UP031",  # Use format specifiers instead of percent format
 ]
 unfixable = [
   # Don't touch print statements

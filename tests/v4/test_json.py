@@ -120,7 +120,7 @@ class TestJSON(formattest.NBFormatTest, TestCase):
                     f"nbformat.v{nbformat}.{nbformat_minor}.schema.json",
                 ),
                 encoding="utf-8",
-            ) as schema_file:  # noqa
+            ) as schema_file:  # noqa: PLW2901
                 ver_schema = json.load(schema_file)
             assert latest_schema == ver_schema
 

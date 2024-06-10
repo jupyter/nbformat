@@ -220,7 +220,7 @@ class TestNotary(TestsBase):
             env = os.environ.copy()
             env["JUPYTER_DATA_DIR"] = self.data_dir
             p = Popen(
-                [sys.executable, "-m", "nbformat.sign", "--log-level=0"],  # noqa
+                [sys.executable, "-m", "nbformat.sign", "--log-level=0"],  # noqa: S603
                 stdin=PIPE,
                 stdout=PIPE,
                 env=env,
