@@ -11,7 +11,7 @@ from .nbexamples import nb0
 
 
 def open_utf8(fname, mode):
-    return open(fname, mode=mode, encoding="utf-8")  # noqa
+    return open(fname, mode=mode, encoding="utf-8")
 
 
 class NBFormatTest:

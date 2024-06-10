@@ -15,7 +15,7 @@ class TestsBase(unittest.TestCase):
 
     @classmethod
     def fopen(cls, f, mode="r", encoding="utf-8"):
-        return open(os.path.join(cls._get_files_path(), f), mode, encoding=encoding)  # noqa
+        return open(os.path.join(cls._get_files_path(), f), mode, encoding=encoding)
 
     @classmethod
     def _get_files_path(cls):
