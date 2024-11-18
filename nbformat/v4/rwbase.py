@@ -3,6 +3,7 @@
 # Copyright (c) IPython Development Team.
 # Distributed under the terms of the Modified BSD License.
 from __future__ import annotations
+
 from collections.abc import Mapping
 
 
@@ -101,7 +102,7 @@ def strip_transient(nb):
     # Handle malformed notebooks where metadata was incorrectly set as a non-dictionary type
     if not isinstance(nb.metadata, Mapping):
         nb.metadata = dict()
-    
+
     nb.metadata.pop("orig_nbformat", None)
     nb.metadata.pop("orig_nbformat_minor", None)
     nb.metadata.pop("signature", None)
