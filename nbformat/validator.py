@@ -23,14 +23,14 @@ _deprecated = object()
 
 
 __all__ = [
+    "NotebookValidationError",
     "ValidationError",
+    "better_validation_error",
     "get_validator",
     "isvalid",
-    "NotebookValidationError",
-    "better_validation_error",
+    "iter_validate",
     "normalize",
     "validate",
-    "iter_validate",
 ]
 
 
@@ -519,7 +519,7 @@ def _get_errors(
     iter_errors = validator.iter_errors(nbdict, *args)
     errors = list(iter_errors)
     # jsonschema gives the best error messages.
-    if len(errors) and validator.name != "jsonschema":
+    if errors and validator.name != "jsonschema":
         validator = get_validator(
             version=version,
             version_minor=version_minor,

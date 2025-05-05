@@ -16,23 +16,23 @@ from ._version import __version__, version_info
 from .sentinel import Sentinel
 
 __all__ = [
-    "versions",
-    "validate",
-    "ValidationError",
-    "convert",
-    "from_dict",
+    "NO_CONVERT",
+    "NBFormatError",
     "NotebookNode",
+    "Sentinel",
+    "ValidationError",
+    "__version__",
+    "convert",
     "current_nbformat",
     "current_nbformat_minor",
-    "NBFormatError",
-    "NO_CONVERT",
-    "reads",
+    "from_dict",
     "read",
-    "writes",
-    "write",
+    "reads",
+    "validate",
     "version_info",
-    "__version__",
-    "Sentinel",
+    "versions",
+    "write",
+    "writes",
 ]
 
 versions = {
