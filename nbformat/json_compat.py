@@ -16,11 +16,11 @@ from jsonschema import Draft4Validator as _JsonSchemaValidator
 from jsonschema.exceptions import ErrorTree, ValidationError
 
 __all__ = [
-    "ValidationError",
-    "JsonSchemaValidator",
-    "FastJsonSchemaValidator",
-    "get_current_validator",
     "VALIDATORS",
+    "FastJsonSchemaValidator",
+    "JsonSchemaValidator",
+    "ValidationError",
+    "get_current_validator",
 ]
 
 
