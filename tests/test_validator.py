@@ -245,7 +245,7 @@ def test_iter_validation_empty(validator_name):
     """Test that an empty notebook (invalid) fails validation via iter_validate"""
     set_validator(validator_name)
     errors = list(iter_validate({}))
-    assert len(errors)
+    assert errors
     assert type(errors[0]) == ValidationError
 
 
