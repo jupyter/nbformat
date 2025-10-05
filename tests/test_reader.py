@@ -40,13 +40,15 @@ class TestReader(TestsBase):
         self.assertEqual(major, 2)
 
     def test_read_fails_on_missing_worksheets(self):
-        with self.fopen("test3_no_worksheets.ipynb", "r") as f, self.assertRaisesRegex(
-            ValidationError, r"worksheets"
+        with (
+            self.fopen("test3_no_worksheets.ipynb", "r") as f,
+            self.assertRaisesRegex(ValidationError, r"worksheets"),
         ):
             nb = read(f)
 
     def test_read_fails_on_missing_worksheet_cells(self):
-        with self.fopen("test3_worksheet_with_no_cells.ipynb", "r") as f, self.assertRaisesRegex(
-            ValidationError, r"cells"
+        with (
+            self.fopen("test3_worksheet_with_no_cells.ipynb", "r") as f,
+            self.assertRaisesRegex(ValidationError, r"cells"),
         ):
             nb = read(f)

@@ -5,12 +5,12 @@ Can probably be replaced by types.SimpleNamespace from Python 3.3
 
 from __future__ import annotations
 
-from typing import Any, Dict
+from typing import Any
 
 __all__ = ["Struct"]
 
 
-class Struct(Dict[Any, Any]):
+class Struct(dict[Any, Any]):
     """A dict subclass with attribute style access.
 
     This dict subclass has a a few extra features:
