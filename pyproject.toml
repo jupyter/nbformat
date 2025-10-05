@@ -51,6 +51,7 @@ docs = [
 "sphinx",
 "sphinxcontrib_github_alt",
 "sphinxcontrib-spelling",
+"intersphinx_registry",
 ]
 test = [
     "testpath",
