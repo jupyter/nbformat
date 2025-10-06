@@ -57,7 +57,7 @@ test = [
     "testpath",
     "pytest",
     "pre-commit",
-    "pep440"
+    "packaging"
 ]
 
 [project.scripts]

@@ -11,7 +11,7 @@ from tempfile import TemporaryDirectory
 from typing import Any
 
 from jsonschema import ValidationError
-from pep440 import is_canonical
+from packaging import version
 
 from nbformat import __version__ as nbf_version
 from nbformat import current_nbformat, read, write, writes
@@ -22,7 +22,7 @@ from .base import TestsBase
 
 
 def test_canonical_version():
-    assert is_canonical(nbf_version)
+    assert str(version.parse(nbf_version)) == nbf_version
 
 
 class TestAPI(TestsBase):
