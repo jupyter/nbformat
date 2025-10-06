@@ -19,6 +19,8 @@ from __future__ import annotations
 import shutil
 from pathlib import Path
 
+from intersphinx_registry import get_intersphinx_mapping
+
 import nbformat
 
 HERE = Path(__file__).parent.resolve()
@@ -51,7 +53,7 @@ templates_path = ["_templates"]
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
 # source_suffix = ['.rst', '.md']
-source_suffix = ".rst"
+source_suffix = {".rst": "restructuredtext"}
 
 # The encoding of source files.
 # source_encoding = 'utf-8-sig'
@@ -301,14 +303,9 @@ texinfo_documents = [
 # texinfo_no_detailmenu = False
 
 
-# Example configuration for intersphinx: refer to the Python standard library.
-intersphinx_mapping = {
-    "python": ("https://docs.python.org/3", None),
-    "jupyterclient": ("https://jupyter-client.readthedocs.io/en/stable", None),
-    "nbconvert": ("https://nbconvert.readthedocs.org/en/stable", None),
-    "notebook": ("https://jupyter-notebook.readthedocs.org/en/stable", None),
-    "server": ("https://jupyter-server.readthedocs.org/en/stable", None),
-}
+intersphinx_mapping = get_intersphinx_mapping(
+    packages={"python", "jupyterclient", "nbconvert", "notebook", "server"}
+)
 
 
 def setup(_):
