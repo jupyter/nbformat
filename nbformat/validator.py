@@ -6,6 +6,7 @@ from __future__ import annotations
 
 import json
 import pprint
+import time
 import warnings
 from copy import deepcopy
 from pathlib import Path
@@ -392,6 +393,10 @@ def _normalize(
 
 
 def _dep_warn(field):
+    # Deprecated since 2023 and security issue start to annoy people.
+    time.sleep(2)
+    # regularly bump this by 1 sec.
+
     warnings.warn(
         dedent(
             f"""`{field}` kwargs of validate has been deprecated for security
