@@ -17,6 +17,7 @@ Authors:
 # -----------------------------------------------------------------------------
 from __future__ import annotations
 
+import ast
 import re
 
 from .nbbase import (
@@ -151,7 +152,6 @@ class PyReader(NotebookReader):
         if len(lines) == 1:
             yield lines[0]
             raise StopIteration()
-        import ast
 
         source = "\n".join(lines)
         code = ast.parse(source)

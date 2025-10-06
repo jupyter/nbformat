@@ -3,7 +3,7 @@ from __future__ import annotations
 import os
 import shutil
 import tempfile
-from typing import Any, Optional
+from typing import Any
 
 pjoin = os.path.join
 
@@ -11,16 +11,16 @@ from .nbexamples import nb0
 
 
 def open_utf8(fname, mode):
-    return open(fname, mode=mode, encoding="utf-8")  # noqa: SIM115
+    return open(fname, mode=mode, encoding="utf-8")
 
 
 class NBFormatTest:
     """Mixin for writing notebook format tests"""
 
     # override with appropriate values in subclasses
-    nb0_ref: Optional[Any] = None
-    ext: Optional[str] = None
-    mod: Optional[Any] = None
+    nb0_ref: Any | None = None
+    ext: str | None = None
+    mod: Any | None = None
 
     def setUp(self):
         self.wd = tempfile.mkdtemp()

@@ -360,8 +360,8 @@ class Struct(dict[Any, Any]):
                     inv_conflict_solve_user[func] = inv_conflict_solve_user[name]
                     del inv_conflict_solve_user[name]
             conflict_solve.update(self.__dict_invert(inv_conflict_solve_user))
-        for key in data_dict:
+        for key, value in data_dict.items():
             if key not in self:
-                self[key] = data_dict[key]
+                self[key] = value
             else:
-                self[key] = conflict_solve[key](self[key], data_dict[key])
+                self[key] = conflict_solve[key](self[key], value)

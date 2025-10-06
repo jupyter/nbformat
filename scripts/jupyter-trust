@@ -3,7 +3,7 @@ from __future__ import annotations
 
 
 def main():
-    from nbformat.sign import TrustNotebookApp
+    from nbformat.sign import TrustNotebookApp  # noqa: PLC0415
 
     TrustNotebookApp.launch_instance()
 

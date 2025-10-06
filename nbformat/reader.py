@@ -70,7 +70,7 @@ def reads(s, **kwargs):
     NBFormatError
         Specified major version is invalid or unsupported.
     """
-    from . import NBFormatError, versions
+    from . import NBFormatError, versions  # noqa: PLC0415
 
     nb_dict = parse_json(s, **kwargs)
     (major, minor) = get_version(nb_dict)

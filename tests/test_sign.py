@@ -219,8 +219,8 @@ class TestNotary(TestsBase):
         def sign_stdin(nb):
             env = os.environ.copy()
             env["JUPYTER_DATA_DIR"] = self.data_dir
-            p = Popen(
-                [sys.executable, "-m", "nbformat.sign", "--log-level=0"],  # noqa: S603
+            p = Popen(  # noqa: S603
+                [sys.executable, "-m", "nbformat.sign", "--log-level=0"],
                 stdin=PIPE,
                 stdout=PIPE,
                 env=env,
