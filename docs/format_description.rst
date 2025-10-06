@@ -302,7 +302,7 @@ regardless of format.
             # nbconvert to formats other than this will exclude this cell.
             "format": "mime/type"
         },
-        "source": "[some nbformat output text]",
+        "source": ["some nbformat output text"],
     }
 
 
