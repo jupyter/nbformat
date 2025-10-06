@@ -31,8 +31,9 @@ def test_downgrade_notebook():
 def test_upgrade_heading():
     # Fake the uuid generation for ids
     cell_ids = ["cell-1", "cell-2", "cell-3"]
-    with mock.patch("nbformat.v4.convert.random_cell_id", side_effect=cell_ids), mock.patch(
-        "nbformat.v4.nbbase.random_cell_id", side_effect=cell_ids
+    with (
+        mock.patch("nbformat.v4.convert.random_cell_id", side_effect=cell_ids),
+        mock.patch("nbformat.v4.nbbase.random_cell_id", side_effect=cell_ids),
     ):
         v3h = v3.new_heading_cell
         v4m = v4.new_markdown_cell
