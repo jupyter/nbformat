@@ -36,7 +36,7 @@ nbformat_schema = {
 
 def validate(node, ref=None):
     """validate a v4 node"""
-    from nbformat import validate as validate_orig
+    from nbformat import validate as validate_orig  # noqa: PLC0415
 
     return validate_orig(node, ref=ref, version=nbformat)
 

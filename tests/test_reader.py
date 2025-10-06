@@ -30,13 +30,13 @@ class TestReader(TestsBase):
         # Open a version 3 notebook.  Make sure it is still version 3.
         with self.fopen("test3.ipynb", "r") as f:
             nb = read(f)
-        (major, minor) = get_version(nb)
+        (major, _minor) = get_version(nb)
         self.assertEqual(major, 3)
 
         # Open a version 2 notebook.  Make sure it is still version 2.
         with self.fopen("test2.ipynb", "r") as f:
             nb = read(f)
-        (major, minor) = get_version(nb)
+        (major, _minor) = get_version(nb)
         self.assertEqual(major, 2)
 
     def test_read_fails_on_missing_worksheets(self):

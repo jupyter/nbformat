@@ -318,11 +318,11 @@ sure to generate valid notebooks.
 
 ## 5.0.8
 
-- Add optional support for using \[fastjsonschema\]{.title-ref} as the
+- Add optional support for using [fastjsonschema]{.title-ref} as the
   JSON validation library. To enable fast validation, install
-  \[fastjsonschema\]{.title-ref} and set the environment variable
-  \[NBFORMAT_VALIDATOR\]{.title-ref} to the value
-  \[fastjsonschema\]{.title-ref}.
+  [fastjsonschema]{.title-ref} and set the environment variable
+  [NBFORMAT_VALIDATOR]{.title-ref} to the value
+  [fastjsonschema]{.title-ref}.
 
 ## 5.0.7
 
@@ -397,7 +397,7 @@ sure to generate valid notebooks.
   database.
 - Dict-like objects added to NotebookNode attributes are now
   transformed to be NotebookNode objects; transformation also works
-  for \[.update()\]{.title-ref}.
+  for [.update()]{.title-ref}.
 
 ## 4.3
 

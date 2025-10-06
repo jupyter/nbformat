@@ -24,7 +24,7 @@ class MiscTests(TestCase):
 
         # check parsing a full file path
         abs_path = os.path.abspath("test.ipynb")
-        basename, ext = os.path.splitext(abs_path)
+        basename, _ext = os.path.splitext(abs_path)
         self.check_filename(abs_path, abs_path, basename, "json")
 
         # check parsing a file name containing dots

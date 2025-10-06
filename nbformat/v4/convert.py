@@ -18,7 +18,7 @@ from .nbbase import nbformat, nbformat_minor
 
 def _warn_if_invalid(nb, version):
     """Log validation errors, if there are any."""
-    from nbformat import ValidationError, validate
+    from nbformat import ValidationError, validate  # noqa: PLC0415
 
     try:
         validate(nb, version=version)

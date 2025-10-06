@@ -22,7 +22,7 @@ class TestConvert(TestsBase):
         nb = convert(nb, 2)
 
         # Check if downgrade was successful.
-        (major, minor) = get_version(nb)
+        (major, _minor) = get_version(nb)
         self.assertEqual(major, 2)
 
     def test_upgrade_2_3(self):
@@ -34,7 +34,7 @@ class TestConvert(TestsBase):
         nb = convert(nb, 3)
 
         # Check if upgrade was successful.
-        (major, minor) = get_version(nb)
+        (major, _minor) = get_version(nb)
         self.assertEqual(major, 3)
 
     def test_upgrade_downgrade_4_3_4(self):
@@ -63,11 +63,11 @@ class TestConvert(TestsBase):
         # while remembering it's version information.
         with self.fopen("test2.ipynb", "r") as f:
             nb = read(f)
-        (original_major, original_minor) = get_version(nb)
+        (original_major, _original_minor) = get_version(nb)
         nb = convert(nb, current_nbformat)
 
         # Check if upgrade was successful.
-        (major, minor) = get_version(nb)
+        (major, _minor) = get_version(nb)
         self.assertEqual(major, current_nbformat)
 
         # Check if the original major revision was remembered.

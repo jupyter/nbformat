@@ -34,7 +34,7 @@ def convert(nb, to_version):
     """
 
     # Get input notebook version.
-    (version, version_minor) = get_version(nb)
+    (version, _version_minor) = get_version(nb)
 
     # Check if destination is target version, if so return contents
     if version == to_version:

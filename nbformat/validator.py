@@ -10,7 +10,7 @@ import warnings
 from copy import deepcopy
 from pathlib import Path
 from textwrap import dedent
-from typing import Any, Optional
+from typing import Any
 
 from ._imports import import_item
 from .corpus.words import generate_corpus_id
@@ -23,14 +23,14 @@ _deprecated = object()
 
 
 __all__ = [
+    "NotebookValidationError",
     "ValidationError",
+    "better_validation_error",
     "get_validator",
     "isvalid",
-    "NotebookValidationError",
-    "better_validation_error",
+    "iter_validate",
     "normalize",
     "validate",
-    "iter_validate",
 ]
 
 
@@ -57,7 +57,7 @@ def _allow_undefined(schema):
 def get_validator(version=None, version_minor=None, relax_add_props=False, name=None):
     """Load the JSON schema into a Validator"""
     if version is None:
-        from . import current_nbformat
+        from . import current_nbformat  # noqa:PLC0415
 
         version = current_nbformat
 
@@ -269,8 +269,8 @@ def better_validation_error(error, version, version_minor):
 
 def normalize(
     nbdict: Any,
-    version: Optional[int] = None,
-    version_minor: Optional[int] = None,
+    version: int | None = None,
+    version_minor: int | None = None,
     *,
     relax_add_props: bool = False,
     strip_invalid_metadata: bool = False,
@@ -409,9 +409,9 @@ def _dep_warn(field):
 
 def validate(
     nbdict: Any = None,
-    ref: Optional[str] = None,
-    version: Optional[int] = None,
-    version_minor: Optional[int] = None,
+    ref: str | None = None,
+    version: int | None = None,
+    version_minor: int | None = None,
     relax_add_props: bool = False,
     nbjson: Any = None,
     repair_duplicate_cell_ids: bool = _deprecated,  # type: ignore[assignment]
@@ -519,7 +519,7 @@ def _get_errors(
     iter_errors = validator.iter_errors(nbdict, *args)
     errors = list(iter_errors)
     # jsonschema gives the best error messages.
-    if len(errors) and validator.name != "jsonschema":
+    if errors and validator.name != "jsonschema":
         validator = get_validator(
             version=version,
             version_minor=version_minor,

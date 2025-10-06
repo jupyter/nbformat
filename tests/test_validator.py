@@ -245,8 +245,8 @@ def test_iter_validation_empty(validator_name):
     """Test that an empty notebook (invalid) fails validation via iter_validate"""
     set_validator(validator_name)
     errors = list(iter_validate({}))
-    assert len(errors)
-    assert type(errors[0]) == ValidationError
+    assert errors
+    assert type(errors[0]) is ValidationError
 
 
 @pytest.mark.parametrize("validator_name", VALIDATORS)
@@ -292,10 +292,16 @@ def test_non_unique_cell_ids():
     with TestsBase.fopen("invalid_unique_cell_id.ipynb", "r") as f:
         # Avoids validate call from `.read`
         nb = nbformat.from_dict(json.load(f))
-    with pytest.raises(ValidationError), pytest.warns(DeprecationWarning):
+    with (
+        pytest.raises(ValidationError),
+        pytest.warns(DeprecationWarning, match="`repair_duplicate_cell_ids` kwargs of validate"),
+    ):
         validate(nb, repair_duplicate_cell_ids=False)
     # try again to verify that we didn't modify the content
-    with pytest.raises(ValidationError), pytest.warns(DeprecationWarning):
+    with (
+        pytest.raises(ValidationError),
+        pytest.warns(DeprecationWarning, match="`repair_duplicate_cell_ids` kwargs of validate"),
+    ):
         validate(nb, repair_duplicate_cell_ids=False)
 
 
@@ -317,10 +323,16 @@ def test_no_cell_ids():
     with TestsBase.fopen("v4_5_no_cell_id.ipynb", "r") as f:
         # Avoids validate call from `.read`
         nb = nbformat.from_dict(json.load(f))
-    with pytest.raises(ValidationError), pytest.warns(DeprecationWarning):
+    with (
+        pytest.raises(ValidationError),
+        pytest.warns(DeprecationWarning, match="`repair_duplicate_cell_ids` kwargs of validate"),
+    ):
         validate(nb, repair_duplicate_cell_ids=False)
     # try again to verify that we didn't modify the content
-    with pytest.raises(ValidationError), pytest.warns(DeprecationWarning):
+    with (
+        pytest.raises(ValidationError),
+        pytest.warns(DeprecationWarning, match="`repair_duplicate_cell_ids` kwargs of validate"),
+    ):
         validate(nb, repair_duplicate_cell_ids=False)
 
 
@@ -365,6 +377,9 @@ def test_strip_invalid_metadata():
     with TestsBase.fopen("v4_5_invalid_metadata.ipynb", "r") as f:
         nb = nbformat.from_dict(json.load(f))
     assert not isvalid(nb)
-    with pytest.warns(DeprecationWarning):
+    with pytest.warns(
+        DeprecationWarning,
+        match="`strip_invalid_metadata` kwargs of validate has been deprecated for security",
+    ):
         validate(nb, strip_invalid_metadata=True)
     assert isvalid(nb)
