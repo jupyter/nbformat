@@ -141,6 +141,33 @@
                 "type": "boolean"
               }
             },
+            "editable": {
+              "description": "Whether the cell is editable.",
+              "type": "boolean"
+            },
+            "deletable": {
+              "description": "Whether the cell is deletable.",
+              "type": "boolean"
+            },
+            "slideshow": {
+              "description": "Slideshow-specific cell metadata.",
+              "type": "object",
+              "additionalProperties": true,
+              "properties": {
+                "slide_type": {
+                  "description": "Type of slide.",
+                  "type": "string",
+                  "enum": [
+                    "slide",
+                    "subslide",
+                    "fragment",
+                    "skip",
+                    "notes",
+                    "-"
+                  ]
+                }
+              }
+            },
             "name": { "$ref": "#/definitions/misc/metadata_name" },
             "tags": { "$ref": "#/definitions/misc/metadata_tags" }
           }
@@ -167,6 +194,33 @@
           "properties": {
             "name": { "$ref": "#/definitions/misc/metadata_name" },
             "tags": { "$ref": "#/definitions/misc/metadata_tags" },
+            "editable": {
+              "description": "Whether the cell is editable.",
+              "type": "boolean"
+            },
+            "deletable": {
+              "description": "Whether the cell is deletable.",
+              "type": "boolean"
+            },
+            "slideshow": {
+              "description": "Slideshow-specific cell metadata.",
+              "type": "object",
+              "additionalProperties": true,
+              "properties": {
+                "slide_type": {
+                  "description": "Type of slide.",
+                  "type": "string",
+                  "enum": [
+                    "slide",
+                    "subslide",
+                    "fragment",
+                    "skip",
+                    "notes",
+                    "-"
+                  ]
+                }
+              }
+            },
             "jupyter": {
               "description": "Official Jupyter Metadata for Markdown Cells",
               "type": "object",
@@ -256,6 +310,33 @@
               "description": "Whether the cell's output is scrolled, unscrolled, or autoscrolled.",
               "enum": [true, false, "auto"]
             },
+            "editable": {
+              "description": "Whether the cell is editable.",
+              "type": "boolean"
+            },
+            "deletable": {
+              "description": "Whether the cell is deletable.",
+              "type": "boolean"
+            },
+            "slideshow": {
+              "description": "Slideshow-specific cell metadata.",
+              "type": "object",
+              "additionalProperties": true,
+              "properties": {
+                "slide_type": {
+                  "description": "Type of slide.",
+                  "type": "string",
+                  "enum": [
+                    "slide",
+                    "subslide",
+                    "fragment",
+                    "skip",
+                    "notes",
+                    "-"
+                  ]
+                }
+              }
+            },
             "name": { "$ref": "#/definitions/misc/metadata_name" },
             "tags": { "$ref": "#/definitions/misc/metadata_tags" }
           }
@@ -291,7 +372,34 @@
           "type": "object",
           "properties": {
             "name": { "$ref": "#/definitions/misc/metadata_name" },
-            "tags": { "$ref": "#/definitions/misc/metadata_tags" }
+            "tags": { "$ref": "#/definitions/misc/metadata_tags" },
+            "editable": {
+              "description": "Whether the cell is editable.",
+              "type": "boolean"
+            },
+            "deletable": {
+              "description": "Whether the cell is deletable.",
+              "type": "boolean"
+            },
+            "slideshow": {
+              "description": "Slideshow-specific cell metadata.",
+              "type": "object",
+              "additionalProperties": true,
+              "properties": {
+                "slide_type": {
+                  "description": "Type of slide.",
+                  "type": "string",
+                  "enum": [
+                    "slide",
+                    "subslide",
+                    "fragment",
+                    "skip",
+                    "notes",
+                    "-"
+                  ]
+                }
+              }
+            }
           },
           "additionalProperties": true
         }

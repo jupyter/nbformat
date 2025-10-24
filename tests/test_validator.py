@@ -179,6 +179,16 @@ def test_nb4jupyter_metadata_timings(validator_name):
 
 
 @pytest.mark.parametrize("validator_name", VALIDATORS)
+def test_nb4_with_cell_metadata(validator_name):
+    """Test that a notebook with editable, deletable, and slideshow metadata passes validation"""
+    set_validator(validator_name)
+    with TestsBase.fopen("test4_with_cell_metadata.ipynb", "r") as f:
+        nb = read(f, as_version=4)
+    validate(nb)
+    assert isvalid(nb)
+
+
+@pytest.mark.parametrize("validator_name", VALIDATORS)
 def test_invalid(validator_name):
     """Test than an invalid notebook does not pass validation"""
     set_validator(validator_name)
