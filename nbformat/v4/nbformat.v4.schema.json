@@ -149,25 +149,7 @@
               "description": "Whether the cell is deletable.",
               "type": "boolean"
             },
-            "slideshow": {
-              "description": "Slideshow-specific cell metadata.",
-              "type": "object",
-              "additionalProperties": true,
-              "properties": {
-                "slide_type": {
-                  "description": "Type of slide.",
-                  "type": "string",
-                  "enum": [
-                    "slide",
-                    "subslide",
-                    "fragment",
-                    "skip",
-                    "notes",
-                    "-"
-                  ]
-                }
-              }
-            },
+            "slideshow": { "$ref": "#/definitions/misc/metadata_slideshow" },
             "name": { "$ref": "#/definitions/misc/metadata_name" },
             "tags": { "$ref": "#/definitions/misc/metadata_tags" }
           }
@@ -202,25 +184,7 @@
               "description": "Whether the cell is deletable.",
               "type": "boolean"
             },
-            "slideshow": {
-              "description": "Slideshow-specific cell metadata.",
-              "type": "object",
-              "additionalProperties": true,
-              "properties": {
-                "slide_type": {
-                  "description": "Type of slide.",
-                  "type": "string",
-                  "enum": [
-                    "slide",
-                    "subslide",
-                    "fragment",
-                    "skip",
-                    "notes",
-                    "-"
-                  ]
-                }
-              }
-            },
+            "slideshow": { "$ref": "#/definitions/misc/metadata_slideshow" },
             "jupyter": {
               "description": "Official Jupyter Metadata for Markdown Cells",
               "type": "object",
@@ -318,25 +282,7 @@
               "description": "Whether the cell is deletable.",
               "type": "boolean"
             },
-            "slideshow": {
-              "description": "Slideshow-specific cell metadata.",
-              "type": "object",
-              "additionalProperties": true,
-              "properties": {
-                "slide_type": {
-                  "description": "Type of slide.",
-                  "type": "string",
-                  "enum": [
-                    "slide",
-                    "subslide",
-                    "fragment",
-                    "skip",
-                    "notes",
-                    "-"
-                  ]
-                }
-              }
-            },
+            "slideshow": { "$ref": "#/definitions/misc/metadata_slideshow" },
             "name": { "$ref": "#/definitions/misc/metadata_name" },
             "tags": { "$ref": "#/definitions/misc/metadata_tags" }
           }
@@ -381,25 +327,7 @@
               "description": "Whether the cell is deletable.",
               "type": "boolean"
             },
-            "slideshow": {
-              "description": "Slideshow-specific cell metadata.",
-              "type": "object",
-              "additionalProperties": true,
-              "properties": {
-                "slide_type": {
-                  "description": "Type of slide.",
-                  "type": "string",
-                  "enum": [
-                    "slide",
-                    "subslide",
-                    "fragment",
-                    "skip",
-                    "notes",
-                    "-"
-                  ]
-                }
-              }
-            }
+            "slideshow": { "$ref": "#/definitions/misc/metadata_slideshow" }
           },
           "additionalProperties": true
         }
@@ -526,6 +454,18 @@
         "items": {
           "type": "string",
           "pattern": "^[^,]+$"
+        }
+      },
+      "metadata_slideshow": {
+        "description": "Slideshow-specific cell metadata.",
+        "type": "object",
+        "additionalProperties": true,
+        "properties": {
+          "slide_type": {
+            "description": "Type of slide.",
+            "type": "string",
+            "enum": ["slide", "subslide", "fragment", "skip", "notes", "-"]
+          }
         }
       },
       "attachments": {
