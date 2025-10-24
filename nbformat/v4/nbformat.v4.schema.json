@@ -464,7 +464,7 @@
           "slide_type": {
             "description": "Type of slide.",
             "type": "string",
-            "enum": ["slide", "subslide", "fragment", "skip", "notes", "-"]
+            "enum": ["slide", "subslide", "fragment", "skip", "notes", "-", ""]
           }
         }
       },
