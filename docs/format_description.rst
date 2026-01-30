@@ -44,7 +44,7 @@ At the highest level, a Jupyter notebook is a dictionary with a few keys:
             },
         },
         "nbformat": 4,
-        "nbformat_minor": 0,
+        "nbformat_minor": 5,
         "cells": [
             # list of cell dictionaries, see below
         ],
