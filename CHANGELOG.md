@@ -265,7 +265,6 @@ Most libraries and applications should continue to generate valid
 notebooks directly and rely on `validate()` to check correctness, rather
 than using `normalize()` as part of normal notebook creation.
 
-
 ### Other changes
 
 - `nbformat` is now built with flit, and uses `pyproject.toml`
