@@ -274,6 +274,7 @@ def test_invalid_validator_raises_value_error_after_read():
     with pytest.raises(ValueError):
         validate(nb)
 
+
 @pytest.mark.parametrize("validator_name", VALIDATORS)
 def test_validate_does_not_mutate_invalid_notebook(validator_name):
     set_validator(validator_name)
