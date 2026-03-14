@@ -15,7 +15,7 @@ from jsonschema import ValidationError
 import nbformat
 from nbformat import read
 from nbformat.json_compat import VALIDATORS
-from nbformat.validator import isvalid, iter_validate, validate
+from nbformat.validator import isvalid, iter_validate, normalize, validate
 from nbformat.warnings import DuplicateCellId, MissingIDFieldWarning
 
 from .base import TestsBase
@@ -383,3 +383,58 @@ def test_strip_invalid_metadata():
     ):
         validate(nb, strip_invalid_metadata=True)
     assert isvalid(nb)
+
+
+def test_normalize_updates_minor_version():
+    """normalize() must update nbformat_minor when the target version is higher.
+
+    When a v4.0-v4.4 notebook is normalized to v4.5 (which adds cell IDs),
+    the returned notebook should declare nbformat_minor=5 so it is valid
+    against the correct schema. See https://github.com/jupyter/nbformat/issues/328
+    """
+    with TestsBase.fopen("test4.ipynb", "r") as f:
+        nb = nbformat.from_dict(json.load(f))
+
+    assert nb.nbformat == 4
+    assert nb.nbformat_minor == 0
+
+    with pytest.warns(MissingIDFieldWarning):
+        changes, normalized_nb = normalize(nb, 4, 5)
+
+    # The normalized notebook should advertise version 4.5
+    assert normalized_nb.nbformat == 4
+    assert normalized_nb.nbformat_minor == 5
+    # Cell IDs must have been added
+    assert all("id" in cell for cell in normalized_nb.cells)
+    # The change count must be positive (IDs added + version bump)
+    assert changes > 0
+    # The original notebook must not be mutated
+    assert nb.nbformat_minor == 0
+
+
+def test_normalize_does_not_downgrade_minor_version():
+    """normalize() must not lower nbformat_minor when the notebook declares a higher version."""
+    with TestsBase.fopen("test4.5.ipynb", "r") as f:
+        nb = nbformat.from_dict(json.load(f))
+
+    assert nb.nbformat_minor == 5
+
+    changes, normalized_nb = normalize(nb)
+
+    # Version must stay at 4.5, not be downgraded
+    assert normalized_nb.nbformat == 4
+    assert normalized_nb.nbformat_minor == 5
+
+
+def test_normalize_no_version_change_when_not_needed():
+    """normalize() must not alter version fields when the version is not upgraded."""
+    with TestsBase.fopen("test4.ipynb", "r") as f:
+        nb = nbformat.from_dict(json.load(f))
+
+    # Normalize without specifying a higher version; no cell IDs should be added
+    # and the version fields should remain unchanged.
+    changes, normalized_nb = normalize(nb)
+
+    assert normalized_nb.nbformat == 4
+    assert normalized_nb.nbformat_minor == 0
+    assert changes == 0

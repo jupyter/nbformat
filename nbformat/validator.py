@@ -313,7 +313,7 @@ def normalize(
         version = nbdict_version
     if version_minor is None:
         version_minor = nbdict_version_minor
-    return _normalize(
+    changes, nbdict = _normalize(
         nbdict,
         version,
         version_minor,
@@ -321,6 +321,18 @@ def normalize(
         relax_add_props=relax_add_props,
         strip_invalid_metadata=strip_invalid_metadata,
     )
+    # Update the notebook version fields to reflect the target version used
+    # during normalization. When normalize() adds cell IDs (a v4.5 feature) to
+    # a notebook that declares an older minor version, the returned notebook
+    # must advertise the correct minor version so it validates against the right
+    # schema. See https://github.com/jupyter/nbformat/issues/328
+    if version > nbdict_version:
+        nbdict["nbformat"] = version
+        changes += 1
+    if version_minor > nbdict_version_minor:
+        nbdict["nbformat_minor"] = version_minor
+        changes += 1
+    return changes, nbdict
 
 
 def _normalize(
