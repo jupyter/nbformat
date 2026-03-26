@@ -1,11 +1,11 @@
 [build-system]
-requires = ["hatchling>=1.5", "hatch-nodejs-version"]
+requires = ["hatchling>=1.5"]
 build-backend = "hatchling.build"
 
 [project]
-name = "nbformat"
-dynamic = ["version"]
-description = "The Jupyter Notebook format"
+name = "nbformat-swoop"
+version = "5.10.4.post1"
+description = "The Jupyter Notebook format (swoop-inc fork with defensive error handling)"
 license = { file = "LICENSE" }
 keywords = ["Interactive", "Interpreter", "Shell", "Web"]
 classifiers = [
@@ -38,10 +38,9 @@ text = "This package contains the base implementation of the Jupyter Notebook fo
 content-type = "text/plain"
 
 [project.urls]
-Homepage = "https://jupyter.org"
-Changelog = "https://github.com/jupyter/nbformat/blob/main/CHANGELOG.md"
-Documentation = "https://nbformat.readthedocs.io/"
-Repository = "https://github.com/jupyter/nbformat.git"
+Homepage = "https://github.com/swoop-inc/nbformat"
+Upstream = "https://github.com/jupyter/nbformat"
+Repository = "https://github.com/swoop-inc/nbformat.git"
 
 
 [project.optional-dependencies]
@@ -63,8 +62,8 @@ test = [
 [project.scripts]
 jupyter-trust = "nbformat.sign:TrustNotebookApp.launch_instance"
 
-[tool.hatch.version]
-source = "nodejs"
+[tool.hatch.build.targets.wheel]
+packages = ["nbformat"]
 
 [tool.hatch.envs.docs]
 features = ["docs"]
