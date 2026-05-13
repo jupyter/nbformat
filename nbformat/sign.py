@@ -6,6 +6,8 @@ from __future__ import annotations
 
 import hashlib
 import os
+import shutil
+import subprocess
 import sys
 import typing as t
 import warnings
@@ -156,6 +158,7 @@ class SQLiteSignatureStore(SignatureStore, LoggingConfigurable):
         try:
             db = sqlite3.connect(db_file, **kwargs)
             self.init_db(db)
+            self._check_db_integrity(db)
         except (sqlite3.DatabaseError, sqlite3.OperationalError):
             if db_file != ":memory:":
                 old_db_location = db_file + ".bak"
@@ -165,14 +168,16 @@ class SQLiteSignatureStore(SignatureStore, LoggingConfigurable):
                     (
                         "The signatures database cannot be opened; maybe it is corrupted or encrypted. "
                         "You may need to rerun your notebooks to ensure that they are trusted to run Javascript. "
-                        "The old signatures database has been renamed to %s and a new one has been created."
+                        "The old signatures database has been renamed to %s."
                     ),
                     old_db_location,
                 )
                 try:
                     Path(db_file).rename(old_db_location)
-                    db = sqlite3.connect(db_file, **kwargs)
-                    self.init_db(db)
+                    db = self.recover(old_db_location, db_file)
+                    if db is None:
+                        db = sqlite3.connect(db_file, **kwargs)
+                        self.init_db(db)
                 except (sqlite3.DatabaseError, sqlite3.OperationalError, OSError):
                     if db is not None:
                         db.close()
@@ -188,6 +193,116 @@ class SQLiteSignatureStore(SignatureStore, LoggingConfigurable):
             else:
                 raise
         return db
+
+    def _check_db_integrity(self, db):
+        """Raise a database error when SQLite detects corruption."""
+        (status,) = db.execute("PRAGMA quick_check(1)").fetchone()
+        if status != "ok":
+            msg = f"quick_check failed: {status}"
+            raise sqlite3.DatabaseError(msg)
+
+    def recover(self, old_db_location, db_file):
+        """Recover as many signatures as possible from a corrupted db file.
+
+        Returns an initialized destination db connection on success, or None if
+        recovery was not possible.
+        """
+        sqlite_cli = shutil.which("sqlite3")
+        if sqlite_cli is None:
+            self.log.warning(
+                "sqlite3 CLI not available; using Python fallback recovery for %s",
+                old_db_location,
+            )
+            return self._recover_fallback(old_db_location, db_file)
+
+        kwargs: dict[str, t.Any] = {
+            "detect_types": sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES
+        }
+        dst = None
+        try:
+            recovered_sql = subprocess.run(  # noqa: S603
+                [sqlite_cli, old_db_location, ".recover"],
+                check=False,
+                capture_output=True,
+                text=True,
+            )
+            if recovered_sql.returncode != 0 or not recovered_sql.stdout.strip():
+                return self._recover_fallback(old_db_location, db_file)
+
+            dst = sqlite3.connect(db_file, **kwargs)
+            dst.executescript(recovered_sql.stdout)
+            self.init_db(dst)
+            (recovered,) = dst.execute("SELECT Count(*) FROM nbsignatures").fetchone()
+            dst.commit()
+            self.log.warning(
+                "Recovered %s notebook signature entries from %s.", recovered, old_db_location
+            )
+            return dst
+        except (sqlite3.DatabaseError, sqlite3.OperationalError):
+            if dst is not None:
+                dst.close()
+            try:
+                if Path(db_file).exists():
+                    Path(db_file).unlink()
+            except OSError:
+                pass
+            return self._recover_fallback(old_db_location, db_file)
+
+    def _recover_fallback(self, old_db_location, db_file):
+        """Best-effort Python recovery path when sqlite3 CLI is unavailable."""
+        dst = None
+        src = None
+        try:
+            src = sqlite3.connect(old_db_location)
+            dst = sqlite3.connect(
+                db_file,
+                detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES,
+            )
+            self.init_db(dst)
+
+            recovered = 0
+            ids = [row[0] for row in src.execute("SELECT id FROM nbsignatures ORDER BY id")]
+            for row_id in ids:
+                try:
+                    row = src.execute(
+                        """
+                        SELECT id, algorithm, signature, last_seen
+                        FROM nbsignatures WHERE id = ?
+                        """,
+                        (row_id,),
+                    ).fetchone()
+                    if row is None:
+                        continue
+                    dst.execute(
+                        """
+                        INSERT OR REPLACE INTO nbsignatures (id, algorithm, signature, last_seen)
+                        VALUES (?, ?, ?, ?)
+                        """,
+                        row,
+                    )
+                    recovered += 1
+                except (sqlite3.DatabaseError, sqlite3.OperationalError):
+                    continue
+
+            dst.commit()
+            self.log.warning(
+                "Recovered %s notebook signature entries from %s using Python fallback.",
+                recovered,
+                old_db_location,
+            )
+            return dst
+        except (sqlite3.DatabaseError, sqlite3.OperationalError):
+            if dst is not None:
+                dst.close()
+            try:
+                if Path(db_file).exists():
+                    Path(db_file).unlink()
+            except OSError:
+                pass
+            return None
+        finally:
+            if src is not None:
+                src.close()
 
     def init_db(self, db):
         """Initialize the db."""
