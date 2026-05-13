@@ -220,6 +220,8 @@ class SQLiteSignatureStore(SignatureStore, LoggingConfigurable):
         }
         dst = None
         try:
+            # Note: Python does not have bindings for recover_extension, see
+            # https://github.com/python/cpython/issues/149735
             recovered_sql = subprocess.run(  # noqa: S603
                 [sqlite_cli, old_db_location, ".recover"],
                 check=False,
