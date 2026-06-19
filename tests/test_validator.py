@@ -15,7 +15,7 @@ from jsonschema import ValidationError
 import nbformat
 from nbformat import read
 from nbformat.json_compat import VALIDATORS
-from nbformat.validator import isvalid, iter_validate, validate
+from nbformat.validator import isvalid, iter_validate, normalize, validate
 from nbformat.warnings import DuplicateCellId, MissingIDFieldWarning
 
 from .base import TestsBase
@@ -369,8 +369,33 @@ def test_notebook_v3_valid_without_min_version():
     validate(nb)
 
 
-def test_notebook_invalid_without_main_version():
-    pass
+@pytest.mark.filterwarnings("ignore::nbformat.warnings.MissingIDFieldWarning")
+def test_normalize_updates_minor_version():
+    """Normalizing to v4.5 should update notebook metadata version."""
+
+    nb = {
+        "nbformat": 4,
+        "nbformat_minor": 0,
+        "metadata": {},
+        "cells": [
+            {
+                "cell_type": "code",
+                "metadata": {},
+                "source": "",
+                "outputs": [],
+                "execution_count": None,
+            }
+        ],
+    }
+
+    changes, new_nb = normalize(nb, version_minor=5)
+
+    assert changes == 1
+    assert "id" in new_nb["cells"][0]
+
+    # Expected notebook version metadata
+    assert new_nb["nbformat"] == 4
+    assert new_nb["nbformat_minor"] == 5
 
 
 def test_strip_invalid_metadata():
