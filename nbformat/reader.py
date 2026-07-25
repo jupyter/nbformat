@@ -47,7 +47,10 @@ def get_version(nb):
 
 
 def reads(s, **kwargs):
-    """Read a notebook from a json string and return the
+    """
+    Note: This function reads notebook content from a string and does not perform file I/O.
+
+    Read a notebook from a json string and return the
     NotebookNode object.
 
     This function properly reads notebooks of any version.  No version

@@ -425,6 +425,8 @@ def validate(
     """Checks whether the given notebook dict-like object
     conforms to the relevant notebook format schema.
 
+    Note: This function validates notebooks but does not modify them; use `normalize()` if a normalized copy is required before validation.
+
     Parameters
     ----------
     nbdict : dict

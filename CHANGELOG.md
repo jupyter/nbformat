@@ -256,10 +256,14 @@ therefore be updated in a near future to not take any of the argument
 related to auto-fixing, and fail instead of silently modifying its
 parameters on invalid notebooks.
 
-`nbformat` now contain a `normalize` function that will return a
-normalized copy of a notebook that is suitable for validation. While
-offered as a convenience we discourage its use and suggest library make
-sure to generate valid notebooks.
+`nbformat` now provides a `normalize` function that returns a normalized
+copy of a notebook suitable for validation. This function is intended as
+a helper for tools that need to prepare notebooks before calling
+`validate()`.
+
+Most libraries and applications should continue to generate valid
+notebooks directly and rely on `validate()` to check correctness, rather
+than using `normalize()` as part of normal notebook creation.
 
 ### Other changes
 

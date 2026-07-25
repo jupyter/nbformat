@@ -383,3 +383,22 @@ def test_strip_invalid_metadata():
     ):
         validate(nb, strip_invalid_metadata=True)
     assert isvalid(nb)
+
+
+def test_validate_does_not_mutate_notebook():
+    from nbformat import v4
+    from nbformat.validator import validate
+
+    # Create a simple valid notebook
+    nb = v4.new_notebook(cells=[v4.new_markdown_cell("hello")])
+
+    # Make a deep copy to compare after validation
+    import copy
+
+    nb_before = copy.deepcopy(nb)
+
+    # Validate the notebook
+    validate(nb)
+
+    # Ensure validation did not modify the notebook
+    assert nb == nb_before
