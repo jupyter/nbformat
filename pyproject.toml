@@ -66,44 +66,6 @@ jupyter-trust = "nbformat.sign:TrustNotebookApp.launch_instance"
 [tool.hatch.version]
 source = "nodejs"
 
-[tool.hatch.envs.default]
-installer = "uv"
-
-[tool.hatch.envs.docs]
-features = ["docs"]
-[tool.hatch.envs.docs.scripts]
-build = "make -C docs html SPHINXOPTS='-W'"
-
-[tool.hatch.envs.test]
-features = ["test"]
-[tool.hatch.envs.test.scripts]
-test = "PYTHONWARNDEFAULTENCODING=1 python -m pytest -vv {args}"
-nowarn = "test -W default {args}"
-
-[tool.hatch.envs.cov]
-features = ["test"]
-dependencies = ["coverage", "pytest-cov"]
-[tool.hatch.envs.cov.scripts]
-test = "python -m pytest -vv --cov nbformat --cov-branch --cov-report term-missing:skip-covered {args}"
-nowarn = "test -W default {args}"
-
-[tool.hatch.envs.lint]
-detached = true
-installer = "uv"
-dependencies = ["pre-commit"]
-[tool.hatch.envs.lint.scripts]
-build = [
-  "pre-commit run --all-files ruff-check",
-  "pre-commit run --all-files ruff-format"
-]
-
-[tool.hatch.envs.typing]
-dependencies = [ "pre-commit"]
-detached = true
-installer = "uv"
-[tool.hatch.envs.typing.scripts]
-test = "pre-commit run --all-files --hook-stage manual mypy"
-
 [tool.pytest.ini_options]
 minversion = "6.0"
 xfail_strict = true

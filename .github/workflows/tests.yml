@@ -35,19 +35,22 @@ jobs:
         with:
           python_package_manager: "uv pip"
           node_version: "none"
+      - name: Install test dependencies
+        run: |
+          uv pip install --system -e ".[test]" coverage pytest-cov
       - name: Run the tests
         if: ${{ !startsWith(matrix.os, 'windows') }}
         run: |
-          hatch run cov:test --cov-fail-under 75
+          PYTHONWARNDEFAULTENCODING=1 python -m pytest -vv --cov nbformat --cov-branch --cov-report term-missing:skip-covered --cov-fail-under 75
       - name: Run the tests on windows
         if: ${{ startsWith(matrix.os, 'windows') }}
         run: |
-          hatch run cov:nowarn
+          python -m pytest -vv --cov nbformat --cov-branch --cov-report term-missing:skip-covered -W default
       # Checks that the nodejs version source is writable. Not OS- or
       # version-sensitive, so once is enough.
       - name: Check the version is writable
         if: ${{ matrix.os == 'ubuntu-latest' && matrix.python-version == '3.12' }}
-        run: hatch version 100.100.100
+        run: pipx run hatch version 100.100.100
       - uses: jupyterlab/maintainer-tools/.github/actions/upload-coverage@v1
 
   coverage:
@@ -71,10 +74,14 @@ jobs:
         with:
           python_package_manager: "uv pip"
           node_version: "none"
+      - name: Install pre-commit
+        run: |
+          uv pip install --system pre-commit
       - name: Run Linters
         run: |
-          hatch run typing:test
-          hatch run lint:build
+          pre-commit run --all-files --hook-stage manual mypy
+          pre-commit run --all-files ruff-check
+          pre-commit run --all-files ruff-format
           pipx run interrogate -v nbformat
           pipx run doc8 --max-line-length=200
 
@@ -87,8 +94,11 @@ jobs:
         with:
           python_package_manager: "uv pip"
           node_version: "none"
+      - name: Install docs dependencies
+        run: |
+          uv pip install --system -e ".[docs]"
       - name: Test docs
-        run: hatch run docs:build
+        run: make -C docs html SPHINXOPTS='-W'
 
   test_minimum_versions:
     name: Test Minimum Versions
@@ -102,9 +112,12 @@ jobs:
           dependency_type: minimum
           python_package_manager: "uv pip"
           node_version: "none"
+      - name: Install test dependencies
+        run: |
+          uv pip install --system -e ".[test]"
       - name: Run the unit tests
         run: |
-          hatch run test:nowarn
+          PYTHONWARNDEFAULTENCODING=1 python -m pytest -vv -W default
 
   test_prereleases:
     name: Test Prereleases
@@ -119,9 +132,12 @@ jobs:
           dependency_type: pre
           python_package_manager: "uv pip"
           node_version: "none"
+      - name: Install test dependencies
+        run: |
+          uv pip install --system -e ".[test]"
       - name: Run the tests
         run: |
-          hatch run test:nowarn
+          PYTHONWARNDEFAULTENCODING=1 python -m pytest -vv -W default
 
   make_sdist:
     name: Make SDist
