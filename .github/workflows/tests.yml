@@ -45,7 +45,7 @@ jobs:
       # version-sensitive, so once is enough.
       - name: Check the version is writable
         if: ${{ matrix.os == 'ubuntu-latest' && matrix.python-version == '3.12' }}
-        run: pipx run hatch version 100.100.100
+        run: uv tool run hatch version 100.100.100
       - uses: jupyterlab/maintainer-tools/.github/actions/upload-coverage@v1
 
   coverage:
@@ -77,8 +77,8 @@ jobs:
           pre-commit run --all-files --hook-stage manual mypy
           pre-commit run --all-files ruff-check
           pre-commit run --all-files ruff-format
-          pipx run interrogate -v nbformat
-          pipx run doc8 --max-line-length=200
+          uv tool run interrogate -v nbformat
+          uv tool run doc8 --max-line-length=200
 
   docs:
     runs-on: ubuntu-latest
