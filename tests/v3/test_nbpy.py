@@ -27,7 +27,7 @@ class TestPy(formattest.NBFormatTest, TestCase):
                 self.assertTrue(k in db)
                 self.assertSubset(v, db[k])
         elif isinstance(da, list):
-            for a, b in zip(da, db):
+            for a, b in zip(da, db, strict=False):
                 self.assertSubset(a, b)
         else:
             if isinstance(da, str) and isinstance(db, str):
