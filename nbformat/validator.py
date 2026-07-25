@@ -313,7 +313,7 @@ def normalize(
         version = nbdict_version
     if version_minor is None:
         version_minor = nbdict_version_minor
-    return _normalize(
+    changes, normalized_nb = _normalize(
         nbdict,
         version,
         version_minor,
@@ -321,6 +321,11 @@ def normalize(
         relax_add_props=relax_add_props,
         strip_invalid_metadata=strip_invalid_metadata,
     )
+    if "nbformat" in normalized_nb:
+        normalized_nb["nbformat"] = version
+    if "nbformat_minor" in normalized_nb:
+        normalized_nb["nbformat_minor"] = version_minor
+    return changes, normalized_nb
 
 
 def _normalize(
