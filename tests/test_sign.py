@@ -254,6 +254,15 @@ class SignatureStoreTests(unittest.TestCase):
     def setUp(self):
         self.store = sign.MemorySignatureStore()
 
+    def tearDown(self):
+        # SQLiteSignatureStore (the subclass below) holds a real connection.
+        # Leaving it for the garbage collector means Python 3.13+ reports the
+        # finalization as an unraisable exception, which surfaces as a
+        # PytestUnraisableExceptionWarning inside whichever unrelated test
+        # happens to be running when the collection occurs -- and
+        # `filterwarnings = ["error"]` turns that into a failure.
+        self.store.close()
+
     def test_basics(self):
         digest = "0123457689abcef"
         algo = "fake_sha"
