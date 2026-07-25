@@ -7,6 +7,15 @@ on:
   schedule:
     - cron: "0 8 * * *"
 
+# Superseded runs are wasted work: without this, pushing twice to a PR leaves the
+# first 20-job run going to completion. Keyed on the PR number where there is one
+# and on the SHA otherwise, so pushes to main never cancel each other.
+concurrency:
+  group: >-
+    ${{ github.workflow }}-${{ github.ref_type }}-
+    ${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: true
+
 defaults:
   run:
     shell: bash -eux {0}
@@ -25,23 +34,25 @@ jobs:
       - uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
         with:
           python_package_manager: "uv pip"
+          node_version: "none"
       - name: Run the tests
-        if: ${{ !startsWith(matrix.python-version, 'pypy') && !startsWith(matrix.os, 'windows') }}
+        if: ${{ !startsWith(matrix.os, 'windows') }}
         run: |
           hatch run cov:test --cov-fail-under 75 || hatch run test:test --lf
-      - name: Run the tests on pypy
-        if: ${{ startsWith(matrix.python-version, 'pypy') }}
-        run: |
-          hatch run test:nowarn || hatch run test:nowarn --lf
       - name: Run the tests on windows
         if: ${{ startsWith(matrix.os, 'windows') }}
         run: |
           hatch run cov:nowarn || hatch run test:nowarn --lf
-      - run: hatch version 100.100.100
+      # Checks that the nodejs version source is writable. Not OS- or
+      # version-sensitive, so once is enough.
+      - name: Check the version is writable
+        if: ${{ matrix.os == 'ubuntu-latest' && matrix.python-version == '3.12' }}
+        run: hatch version 100.100.100
       - uses: jupyterlab/maintainer-tools/.github/actions/upload-coverage@v1
 
   coverage:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     needs:
       - tests
     steps:
@@ -53,11 +64,13 @@ jobs:
   test_lint:
     name: Test Lint
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v6
       - uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
         with:
           python_package_manager: "uv pip"
+          node_version: "none"
       - name: Run Linters
         run: |
           hatch run typing:test
@@ -67,11 +80,13 @@ jobs:
 
   docs:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v6
       - uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
         with:
           python_package_manager: "uv pip"
+          node_version: "none"
       - name: Test docs
         run: hatch run docs:build
 
@@ -86,6 +101,7 @@ jobs:
         with:
           dependency_type: minimum
           python_package_manager: "uv pip"
+          node_version: "none"
       - name: Run the unit tests
         run: |
           hatch run test:nowarn || hatch run test:nowarn --lf
@@ -102,6 +118,7 @@ jobs:
         with:
           dependency_type: pre
           python_package_manager: "uv pip"
+          node_version: "none"
       - name: Run the tests
         run: |
           hatch run test:nowarn || hatch run test:nowarn --lf
@@ -130,6 +147,7 @@ jobs:
 
   check_release:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -154,6 +172,7 @@ jobs:
       - uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
         with:
           python_package_manager: "uv pip"
+          node_version: "none"
       - uses: jupyterlab/maintainer-tools/.github/actions/check-links@v1
         with:
           ignore_glob: "tests/*.ipynb"
