@@ -34,7 +34,7 @@ from nbformat.v3 import (
 from . import versions
 from .converter import convert
 from .reader import reads as reader_reads
-from .validator import ValidationError, validate
+from .validator import ValidationError, _validate, validate
 
 warnings.warn(
     """nbformat.current is deprecated since before nbformat 3.0
@@ -169,9 +169,7 @@ def reads(s, format="DEPRECATED", version=current_nbformat, **kwargs):
     nb = reader_reads(s, **kwargs)
     nb = convert(nb, version)
     try:
-        with warnings.catch_warnings():
-            warnings.filterwarnings("ignore", category=DeprecationWarning)
-            validate(nb, repair_duplicate_cell_ids=False)
+        _validate(nb, repair_duplicate_cell_ids=False)
     except ValidationError as e:
         get_logger().error("Notebook JSON is invalid: %s", e)
     return nb
@@ -199,9 +197,7 @@ def writes(nb, format="DEPRECATED", version=current_nbformat, **kwargs):
         _warn_format()
     nb = convert(nb, version)
     try:
-        with warnings.catch_warnings():
-            warnings.filterwarnings("ignore", category=DeprecationWarning)
-            validate(nb, repair_duplicate_cell_ids=False)
+        _validate(nb, repair_duplicate_cell_ids=False)
     except ValidationError as e:
         get_logger().error("Notebook JSON is invalid: %s", e)
     return versions[version].writes_json(nb, **kwargs)

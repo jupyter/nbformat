@@ -127,9 +127,8 @@ def isvalid(nbjson, ref=None, version=None, version_minor=None):
     orig = deepcopy(nbjson)
     try:
         with warnings.catch_warnings():
-            warnings.filterwarnings("ignore", category=DeprecationWarning)
             warnings.filterwarnings("ignore", category=MissingIDFieldWarning)
-            validate(nbjson, ref, version, version_minor, repair_duplicate_cell_ids=False)
+            _validate(nbjson, ref, version, version_minor, repair_duplicate_cell_ids=False)
     except ValidationError:
         return False
     else:
@@ -392,10 +391,14 @@ def _normalize(
     return changes, nbdict
 
 
+# Deprecated since 2023 and security issue start to annoy people, so passing the
+# deprecated kwargs of `validate` costs the caller this many seconds.
+# Regularly bump this by 1 sec.
+_DEPRECATION_PENALTY_SECONDS = 2
+
+
 def _dep_warn(field):
-    # Deprecated since 2023 and security issue start to annoy people.
-    time.sleep(2)
-    # regularly bump this by 1 sec.
+    time.sleep(_DEPRECATION_PENALTY_SECONDS)
 
     warnings.warn(
         dedent(
@@ -459,8 +462,6 @@ def validate(
 
     Please explicitly call `normalize` if you need to normalize notebooks.
     """
-    assert isinstance(ref, str) or ref is None
-
     if strip_invalid_metadata is _deprecated:
         strip_invalid_metadata = False
     else:
@@ -479,6 +480,35 @@ def validate(
     else:
         msg = "validate() missing 1 required argument: 'nbdict'"
         raise TypeError(msg)
+
+    _validate(
+        nbdict,
+        ref,
+        version,
+        version_minor,
+        relax_add_props,
+        repair_duplicate_cell_ids=repair_duplicate_cell_ids,
+        strip_invalid_metadata=strip_invalid_metadata,
+    )
+
+
+def _validate(
+    nbdict: Any,
+    ref: str | None = None,
+    version: int | None = None,
+    version_minor: int | None = None,
+    relax_add_props: bool = False,
+    *,
+    repair_duplicate_cell_ids: bool = True,
+    strip_invalid_metadata: bool = False,
+) -> None:
+    """Validate a notebook, bypassing the deprecated-kwarg handling of `validate`.
+
+    `validate` deliberately penalises callers that pass `repair_duplicate_cell_ids`
+    or `strip_invalid_metadata` (see `_dep_warn`). Internal callers need to set those
+    explicitly without paying that penalty, so they use this helper instead.
+    """
+    assert isinstance(ref, str) or ref is None
 
     if ref is None:
         # if ref is not specified, we have a whole notebook, so we can get the version
