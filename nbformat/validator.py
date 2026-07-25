@@ -9,6 +9,7 @@ import pprint
 import time
 import warnings
 from copy import deepcopy
+from itertools import chain
 from pathlib import Path
 from textwrap import dedent
 from typing import Any
@@ -547,10 +548,15 @@ def _get_errors(
     if not validator:
         msg = f"No schema for validating v{version}.{version_minor} notebooks"
         raise ValidationError(msg)
-    iter_errors = validator.iter_errors(nbdict, *args)
-    errors = list(iter_errors)
+    # Peek at the first error rather than draining the iterator: callers that only
+    # need a verdict (or only the first error) should not pay for a full traversal.
+    # `iter()` once and reuse it, since a backend may hand back a list.
+    errors = iter(validator.iter_errors(nbdict, *args))
+    first = next(errors, None)
+    if first is None:
+        return iter(())
     # jsonschema gives the best error messages.
-    if errors and validator.name != "jsonschema":
+    if validator.name != "jsonschema":
         validator = get_validator(
             version=version,
             version_minor=version_minor,
@@ -558,7 +564,7 @@ def _get_errors(
             name="jsonschema",
         )
         return validator.iter_errors(nbdict, *args)
-    return iter(errors)
+    return chain((first,), errors)
 
 
 def _strip_invalida_metadata(
@@ -587,7 +593,8 @@ def _strip_invalida_metadata(
     """
     errors = _get_errors(nbdict, version, version_minor, relax_add_props)
     changes = 0
-    if len(list(errors)) > 0:
+    # only the presence of an error matters here, so don't drain the iterator
+    if next(iter(errors), None) is not None:
         # jsonschema gives a better error tree.
         validator = get_validator(
             version=version,
