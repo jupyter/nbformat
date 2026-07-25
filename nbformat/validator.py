@@ -394,7 +394,7 @@ def _normalize(
 # Deprecated since 2023 and security issue start to annoy people, so passing the
 # deprecated kwargs of `validate` costs the caller this many seconds.
 # Regularly bump this by 1 sec.
-_DEPRECATION_PENALTY_SECONDS = 2
+_DEPRECATION_PENALTY_SECONDS = 3
 
 
 def _dep_warn(field):
