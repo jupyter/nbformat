@@ -304,7 +304,7 @@ texinfo_documents = [
 
 
 intersphinx_mapping = get_intersphinx_mapping(
-    packages={"python", "jupyterclient", "nbconvert", "notebook", "server"}
+    packages={"python", "jupyterclient", "nbconvert", "notebook", "jupyter-server"}
 )
 
 
