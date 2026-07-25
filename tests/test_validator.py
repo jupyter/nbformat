@@ -33,6 +33,20 @@ def clean_env_before_and_after_tests():
 
 
 @pytest.fixture
+def restore_validator_cache():
+    """Undo any additions these tests make to the global validator cache.
+
+    Deliberately snapshots rather than clearing: wiping the cache forces every
+    schema to be recompiled, and fastjsonschema codegen is ~17ms a go -- a cost
+    that lands on whichever unrelated test happens to run next.
+    """
+    saved = dict(nbformat.validator.validators)
+    yield
+    nbformat.validator.validators.clear()
+    nbformat.validator.validators.update(saved)
+
+
+@pytest.fixture
 def no_deprecation_penalty(monkeypatch):
     """Skip the sleep that `validate` inflicts on callers of its deprecated kwargs.
 
@@ -396,7 +410,7 @@ def test_strip_invalid_metadata(no_deprecation_penalty):
 
 
 @pytest.mark.parametrize("validator_name", VALIDATORS)
-def test_get_validator_caches_per_relax_add_props(validator_name):
+def test_get_validator_caches_per_relax_add_props(validator_name, restore_validator_cache):
     """Test that relaxed and strict validators are cached separately.
 
     `relax_add_props` builds a different schema, so it has to be part of the cache
@@ -404,7 +418,6 @@ def test_get_validator_caches_per_relax_add_props(validator_name):
     a strict one, and unknown properties silently stop being rejected.
     """
     set_validator(validator_name)
-    nbformat.validator.validators.clear()
 
     strict = get_validator(4, 5, relax_add_props=False)
     relaxed = get_validator(4, 5, relax_add_props=True)
@@ -416,10 +429,11 @@ def test_get_validator_caches_per_relax_add_props(validator_name):
 
 
 @pytest.mark.parametrize("validator_name", VALIDATORS)
-def test_relax_add_props_does_not_leak_into_strict_validation(validator_name):
+def test_relax_add_props_does_not_leak_into_strict_validation(
+    validator_name, restore_validator_cache
+):
     """Test that a relaxed validation does not weaken later strict validations."""
     set_validator(validator_name)
-    nbformat.validator.validators.clear()
 
     with TestsBase.fopen("test4.5.ipynb", "r") as f:
         nb = read(f, as_version=4)
