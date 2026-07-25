@@ -19,7 +19,7 @@ from .json_compat import ValidationError, _validator_for_name, get_current_valid
 from .reader import get_version
 from .warnings import DuplicateCellId, MissingIDFieldWarning
 
-validators = {}
+validators: dict[tuple[str, int | None, int | None], Any] = {}
 _deprecated = object()
 
 
@@ -261,7 +261,7 @@ def better_validation_error(error, version, version_minor):
                 if better.ref is None:
                     better.ref = ref
                 return better
-            except Exception:  # noqa: S110
+            except Exception:  # noqa: S110, BLE001
                 # if it fails for some reason,
                 # let the original error through
                 pass

@@ -61,4 +61,4 @@ def downgrade(nb):
         The Python representation of the notebook to convert.
     """
     msg = "Downgrade from notebook v2 to v1 is not supported."
-    raise Exception(msg)
+    raise RuntimeError(msg)
