@@ -15,7 +15,7 @@ from jsonschema import ValidationError
 import nbformat
 from nbformat import read
 from nbformat.json_compat import VALIDATORS
-from nbformat.validator import isvalid, iter_validate, validate
+from nbformat.validator import get_validator, isvalid, iter_validate, validate
 from nbformat.warnings import DuplicateCellId, MissingIDFieldWarning
 
 from .base import TestsBase
@@ -393,3 +393,41 @@ def test_strip_invalid_metadata(no_deprecation_penalty):
     ):
         validate(nb, strip_invalid_metadata=True)
     assert isvalid(nb)
+
+
+@pytest.mark.parametrize("validator_name", VALIDATORS)
+def test_get_validator_caches_per_relax_add_props(validator_name):
+    """Test that relaxed and strict validators are cached separately.
+
+    `relax_add_props` builds a different schema, so it has to be part of the cache
+    key -- otherwise a relaxed validator gets handed out to a caller that asked for
+    a strict one, and unknown properties silently stop being rejected.
+    """
+    set_validator(validator_name)
+    nbformat.validator.validators.clear()
+
+    strict = get_validator(4, 5, relax_add_props=False)
+    relaxed = get_validator(4, 5, relax_add_props=True)
+    assert strict is not relaxed
+
+    # asking again either way must return the same cached objects, not rebuild
+    assert get_validator(4, 5, relax_add_props=False) is strict
+    assert get_validator(4, 5, relax_add_props=True) is relaxed
+
+
+@pytest.mark.parametrize("validator_name", VALIDATORS)
+def test_relax_add_props_does_not_leak_into_strict_validation(validator_name):
+    """Test that a relaxed validation does not weaken later strict validations."""
+    set_validator(validator_name)
+    nbformat.validator.validators.clear()
+
+    with TestsBase.fopen("test4.5.ipynb", "r") as f:
+        nb = read(f, as_version=4)
+    nb.cells[0]["not_a_real_property"] = "should not be allowed"
+
+    # relax_add_props=True tolerates the unknown property ...
+    validate(nb, relax_add_props=True)
+
+    # ... but that must not make the strict path tolerate it too.
+    with pytest.raises(ValidationError):
+        validate(nb)
