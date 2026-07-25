@@ -69,7 +69,9 @@ def get_validator(version=None, version_minor=None, relax_add_props=False, name=
 
     current_validator = _validator_for_name(name) if name else get_current_validator()
 
-    version_tuple = (current_validator.name, version, version_minor)
+    # `relax_add_props` is part of the key: it produces a different schema, so a
+    # relaxed validator must not be handed out to callers asking for a strict one.
+    version_tuple = (current_validator.name, version, version_minor, relax_add_props)
 
     if version_tuple not in validators:
         try:
@@ -83,17 +85,11 @@ def get_validator(version=None, version_minor=None, relax_add_props=False, name=
             # and allow undefined cell types and outputs
             schema_json = _allow_undefined(schema_json)
 
-        validators[version_tuple] = current_validator(schema_json)
+        if relax_add_props:
+            # this allows properties to be added for intermediate
+            # representations while validating for all other kinds of errors
+            schema_json = _relax_additional_properties(schema_json)
 
-    if relax_add_props:
-        try:
-            schema_json = _get_schema_json(v, version=version, version_minor=version_minor)
-        except AttributeError:
-            return None
-
-        # this allows properties to be added for intermediate
-        # representations while validating for all other kinds of errors
-        schema_json = _relax_additional_properties(schema_json)
         validators[version_tuple] = current_validator(schema_json)
 
     return validators[version_tuple]
