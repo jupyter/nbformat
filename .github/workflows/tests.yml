@@ -39,13 +39,8 @@ jobs:
         run: |
           uv pip install --system -e ".[test]" coverage pytest-cov
       - name: Run the tests
-        if: ${{ !startsWith(matrix.os, 'windows') }}
         run: |
           PYTHONWARNDEFAULTENCODING=1 python -m pytest -vv --cov nbformat --cov-branch --cov-report term-missing:skip-covered --cov-fail-under 75
-      - name: Run the tests on windows
-        if: ${{ startsWith(matrix.os, 'windows') }}
-        run: |
-          python -m pytest -vv --cov nbformat --cov-branch --cov-report term-missing:skip-covered -W default
       # Checks that the nodejs version source is writable. Not OS- or
       # version-sensitive, so once is enough.
       - name: Check the version is writable
@@ -117,7 +112,7 @@ jobs:
           uv pip install --system -e ".[test]"
       - name: Run the unit tests
         run: |
-          PYTHONWARNDEFAULTENCODING=1 python -m pytest -vv -W default
+          PYTHONWARNDEFAULTENCODING=1 python -m pytest -vv
 
   test_prereleases:
     name: Test Prereleases
@@ -137,7 +132,7 @@ jobs:
           uv pip install --system -e ".[test]"
       - name: Run the tests
         run: |
-          PYTHONWARNDEFAULTENCODING=1 python -m pytest -vv -W default
+          PYTHONWARNDEFAULTENCODING=1 python -m pytest -vv
 
   make_sdist:
     name: Make SDist
