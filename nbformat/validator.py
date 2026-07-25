@@ -20,7 +20,7 @@ from .json_compat import ValidationError, _validator_for_name, get_current_valid
 from .reader import get_version
 from .warnings import DuplicateCellId, MissingIDFieldWarning
 
-validators: dict[tuple[str, int | None, int | None], Any] = {}
+validators: dict[tuple[str, int | None, int | None, bool], Any] = {}
 _deprecated = object()
 
 
