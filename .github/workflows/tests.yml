@@ -69,14 +69,12 @@ jobs:
         with:
           python_package_manager: "uv pip"
           node_version: "none"
-      - name: Install pre-commit
+      - name: Install mypy
         run: |
-          uv pip install --system pre-commit
+          uv pip install --system -e . mypy
       - name: Run Linters
         run: |
-          pre-commit run --all-files --hook-stage manual mypy
-          pre-commit run --all-files ruff-check
-          pre-commit run --all-files ruff-format
+          python -m mypy
           uv tool run interrogate -v nbformat
           uv tool run doc8 --max-line-length=200
 
