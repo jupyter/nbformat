@@ -32,6 +32,16 @@ def clean_env_before_and_after_tests():
     os.environ.pop("NBFORMAT_VALIDATOR", None)
 
 
+@pytest.fixture
+def no_deprecation_penalty(monkeypatch):
+    """Skip the sleep that `validate` inflicts on callers of its deprecated kwargs.
+
+    The warning itself is what these tests assert on; the sleep is only there to
+    annoy downstream users into migrating, and paying it serves no purpose in CI.
+    """
+    monkeypatch.setattr(nbformat.validator, "_DEPRECATION_PENALTY_SECONDS", 0)
+
+
 # Helpers
 def set_validator(validator_name):
     os.environ["NBFORMAT_VALIDATOR"] = validator_name
@@ -287,7 +297,7 @@ def test_fallback_validator_with_iter_errors_using_ref(recwarn):
     assert len(recwarn) == 0
 
 
-def test_non_unique_cell_ids():
+def test_non_unique_cell_ids(no_deprecation_penalty):
     """Test than a non-unique cell id does not pass validation"""
     with TestsBase.fopen("invalid_unique_cell_id.ipynb", "r") as f:
         # Avoids validate call from `.read`
@@ -317,7 +327,7 @@ def test_repair_non_unique_cell_ids():
 
 
 @pytest.mark.filterwarnings("ignore::nbformat.warnings.MissingIDFieldWarning")
-def test_no_cell_ids():
+def test_no_cell_ids(no_deprecation_penalty):
     """Test that a cell without a cell ID does not pass validation"""
 
     with TestsBase.fopen("v4_5_no_cell_id.ipynb", "r") as f:
@@ -373,7 +383,7 @@ def test_notebook_invalid_without_main_version():
     pass
 
 
-def test_strip_invalid_metadata():
+def test_strip_invalid_metadata(no_deprecation_penalty):
     with TestsBase.fopen("v4_5_invalid_metadata.ipynb", "r") as f:
         nb = nbformat.from_dict(json.load(f))
     assert not isvalid(nb)
