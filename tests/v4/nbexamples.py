@@ -35,7 +35,7 @@ cells.append(
         source="Cell with attachments",
         attachments={
             "attachment1": {
-                "text/plain": "\n".join(["a", "b", "c"]),
+                "text/plain": "a\nb\nc",
                 "application/vnd.stuff+json": ["a", 1, "x"],
             }
         },

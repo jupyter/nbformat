@@ -24,7 +24,7 @@ def parse_ref(current_ref):
     """
     if not current_ref.startswith("refs/tags/"):
         msg = f"Invalid ref `{current_ref}`!"
-        raise Exception(msg)
+        raise ValueError(msg)
 
     tag_name = current_ref.replace("refs/tags/", "")
     print(tag_name)  # noqa: T201
