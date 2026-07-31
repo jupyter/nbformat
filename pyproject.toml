@@ -194,7 +194,13 @@ fail-under=100
 ignore = ["W002"]
 
 [tool.repo-review]
-ignore = ["GH102"]
+ignore = [
+  "GH102",
+  "PY007",  # No task runner (nox/tox/pixi) by design, see PR discussion on hatch/pre-commit indirection
+  "PP006",  # No dev dependency group
+  "PP304",  # pytest log_level not set
+  "PC902",  # Default pre-commit.ci autofix commit message is fine
+]
 
 [tool.codespell]
 skip = "*.ipynb"
