@@ -60,6 +60,26 @@ test = [
     "packaging"
 ]
 
+# These mirror the "docs" and "test" extras above, which are kept for
+# backwards compatibility (`pip install nbformat[test]`) and are what the
+# hatch environments below consume via `features`.
+[dependency-groups]
+docs = [
+    "myst_parser",
+    "pydata_sphinx_theme",
+    "sphinx",
+    "sphinxcontrib_github_alt",
+    "sphinxcontrib-spelling",
+    "intersphinx_registry",
+]
+test = [
+    "testpath",
+    "pytest",
+    "pre-commit",
+    "packaging",
+]
+dev = [{ include-group = "test" }]
+
 [project.scripts]
 jupyter-trust = "nbformat.sign:TrustNotebookApp.launch_instance"
 
@@ -107,6 +127,7 @@ test = "pre-commit run --all-files --hook-stage manual mypy"
 [tool.pytest.ini_options]
 minversion = "6.0"
 xfail_strict = true
+log_level = "info"
 log_cli_level = "info"
 addopts = [
   "-ra", "--durations=10", "--color=yes", "--doctest-modules",
