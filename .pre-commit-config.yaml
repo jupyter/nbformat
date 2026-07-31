@@ -62,7 +62,12 @@ repos:
         files: "^nbformat"
         stages: [manual]
         additional_dependencies:
-          ["jsonschema>=2.6", "traitlets>=5.13", "jupyter_core>5.4", "types-jsonschema"]
+          [
+            "jsonschema>=2.6",
+            "traitlets>=5.13",
+            "jupyter_core>5.4",
+            "types-jsonschema",
+          ]
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.16.0
