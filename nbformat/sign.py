@@ -8,6 +8,7 @@ import hashlib
 import os
 import sys
 import typing as t
+import warnings
 from collections import OrderedDict
 from contextlib import contextmanager
 from datetime import datetime, timezone
@@ -332,6 +333,40 @@ def signature_removed(nb):
             nb["metadata"]["signature"] = save_signature
 
 
+class NotebookNotaryContext(t.Protocol):
+    """The operations available on a :class:`NotebookNotary` used as a context manager.
+
+    This is what ``NotebookNotary.__enter__`` returns. It deliberately omits
+    ``close()``, ``__enter__``, and ``__exit__`` so that a type checker flags
+    attempts to close or re-enter the notary from within its own ``with``
+    block.
+    """
+
+    def compute_signature(self, nb: t.Any) -> str:
+        """Compute a notebook's signature."""
+        ...
+
+    def check_signature(self, nb: t.Any) -> bool:
+        """Check a notebook's stored signature."""
+        ...
+
+    def sign(self, nb: t.Any) -> None:
+        """Sign a notebook, indicating that its output is trusted on this machine."""
+        ...
+
+    def unsign(self, nb: t.Any) -> None:
+        """Ensure that a notebook is untrusted."""
+        ...
+
+    def mark_cells(self, nb: t.Any, trusted: bool) -> None:
+        """Mark cells as trusted if the notebook's signature can be verified."""
+        ...
+
+    def check_cells(self, nb: t.Any) -> bool:
+        """Return whether all code cells are trusted."""
+        ...
+
+
 class NotebookNotary(LoggingConfigurable):
     """A class for computing and verifying notebook signatures."""
 
@@ -424,6 +459,45 @@ class NotebookNotary(LoggingConfigurable):
         """Initialize the notary."""
         super().__init__(**kwargs)
         self.store = self.store_factory()
+        self._used_as_context_manager = False
+        self._warned_not_context_manager = False
+
+    def close(self):
+        """Close the notary's signature store.
+
+        Should be called when the notary is no longer needed, to release
+        any resources (e.g. database connections) held by the store.
+        """
+        self.store.close()
+
+    def __enter__(self) -> NotebookNotaryContext:
+        """Enter the notary's context, marking it as used within a `with` block."""
+        self._used_as_context_manager = True
+        return self
+
+    def __exit__(self, *exc_info):
+        """Exit the notary's context, closing its signature store."""
+        self.close()
+
+    def _warn_if_not_context_manager(self):
+        """Warn once if the store is accessed without using this notary as a context manager.
+
+        Using ``NotebookNotary`` outside of a ``with`` block is deprecated as
+        of nbformat 5.11, since it makes it easy to forget to release the
+        resources (e.g. database connections) held by the store.
+        """
+        if self._used_as_context_manager or self._warned_not_context_manager:
+            return
+        self._warned_not_context_manager = True
+        warnings.warn(
+            "Using NotebookNotary without a `with` block is deprecated as of "
+            "nbformat 5.11. Use it as a context manager instead, e.g.:\n\n"
+            "    with NotebookNotary() as notary:\n"
+            "        notary.sign(nb)\n\n"
+            "so that the underlying signature store is properly closed.",
+            PendingDeprecationWarning,
+            stacklevel=3,
+        )
 
     def _write_secret_file(self, secret):
         """write my secret to my secret_file"""
@@ -464,6 +538,7 @@ class NotebookNotary(LoggingConfigurable):
         - the requested scheme is available from hashlib
         - the computed hash from notebook_signature matches the stored hash
         """
+        self._warn_if_not_context_manager()
         if nb.nbformat < 3:
             return False
         signature = self.compute_signature(nb)
@@ -474,6 +549,7 @@ class NotebookNotary(LoggingConfigurable):
 
         Stores hash algorithm and hmac digest in a local database of trusted notebooks.
         """
+        self._warn_if_not_context_manager()
         if nb.nbformat < 3:
             return
         signature = self.compute_signature(nb)
@@ -484,6 +560,7 @@ class NotebookNotary(LoggingConfigurable):
 
         by removing its signature from the trusted database, if present.
         """
+        self._warn_if_not_context_manager()
         signature = self.compute_signature(nb)
         self.store.remove_signature(signature, self.algorithm)
 
@@ -624,21 +701,22 @@ class TrustNotebookApp(JupyterApp):
 
     def start(self):
         """Start the trust notebook app."""
-        if self.reset:
-            if Path(self.notary.db_file).exists():
-                print("Removing trusted signature cache: %s" % self.notary.db_file)  # noqa: T201
-                Path(self.notary.db_file).unlink()
-            self.generate_new_key()
-            return
-        if not self.extra_args:
-            self.log.debug("Reading notebook from stdin")
-            nb_s = sys.stdin.read()
-            assert isinstance(nb_s, str)
-            nb = reads(nb_s, NO_CONVERT)
-            self.sign_notebook(nb, "<stdin>")
-        else:
-            for notebook_path in self.extra_args:
-                self.sign_notebook_file(notebook_path)
+        with self.notary:
+            if self.reset:
+                if Path(self.notary.db_file).exists():
+                    print("Removing trusted signature cache: %s" % self.notary.db_file)  # noqa: T201
+                    Path(self.notary.db_file).unlink()
+                self.generate_new_key()
+                return
+            if not self.extra_args:
+                self.log.debug("Reading notebook from stdin")
+                nb_s = sys.stdin.read()
+                assert isinstance(nb_s, str)
+                nb = reads(nb_s, NO_CONVERT)
+                self.sign_notebook(nb, "<stdin>")
+            else:
+                for notebook_path in self.extra_args:
+                    self.sign_notebook_file(notebook_path)
 
 
 main = TrustNotebookApp.launch_instance
