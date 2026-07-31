@@ -181,7 +181,7 @@ def _truncate_obj(obj):
     return obj
 
 
-class NotebookValidationError(ValidationError):  # type:ignore[misc]
+class NotebookValidationError(ValidationError):
     """Schema ValidationError with truncated representation
 
     to avoid massive verbose tracebacks.

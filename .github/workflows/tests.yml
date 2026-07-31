@@ -71,7 +71,7 @@ jobs:
           node_version: "none"
       - name: Install mypy
         run: |
-          uv pip install --system -e . mypy
+          uv pip install --system -e . mypy types-jsonschema
       - name: Run Linters
         run: |
           python -m mypy
