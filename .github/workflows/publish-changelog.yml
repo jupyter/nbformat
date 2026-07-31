@@ -9,10 +9,14 @@ on:
         description: "The branch to target"
         required: false
 
+permissions: {}
+
 jobs:
   publish_changelog:
     runs-on: ubuntu-latest
     environment: release
+    permissions:
+      contents: read
     steps:
       - uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
 
@@ -30,5 +34,7 @@ jobs:
           branch: ${{ github.event.inputs.branch }}
 
       - name: "** Next Step **"
+        env:
+          PR_URL: ${{ steps.publish-changelog.outputs.pr_url }}
         run: |
-          echo "Merge the changelog update PR: ${{ steps.publish-changelog.outputs.pr_url }}"
+          echo "Merge the changelog update PR: ${PR_URL}"

@@ -4,6 +4,10 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+    # Let a release sit for a week before we pick it up, so a compromised or
+    # yanked version has time to be caught upstream.
+    cooldown:
+      default-days: 7
     groups:
       actions:
         patterns:
@@ -12,6 +16,8 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+    cooldown:
+      default-days: 7
     groups:
       actions:
         patterns:

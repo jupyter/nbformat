@@ -7,6 +7,10 @@ on:
   schedule:
     - cron: "0 8 * * *"
 
+# Every job here only reads the repo; nothing publishes or writes back.
+permissions:
+  contents: read
+
 # Superseded runs are wasted work: without this, pushing twice to a PR leaves the
 # first 20-job run going to completion. Keyed on the PR number where there is one
 # and on the SHA otherwise, so pushes to main never cancel each other.
@@ -31,6 +35,8 @@ jobs:
         python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
     steps:
       - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
       - uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
         with:
           python_package_manager: "uv pip"
@@ -57,6 +63,8 @@ jobs:
       - tests
     steps:
       - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
       - uses: jupyterlab/maintainer-tools/.github/actions/report-coverage@v1
         with:
           fail_under: 77
@@ -67,6 +75,8 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
       - uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
         with:
           python_package_manager: "uv pip"
@@ -83,6 +93,8 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
       - uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
         with:
           python_package_manager: "uv pip"
@@ -96,6 +108,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
       - name: Base Setup
         uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
         with:
@@ -113,6 +127,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v7
+        with:
+          persist-credentials: false
       - name: Base Setup
         uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
         with:
@@ -129,6 +145,8 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
       - uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
         with:
           python_package_manager: "uv pip"
@@ -151,6 +169,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v7
+        with:
+          persist-credentials: false
       - name: Base Setup
         uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
         with:
@@ -169,6 +189,8 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
       - uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
         with:
           python_package_manager: "uv pip"

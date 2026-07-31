@@ -25,6 +25,17 @@ repos:
     hooks:
       - id: check-github-workflows
 
+  # Keep `rev` in sync with ZIZMOR_VERSION in .github/workflows/zizmor.yml.
+  - repo: https://github.com/zizmorcore/zizmor-pre-commit
+    rev: v1.28.0
+    hooks:
+      - id: zizmor
+        # Online audits need a GitHub token and network access, neither of which
+        # is dependable here (pre-commit.ci runs sandboxed, and a contributor's
+        # token may not reach the shared Jupyter action repos). The zizmor
+        # workflow runs them in CI instead.
+        args: ["--offline"]
+
   - repo: https://github.com/hukkin/mdformat
     rev: 1.0.0
     hooks:
