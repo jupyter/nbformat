@@ -1,0 +1,26 @@
+# Configuration for zizmor (https://docs.zizmor.sh), the static analyzer for
+# GitHub Actions workflows. Run it locally with:
+#
+#     pre-commit run zizmor --all-files
+
+rules:
+  unpinned-uses:
+    config:
+      policies:
+        # Tag pins rather than SHA pins. Dependabot already bumps the
+        # github-actions ecosystem weekly (see dependabot.yml), and the shared
+        # jupyterlab/maintainer-tools and jupyter_releaser actions are consumed
+        # from moving major tags across the Jupyter org. Tighten a pattern to
+        # `hash-pin` if that tradeoff stops being acceptable.
+        "*": ref-pin
+
+  github-app:
+    ignore:
+      # Both workflows mint an installation token for jupyter_releaser, which
+      # writes across contents, pull requests and releases while cutting a
+      # release. Scoping the token with `permission-<name>` inputs means
+      # pinning down exactly which scopes each releaser action needs, and
+      # guessing low breaks a release only at release time -- so for now the
+      # token keeps its default installation permissions.
+      - publish-changelog.yml
+      - publish-release.yml

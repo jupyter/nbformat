@@ -23,6 +23,9 @@ on:
         description: "Use PRs with activity since the last stable git tag"
         required: false
         type: boolean
+
+permissions: {}
+
 jobs:
   prep_release:
     runs-on: ubuntu-latest
@@ -45,5 +48,7 @@ jobs:
           since_last_stable: ${{ github.event.inputs.since_last_stable }}
 
       - name: "** Next Step **"
+        env:
+          RELEASE_URL: ${{ steps.prep-release.outputs.release_url }}
         run: |
-          echo "Optional): Review Draft Release: ${{ steps.prep-release.outputs.release_url }}"
+          echo "Optional): Review Draft Release: ${RELEASE_URL}"

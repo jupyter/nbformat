@@ -1,0 +1,60 @@
+name: Audit GitHub Actions
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+  # The online audits check action refs against GitHub, so their verdicts change
+  # even when this repo doesn't. Re-run daily alongside the test suite.
+  schedule:
+    - cron: "0 8 * * *"
+
+permissions: {}
+
+concurrency:
+  group: >-
+    ${{ github.workflow }}-${{ github.ref_type }}-
+    ${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: true
+
+env:
+  # Keep in sync with the zizmor-pre-commit rev in .pre-commit-config.yaml.
+  ZIZMOR_VERSION: "1.28.0"
+
+jobs:
+  zizmor:
+    name: zizmor
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      # Required to publish the SARIF report as code scanning alerts.
+      security-events: write
+      contents: read
+      actions: read
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - uses: astral-sh/setup-uv@v7
+
+      # The pre-commit hook only runs the offline audits; a token here also
+      # enables the online ones (stale action refs, known-vulnerable actions).
+      - name: Run zizmor
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: uvx "zizmor@${ZIZMOR_VERSION}" --format=sarif . > results.sarif
+
+      - name: Upload SARIF report
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: results.sarif
+          category: zizmor
+
+      # `--format=sarif` always exits 0, so the run above only ever populates
+      # the code scanning alerts. Re-run for the exit code and for inline
+      # annotations on the offending lines, so findings also turn the PR red.
+      - name: Check for findings
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: uvx "zizmor@${ZIZMOR_VERSION}" --format=github .
