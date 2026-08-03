@@ -28,7 +28,7 @@ repos:
 
   # Keep `rev` in sync with ZIZMOR_VERSION in .github/workflows/zizmor.yml.
   - repo: https://github.com/zizmorcore/zizmor-pre-commit
-    rev: v1.28.0
+    rev: v1.29.0
     hooks:
       - id: zizmor
         # Online audits need a GitHub token and network access, neither of which
