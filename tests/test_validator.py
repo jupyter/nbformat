@@ -15,7 +15,7 @@ from jsonschema import ValidationError
 import nbformat
 from nbformat import read
 from nbformat.json_compat import VALIDATORS
-from nbformat.validator import get_validator, isvalid, iter_validate, validate
+from nbformat.validator import get_validator, isvalid, iter_validate, normalize, validate
 from nbformat.warnings import DuplicateCellId, MissingIDFieldWarning
 
 from .base import TestsBase
@@ -44,16 +44,6 @@ def restore_validator_cache():
     yield
     nbformat.validator.validators.clear()
     nbformat.validator.validators.update(saved)
-
-
-@pytest.fixture
-def no_deprecation_penalty(monkeypatch):
-    """Skip the sleep that `validate` inflicts on callers of its deprecated kwargs.
-
-    The warning itself is what these tests assert on; the sleep is only there to
-    annoy downstream users into migrating, and paying it serves no purpose in CI.
-    """
-    monkeypatch.setattr(nbformat.validator, "_DEPRECATION_PENALTY_SECONDS", 0)
 
 
 # Helpers
@@ -311,22 +301,16 @@ def test_fallback_validator_with_iter_errors_using_ref(recwarn):
     assert len(recwarn) == 0
 
 
-def test_non_unique_cell_ids(no_deprecation_penalty):
+def test_non_unique_cell_ids():
     """Test than a non-unique cell id does not pass validation"""
     with TestsBase.fopen("invalid_unique_cell_id.ipynb", "r") as f:
         # Avoids validate call from `.read`
         nb = nbformat.from_dict(json.load(f))
-    with (
-        pytest.raises(ValidationError),
-        pytest.warns(DeprecationWarning, match="`repair_duplicate_cell_ids` kwargs of validate"),
-    ):
-        validate(nb, repair_duplicate_cell_ids=False)
+    with pytest.raises(ValidationError):
+        nbformat.validator._validate(nb, repair_duplicate_cell_ids=False)
     # try again to verify that we didn't modify the content
-    with (
-        pytest.raises(ValidationError),
-        pytest.warns(DeprecationWarning, match="`repair_duplicate_cell_ids` kwargs of validate"),
-    ):
-        validate(nb, repair_duplicate_cell_ids=False)
+    with pytest.raises(ValidationError):
+        nbformat.validator._validate(nb, repair_duplicate_cell_ids=False)
 
 
 def test_repair_non_unique_cell_ids():
@@ -341,23 +325,17 @@ def test_repair_non_unique_cell_ids():
 
 
 @pytest.mark.filterwarnings("ignore::nbformat.warnings.MissingIDFieldWarning")
-def test_no_cell_ids(no_deprecation_penalty):
+def test_no_cell_ids():
     """Test that a cell without a cell ID does not pass validation"""
 
     with TestsBase.fopen("v4_5_no_cell_id.ipynb", "r") as f:
         # Avoids validate call from `.read`
         nb = nbformat.from_dict(json.load(f))
-    with (
-        pytest.raises(ValidationError),
-        pytest.warns(DeprecationWarning, match="`repair_duplicate_cell_ids` kwargs of validate"),
-    ):
-        validate(nb, repair_duplicate_cell_ids=False)
+    with pytest.raises(ValidationError):
+        nbformat.validator._validate(nb, repair_duplicate_cell_ids=False)
     # try again to verify that we didn't modify the content
-    with (
-        pytest.raises(ValidationError),
-        pytest.warns(DeprecationWarning, match="`repair_duplicate_cell_ids` kwargs of validate"),
-    ):
-        validate(nb, repair_duplicate_cell_ids=False)
+    with pytest.raises(ValidationError):
+        nbformat.validator._validate(nb, repair_duplicate_cell_ids=False)
 
 
 @pytest.mark.filterwarnings("ignore::nbformat.warnings.MissingIDFieldWarning")
@@ -397,15 +375,11 @@ def test_notebook_invalid_without_main_version():
     pass
 
 
-def test_strip_invalid_metadata(no_deprecation_penalty):
+def test_strip_invalid_metadata():
     with TestsBase.fopen("v4_5_invalid_metadata.ipynb", "r") as f:
         nb = nbformat.from_dict(json.load(f))
     assert not isvalid(nb)
-    with pytest.warns(
-        DeprecationWarning,
-        match="`strip_invalid_metadata` kwargs of validate has been deprecated for security",
-    ):
-        validate(nb, strip_invalid_metadata=True)
+    _changes, nb = normalize(nb, strip_invalid_metadata=True)
     assert isvalid(nb)
 
 
