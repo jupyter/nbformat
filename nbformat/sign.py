@@ -223,7 +223,7 @@ class SQLiteSignatureStore(SignatureStore, LoggingConfigurable):
             # Note: Python does not have bindings for recover_extension, see
             # https://github.com/python/cpython/issues/149735
             recovered_sql = subprocess.run(  # noqa: S603
-                [sqlite_cli, old_db_location, ".recover"],
+                [sqlite_cli, "-batch", "--", old_db_location, ".recover"],
                 check=False,
                 capture_output=True,
                 text=True,
@@ -263,28 +263,31 @@ class SQLiteSignatureStore(SignatureStore, LoggingConfigurable):
             self.init_db(dst)
 
             recovered = 0
-            ids = [row[0] for row in src.execute("SELECT id FROM nbsignatures ORDER BY id")]
-            for row_id in ids:
-                try:
-                    row = src.execute(
-                        """
-                        SELECT id, algorithm, signature, last_seen
-                        FROM nbsignatures WHERE id = ?
-                        """,
-                        (row_id,),
-                    ).fetchone()
-                    if row is None:
+            try:
+                for (row_id,) in src.execute("SELECT id FROM nbsignatures ORDER BY id"):
+                    try:
+                        row = src.execute(
+                            """
+                            SELECT id, algorithm, signature, last_seen
+                            FROM nbsignatures WHERE id = ?
+                            """,
+                            (row_id,),
+                        ).fetchone()
+                        if row is None:
+                            continue
+                        dst.execute(
+                            """
+                            INSERT OR REPLACE INTO nbsignatures (id, algorithm, signature, last_seen)
+                            VALUES (?, ?, ?, ?)
+                            """,
+                            row,
+                        )
+                        recovered += 1
+                    except (sqlite3.DatabaseError, sqlite3.OperationalError):
                         continue
-                    dst.execute(
-                        """
-                        INSERT OR REPLACE INTO nbsignatures (id, algorithm, signature, last_seen)
-                        VALUES (?, ?, ?, ?)
-                        """,
-                        row,
-                    )
-                    recovered += 1
-                except (sqlite3.DatabaseError, sqlite3.OperationalError):
-                    continue
+            except (sqlite3.DatabaseError, sqlite3.OperationalError):
+                # Preserve any rows recovered prior to the read failure.
+                pass
 
             dst.commit()
             self.log.warning(
