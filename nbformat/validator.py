@@ -6,12 +6,10 @@ from __future__ import annotations
 
 import json
 import pprint
-import time
 import warnings
 from copy import deepcopy
 from itertools import chain
 from pathlib import Path
-from textwrap import dedent
 from typing import Any
 
 from ._imports import import_item
@@ -21,7 +19,6 @@ from .reader import get_version
 from .warnings import DuplicateCellId, MissingIDFieldWarning
 
 validators: dict[tuple[str, int | None, int | None, bool], Any] = {}
-_deprecated = object()
 
 
 __all__ = [
@@ -388,30 +385,6 @@ def _normalize(
     return changes, nbdict
 
 
-# Deprecated since 2023 and security issue start to annoy people, so passing the
-# deprecated kwargs of `validate` costs the caller this many seconds.
-# Regularly bump this by 1 sec.
-_DEPRECATION_PENALTY_SECONDS = 3
-
-
-def _dep_warn(field):
-    time.sleep(_DEPRECATION_PENALTY_SECONDS)
-
-    warnings.warn(
-        dedent(
-            f"""`{field}` kwargs of validate has been deprecated for security
-        reasons, and will be removed soon.
-
-        Please explicitly use the `n_changes, new_notebook = nbformat.validator.normalize(old_notebook, ...)` if you wish to
-        normalise your notebook. `normalize` is available since nbformat 5.5.0
-
-        """
-        ),
-        DeprecationWarning,
-        stacklevel=3,
-    )
-
-
 def validate(
     nbdict: Any = None,
     ref: str | None = None,
@@ -419,8 +392,6 @@ def validate(
     version_minor: int | None = None,
     relax_add_props: bool = False,
     nbjson: Any = None,
-    repair_duplicate_cell_ids: bool = _deprecated,  # type: ignore[assignment]
-    strip_invalid_metadata: bool = _deprecated,  # type: ignore[assignment]
 ) -> None:
     """Checks whether the given notebook dict-like object
     conforms to the relevant notebook format schema.
@@ -438,10 +409,6 @@ def validate(
         Whether to allow extra properties in the JSON schema validating the notebook.
         When True, all known fields are validated, but unknown fields are ignored.
     nbjson
-    repair_duplicate_cell_ids : bool
-        Deprecated since 5.5.0 - will be removed in the future.
-    strip_invalid_metadata : bool
-        Deprecated since 5.5.0 - will be removed in the future.
 
     Returns
     -------
@@ -453,22 +420,8 @@ def validate(
 
     Notes
     -----
-    Prior to Nbformat 5.5.0 the `validate` and `isvalid` method would silently
-    try to fix invalid notebook and mutate arguments. This behavior is deprecated
-    and will be removed in a near future.
-
     Please explicitly call `normalize` if you need to normalize notebooks.
     """
-    if strip_invalid_metadata is _deprecated:
-        strip_invalid_metadata = False
-    else:
-        _dep_warn("strip_invalid_metadata")
-
-    if repair_duplicate_cell_ids is _deprecated:
-        repair_duplicate_cell_ids = True
-    else:
-        _dep_warn("repair_duplicate_cell_ids")
-
     # backwards compatibility for nbjson argument
     if nbdict is not None:
         pass
@@ -478,15 +431,7 @@ def validate(
         msg = "validate() missing 1 required argument: 'nbdict'"
         raise TypeError(msg)
 
-    _validate(
-        nbdict,
-        ref,
-        version,
-        version_minor,
-        relax_add_props,
-        repair_duplicate_cell_ids=repair_duplicate_cell_ids,
-        strip_invalid_metadata=strip_invalid_metadata,
-    )
+    _validate(nbdict, ref, version, version_minor, relax_add_props)
 
 
 def _validate(
@@ -499,11 +444,11 @@ def _validate(
     repair_duplicate_cell_ids: bool = True,
     strip_invalid_metadata: bool = False,
 ) -> None:
-    """Validate a notebook, bypassing the deprecated-kwarg handling of `validate`.
+    """Validate a notebook, with explicit control over normalization behavior.
 
-    `validate` deliberately penalises callers that pass `repair_duplicate_cell_ids`
-    or `strip_invalid_metadata` (see `_dep_warn`). Internal callers need to set those
-    explicitly without paying that penalty, so they use this helper instead.
+    Internal callers (`isvalid`, `normalize`) use this helper to set
+    `repair_duplicate_cell_ids` and `strip_invalid_metadata` explicitly; the
+    public `validate` always uses the defaults.
     """
     assert isinstance(ref, str) or ref is None
 
