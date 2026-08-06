@@ -10,6 +10,7 @@ from nbformat.v4.nbbase import (
     new_notebook,
     new_output,
     new_raw_cell,
+    output_from_msg,
 )
 
 
@@ -120,3 +121,67 @@ def test_stream():
     output = new_output("stream", name="stderr", text="hello there")
     assert output.name == "stderr"
     assert output.text == "hello there"
+
+
+# --- output_from_msg tests ---
+
+
+def test_output_from_msg_error_complete():
+    """Error message with all fields present — existing behavior preserved."""
+    msg = {
+        "header": {"msg_type": "error"},
+        "content": {
+            "ename": "ValueError",
+            "evalue": "something broke",
+            "traceback": ["frame1", "frame2"],
+        },
+    }
+    output = output_from_msg(msg)
+    assert output.output_type == "error"
+    assert output.ename == "ValueError"
+    assert output.evalue == "something broke"
+    assert output.traceback == ["frame1", "frame2"]
+
+
+def test_output_from_msg_error_missing_traceback():
+    """Error message missing traceback — should default to []."""
+    msg = {
+        "header": {"msg_type": "error"},
+        "content": {
+            "ename": "RuntimeError",
+            "evalue": "kernel error",
+        },
+    }
+    output = output_from_msg(msg)
+    assert output.output_type == "error"
+    assert output.ename == "RuntimeError"
+    assert output.evalue == "kernel error"
+    assert output.traceback == []
+
+
+def test_output_from_msg_error_minimal():
+    """Error message with empty content — all fields should get defaults."""
+    msg = {
+        "header": {"msg_type": "error"},
+        "content": {},
+    }
+    output = output_from_msg(msg)
+    assert output.output_type == "error"
+    assert output.ename == "UnknownError"
+    assert output.evalue == ""
+    assert output.traceback == []
+
+
+def test_output_from_msg_error_empty_traceback():
+    """Error message with empty traceback list — valid per protocol."""
+    msg = {
+        "header": {"msg_type": "error"},
+        "content": {
+            "ename": "Error",
+            "evalue": "",
+            "traceback": [],
+        },
+    }
+    output = output_from_msg(msg)
+    assert output.output_type == "error"
+    assert output.traceback == []

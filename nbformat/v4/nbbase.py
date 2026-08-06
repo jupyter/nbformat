@@ -107,9 +107,9 @@ def output_from_msg(msg):
     if msg_type == "error":
         return new_output(
             output_type=msg_type,
-            ename=content["ename"],
-            evalue=content["evalue"],
-            traceback=content["traceback"],
+            ename=content.get("ename", "UnknownError"),
+            evalue=content.get("evalue", ""),
+            traceback=content.get("traceback", []),
         )
     raise ValueError("Unrecognized output msg type: %r" % msg_type)
 
