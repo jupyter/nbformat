@@ -4,6 +4,10 @@
 The Notebook file format
 ========================
 
+.. note::
+
+    The version number for the Jupyter Notebook format is independent of the version number for the reference implementation library.
+
 The official Jupyter Notebook format is defined with
 `this JSON schema <https://github.com/jupyter/nbformat/blob/master/nbformat/v4/nbformat.v4.schema.json>`_,
 which is used by Jupyter tools to validate notebooks.
@@ -44,7 +48,7 @@ At the highest level, a Jupyter notebook is a dictionary with a few keys:
             },
         },
         "nbformat": 4,
-        "nbformat_minor": 0,
+        "nbformat_minor": 5,
         "cells": [
             # list of cell dictionaries, see below
         ],
