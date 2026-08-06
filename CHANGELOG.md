@@ -292,21 +292,31 @@ No merged PRs
 ## 5.5.0
 
 The biggest change in `nbformat` 5.5.0 is the deprecation of arguments
-to `validate()` that try to fix notebooks errors during validation.
+to `validate()` that try to fix notebook errors during validation.
 
 `validate()` is a function that is core to the security model of
-Jupyter, and is assumed in a number of places to not mutate it's
-argument, or try to fix notebooks passed to it.
+Jupyter. Callers rely on it not mutating its argument or trying to fix
+the notebook passed to it.
 
-Auto fixing of notebook in validate can also hide subtle bugs, and will
-therefore be updated in a near future to not take any of the argument
-related to auto-fixing, and fail instead of silently modifying its
-parameters on invalid notebooks.
+Automatically fixing a notebook during validation can hide subtle bugs.
+The auto-fixing arguments are therefore deprecated and will be removed in
+a future release; validation will fail instead of silently modifying an
+invalid notebook.
 
-`nbformat` now contain a `normalize` function that will return a
-normalized copy of a notebook that is suitable for validation. While
-offered as a convenience we discourage its use and suggest library make
-sure to generate valid notebooks.
+Use `normalize()` explicitly when a notebook from an external source needs
+to be repaired before validation. It returns a normalized copy and the
+number of changes made:
+
+```python
+from nbformat.validator import normalize
+
+changes, normalized = normalize(notebook)
+nbformat.validate(normalized)
+```
+
+The preferred approach is still to generate valid notebooks at the source;
+normalization is a compatibility tool, not a substitute for fixing the
+producer.
 
 ### Other changes
 
