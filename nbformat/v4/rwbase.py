@@ -4,6 +4,8 @@
 # Distributed under the terms of the Modified BSD License.
 from __future__ import annotations
 
+from collections.abc import Mapping
+
 
 def _is_json_mime(mime):
     """Is a key a JSON mime-type that should be left alone?"""
@@ -97,6 +99,10 @@ def strip_transient(nb):
 
     This should be called in *both* read and write.
     """
+    # Handle malformed notebooks where metadata was incorrectly set as a non-dictionary type
+    if not isinstance(nb.metadata, Mapping):
+        nb.metadata = dict()
+
     nb.metadata.pop("orig_nbformat", None)
     nb.metadata.pop("orig_nbformat_minor", None)
     nb.metadata.pop("signature", None)
