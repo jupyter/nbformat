@@ -46,6 +46,7 @@ jobs:
         with:
           token: ${{ steps.app-token.outputs.token }}
           release_url: ${{ steps.populate-release.outputs.release_url }}
+          steps_to_skip: ${{ github.event.inputs.steps_to_skip }}
 
       - name: "** Next Step **"
         if: ${{ success() }}
