@@ -4,6 +4,55 @@
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 5.11.0
+
+([Full Changelog](https://github.com/jupyter/nbformat/compare/v5.10.4...434f6ca75aa615d228d4f68cb4dcbc04a97c14d2))
+
+### Enhancements made
+
+- Add context manager support to NotebookNotary [#436](https://github.com/jupyter/nbformat/pull/436) ([@Carreau](https://github.com/Carreau))
+
+### Maintenance and upkeep improvements
+
+- Add GitHub Actions security auditing with zizmor [#444](https://github.com/jupyter/nbformat/pull/444) ([@Carreau](https://github.com/Carreau), [@claude](https://github.com/claude))
+- chore: update pre-commit hooks [#443](https://github.com/jupyter/nbformat/pull/443) ([@Carreau](https://github.com/Carreau), [@claude](https://github.com/claude))
+- Fix validators cache key type annotation [#440](https://github.com/jupyter/nbformat/pull/440) ([@Carreau](https://github.com/Carreau), [@claude](https://github.com/claude))
+- Refactor validation to separate deprecated kwarg handling [#439](https://github.com/jupyter/nbformat/pull/439) ([@Carreau](https://github.com/Carreau), [@claude](https://github.com/claude))
+- Bump pre-commit hook pins and fix resulting lint/typing fallout [#438](https://github.com/jupyter/nbformat/pull/438) ([@Carreau](https://github.com/Carreau), [@claude](https://github.com/claude))
+- Add Python 3.14 to CI [#437](https://github.com/jupyter/nbformat/pull/437) ([@Carreau](https://github.com/Carreau), [@claude](https://github.com/claude))
+- Bump actions/checkout from 5 to 6 in the actions group [#422](https://github.com/jupyter/nbformat/pull/422) ([@Carreau](https://github.com/Carreau))
+- chore: update pre-commit hooks [#421](https://github.com/jupyter/nbformat/pull/421) ([@Carreau](https://github.com/Carreau))
+- Make security deprecated slow to nudge people [#418](https://github.com/jupyter/nbformat/pull/418) ([@Carreau](https://github.com/Carreau))
+- bump pre-commit [#417](https://github.com/jupyter/nbformat/pull/417) ([@Carreau](https://github.com/Carreau))
+- Drop 3.8, CI does not work on 3.8 [#416](https://github.com/jupyter/nbformat/pull/416) ([@Carreau](https://github.com/Carreau))
+- Bump the actions group across 1 directory with 2 updates [#414](https://github.com/jupyter/nbformat/pull/414) ([@Carreau](https://github.com/Carreau))
+- Add security.md [#411](https://github.com/jupyter/nbformat/pull/411) ([@Carreau](https://github.com/Carreau), [@jasongrout](https://github.com/jasongrout))
+- Drop pep440 dependency [#408](https://github.com/jupyter/nbformat/pull/408) ([@LecrisUT](https://github.com/LecrisUT), [@Carreau](https://github.com/Carreau))
+- chore: update pre-commit hooks [#401](https://github.com/jupyter/nbformat/pull/401) ([@blink1073](https://github.com/blink1073))
+
+### Documentation improvements
+
+- Use intersphinx_registry for intersphinx_mapping [#415](https://github.com/jupyter/nbformat/pull/415) ([@Carreau](https://github.com/Carreau))
+
+### Other merged PRs
+
+- Remove deprecated kwargs from validate() function [#447](https://github.com/jupyter/nbformat/pull/447) ([@Carreau](https://github.com/Carreau), [@claude](https://github.com/claude))
+- Bump github/codeql-action from 4 to 4.37.3 in the actions group [#446](https://github.com/jupyter/nbformat/pull/446) ([@Carreau](https://github.com/Carreau))
+- Remove enforce-label workflow [#445](https://github.com/jupyter/nbformat/pull/445) ([@Carreau](https://github.com/Carreau), [@claude](https://github.com/claude))
+- Bump the actions group with 2 updates [#441](https://github.com/jupyter/nbformat/pull/441) ([@Carreau](https://github.com/Carreau))
+- fix typo with quotes in docs [#409](https://github.com/jupyter/nbformat/pull/409) ([@crypdick](https://github.com/crypdick), [@Carreau](https://github.com/Carreau))
+
+### Contributors to this release
+
+The following people contributed discussions, new ideas, code and documentation contributions, and review.
+See [our definition of contributors](https://github-activity.readthedocs.io/en/latest/use/#how-does-this-tool-define-contributions-in-the-reports).
+
+([GitHub contributors page for this release](https://github.com/jupyter/nbformat/graphs/contributors?from=2024-04-04&to=2026-08-06&type=c))
+
+@blink1073 ([activity](https://github.com/search?q=repo%3Ajupyter%2Fnbformat+involves%3Ablink1073+updated%3A2024-04-04..2026-08-06&type=Issues)) | @Carreau ([activity](https://github.com/search?q=repo%3Ajupyter%2Fnbformat+involves%3ACarreau+updated%3A2024-04-04..2026-08-06&type=Issues)) | @claude ([activity](https://github.com/search?q=repo%3Ajupyter%2Fnbformat+involves%3Aclaude+updated%3A2024-04-04..2026-08-06&type=Issues)) | @crypdick ([activity](https://github.com/search?q=repo%3Ajupyter%2Fnbformat+involves%3Acrypdick+updated%3A2024-04-04..2026-08-06&type=Issues)) | @jasongrout ([activity](https://github.com/search?q=repo%3Ajupyter%2Fnbformat+involves%3Ajasongrout+updated%3A2024-04-04..2026-08-06&type=Issues)) | @LecrisUT ([activity](https://github.com/search?q=repo%3Ajupyter%2Fnbformat+involves%3ALecrisUT+updated%3A2024-04-04..2026-08-06&type=Issues)) | @rgbkrk ([activity](https://github.com/search?q=repo%3Ajupyter%2Fnbformat+involves%3Argbkrk+updated%3A2024-04-04..2026-08-06&type=Issues))
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 5.10.4
 
 ([Full Changelog](https://github.com/jupyter/nbformat/compare/v5.10.3...be5ff0a81d544238599b9df4fcefa19e235a8898))
@@ -18,8 +67,6 @@
 ([GitHub contributors page for this release](https://github.com/jupyter/nbformat/graphs/contributors?from=2024-03-15&to=2024-04-04&type=c))
 
 [@blink1073](https://github.com/search?q=repo%3Ajupyter%2Fnbformat+involves%3Ablink1073+updated%3A2024-03-15..2024-04-04&type=Issues) | [@pre-commit-ci](https://github.com/search?q=repo%3Ajupyter%2Fnbformat+involves%3Apre-commit-ci+updated%3A2024-03-15..2024-04-04&type=Issues)
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 5.10.3
 
