@@ -204,6 +204,67 @@ class TestNotary(TestsBase):
         self.assertEqual(calls.count("compute_signature"), 3)
         self.assertIn("_check_cell", calls)
 
+    def test_assigned_store_is_not_closed(self):
+        """A store assigned by the caller is owned by the caller."""
+        # a real store, whose close() is observable (unlike MemorySignatureStore's)
+        store = sign.SQLiteSignatureStore(":memory:")
+        notary = sign.NotebookNotary(
+            db_file=":memory:",
+            secret=b"secret",
+            data_dir=self.data_dir,
+        )
+        notary.store = store
+        with notary:
+            notary.sign(self.nb)
+        notary.close()
+        # even an explicit close leaves a caller-owned store alone
+        self.assertTrue(store.check_signature(notary.compute_signature(self.nb), "sha256"))
+        store.close()
+
+    def test_reusable_after_internal_close(self):
+        """Leaving a `with` block closes the store but leaves the notary working."""
+        notary = sign.NotebookNotary(
+            db_file=":memory:",
+            secret=b"secret",
+            data_dir=self.data_dir,
+        )
+        with notary:
+            notary.sign(self.nb)
+        self.assertIsNone(notary._store)
+        # code that goes on using the notary keeps working: a fresh store is
+        # created on demand
+        with notary:
+            self.assertFalse(notary.check_signature(self.nb))
+            notary.sign(self.nb)
+            self.assertTrue(notary.check_signature(self.nb))
+
+    def test_explicit_close_is_final(self):
+        """An explicit close() means done: the store is not re-created."""
+        notary = sign.NotebookNotary(
+            db_file=":memory:",
+            secret=b"secret",
+            data_dir=self.data_dir,
+        )
+        with notary:
+            notary.sign(self.nb)
+        notary.close()
+        with pytest.raises(RuntimeError, match="has been closed"):
+            notary.check_signature(self.nb)
+        with pytest.raises(RuntimeError, match="has been closed"):
+            _ = notary.store
+        # closing twice is harmless, and sessions are unaffected
+        notary.close()
+        with notary.open_session() as session:
+            self.assertFalse(session.check_signature(self.nb))
+
+    def test_store_free_methods_open_no_store(self):
+        """compute_signature/mark_cells/check_cells need no store at all."""
+        notary = sign.NotebookNotary(db_file=":memory:", secret=b"secret", data_dir=self.data_dir)
+        notary.compute_signature(self.nb)
+        notary.mark_cells(self.nb, True)
+        notary.check_cells(self.nb)
+        self.assertIsNone(notary._store)
+
     def test_algorithms(self):
         last_sig = ""
         for algo in sign.algorithms:
@@ -389,6 +450,25 @@ class TestNotary(TestsBase):
         self.assertIn("Signing notebook: <stdin>", out)
         out = sign_stdin(self.nb3)
         self.assertIn("already signed: <stdin>", out)
+
+    def test_trust_reset(self):
+        """`jupyter trust --reset` deletes the cache without reopening it."""
+        app = sign.TrustNotebookApp(data_dir=self.data_dir)
+        app.notary = sign.NotebookNotary(
+            db_file=os.path.join(self.data_dir, "reset.db"),
+            secret_file=os.path.join(self.data_dir, "reset_secret"),
+            data_dir=self.data_dir,
+        )
+        with app.notary.open_session() as session:
+            session.sign(self.nb)
+        testpath.assert_isfile(app.notary.db_file)
+
+        app.reset = True
+        app.start()
+
+        testpath.assert_not_path_exists(app.notary.db_file)
+        # the store must not have been reopened, which would recreate the file
+        self.assertIsNone(app.notary._store)
 
 
 def test_config_store():

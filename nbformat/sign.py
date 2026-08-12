@@ -7,6 +7,7 @@ from __future__ import annotations
 import hashlib
 import os
 import sys
+import threading
 import typing as t
 import warnings
 from collections import OrderedDict
@@ -635,7 +636,11 @@ class NotebookNotary(LoggingConfigurable):
     def __init__(self, **kwargs):
         """Initialize the notary."""
         super().__init__(**kwargs)
-        self.store = self.store_factory()
+        self._store: SignatureStore | None = None
+        # whether the store was created by us (and is therefore ours to close)
+        self._store_owned = True
+        self._store_lock = threading.Lock()
+        self._closed = False
         self._used_as_context_manager = False
         self._warned_not_context_manager = False
 
@@ -658,13 +663,75 @@ class NotebookNotary(LoggingConfigurable):
         finally:
             session._close()
 
-    def close(self):
-        """Close the notary's signature store.
+    @property
+    def store(self) -> SignatureStore:
+        """The shared signature store used by the direct (non-session) API.
 
-        Should be called when the notary is no longer needed, to release
-        any resources (e.g. database connections) held by the store.
+        Sessions returned by :meth:`open_session` have their own store; this one
+        backs direct calls such as ``notary.sign(nb)``. It is created lazily, and
+        re-created on demand after an internal close (such as leaving a ``with``
+        block), so that code which keeps using the notary keeps working.
+
+        Once :meth:`close` has been called explicitly, it is not re-created:
+        accessing it raises :exc:`RuntimeError`.
         """
-        self.store.close()
+        with self._store_lock:
+            if self._closed:
+                msg = (
+                    "This NotebookNotary has been closed. Use a new notary, or "
+                    "`with notary.open_session() as session:` for a store whose "
+                    "lifetime is the block."
+                )
+                raise RuntimeError(msg)
+            if self._store is None:
+                self._store = self.store_factory()
+                self._store_owned = True
+            return self._store
+
+    @store.setter
+    def store(self, store: SignatureStore) -> None:
+        # A store assigned by the caller is owned by the caller: we hand out
+        # that same object for the notary's whole lifetime and never close it.
+        with self._store_lock:
+            self._store = store
+            self._store_owned = False
+
+    def close(self):
+        """Close the notary's shared signature store, for good.
+
+        Should be called when the notary is no longer needed, to release any
+        resources (e.g. database connections) held by the store. The store is
+        not re-created afterwards: using the notary's direct API again raises
+        :exc:`RuntimeError`. Sessions opened by :meth:`open_session` are
+        unaffected, since they own their stores.
+
+        A store that was assigned to :attr:`store` by the caller is left open,
+        since its lifetime belongs to whoever created it.
+        """
+        self._close_store()
+        self._closed = True
+
+    def _close_store(self):
+        """Close the shared store, leaving the notary usable.
+
+        This is the internal close, used when leaving a ``with`` block: code
+        written before the notary was a context manager may go on using it
+        afterwards, and should keep working.
+        """
+        with self._store_lock:
+            if not self._store_owned:
+                return
+            store, self._store = self._store, None
+        if store is None:
+            return
+        try:
+            store.close()
+        except BaseException:
+            # keep hold of a store we failed to close, so a retry can reach it
+            with self._store_lock:
+                if self._store is None:
+                    self._store = store
+            raise
 
     def __enter__(self) -> NotebookNotary:  # noqa: PYI034 (typing.Self needs 3.11)
         """Enter the notary's context, as introduced in nbformat 5.11.
@@ -681,8 +748,12 @@ class NotebookNotary(LoggingConfigurable):
         return self
 
     def __exit__(self, *exc_info):
-        """Exit the notary's context, closing its signature store."""
-        self.close()
+        """Exit the notary's context, closing the shared store.
+
+        The notary stays usable afterwards: unlike an explicit :meth:`close`,
+        leaving a block is not the caller saying they are done with it.
+        """
+        self._close_store()
 
     def _session(self) -> NotarySession:
         """A session over the shared store, for the non-session API.
@@ -875,11 +946,11 @@ class TrustNotebookApp(JupyterApp):
     def start(self):
         """Start the trust notebook app."""
         if self.reset:
-            with self.notary:
-                if Path(self.notary.db_file).exists():
-                    print("Removing trusted signature cache: %s" % self.notary.db_file)  # noqa: T201
-                    Path(self.notary.db_file).unlink()
-                self.generate_new_key()
+            # don't open a store we are about to delete
+            if Path(self.notary.db_file).exists():
+                print("Removing trusted signature cache: %s" % self.notary.db_file)  # noqa: T201
+                Path(self.notary.db_file).unlink()
+            self.generate_new_key()
             return
         with self.notary.open_session() as session:
             if not self.extra_args:
