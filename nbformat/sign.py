@@ -7,6 +7,7 @@ from __future__ import annotations
 import hashlib
 import os
 import sys
+import threading
 import typing as t
 import warnings
 from collections import OrderedDict
@@ -333,13 +334,194 @@ def signature_removed(nb):
             nb["metadata"]["signature"] = save_signature
 
 
-class NotebookNotaryContext(t.Protocol):
-    """The operations available on a :class:`NotebookNotary` used as a context manager.
+def _compute_signature(nb: t.Any, secret: bytes, digestmod: t.Any) -> str:
+    """Compute a notebook's signature
 
-    This is what ``NotebookNotary.__enter__`` returns. It deliberately omits
-    ``close()``, ``__enter__``, and ``__exit__`` so that a type checker flags
-    attempts to close or re-enter the notary from within its own ``with``
-    block.
+    by hashing the entire contents of the notebook via HMAC digest.
+    """
+    hmac = HMAC(secret, digestmod=digestmod)
+    # don't include the previous hash in the content to hash
+    with signature_removed(nb):
+        # sign the whole thing
+        for b in yield_everything(nb):
+            hmac.update(b)
+
+    return hmac.hexdigest()
+
+
+def _mark_cells(nb, trusted):
+    """Mark cells as trusted if the notebook's signature can be verified
+
+    Sets ``cell.metadata.trusted = True | False`` on all code cells,
+    depending on the *trusted* parameter.
+
+    This function is the inverse of check_cells.
+    """
+    if nb.nbformat < 3:
+        return
+
+    for cell in yield_code_cells(nb):
+        cell["metadata"]["trusted"] = trusted
+
+
+def _check_cell(cell, nbformat_version):
+    """Do we trust an individual cell?
+
+    Return True if:
+
+    - cell is explicitly trusted
+    - cell has no potentially unsafe rich output
+
+    If a cell has no output, or only simple print statements,
+    it will always be trusted.
+    """
+    # explicitly trusted
+    if cell["metadata"].pop("trusted", False):
+        return True
+
+    # explicitly safe output
+    if nbformat_version >= 4:
+        unsafe_output_types = ["execute_result", "display_data"]
+        safe_keys = {"output_type", "execution_count", "metadata"}
+    else:  # v3
+        unsafe_output_types = ["pyout", "display_data"]
+        safe_keys = {"output_type", "prompt_number", "metadata"}
+
+    for output in cell["outputs"]:
+        output_type = output["output_type"]
+        if output_type in unsafe_output_types:
+            # if there are any data keys not in the safe whitelist
+            output_keys = set(output)
+            if output_keys.difference(safe_keys):
+                return False
+
+    return True
+
+
+def _check_cells(nb: t.Any, check_cell: t.Callable[[t.Any, int], bool] = _check_cell) -> bool:
+    """Return whether all code cells are trusted.
+
+    A cell is trusted if the 'trusted' field in its metadata is truthy, or
+    if it has no potentially unsafe outputs.
+    If there are no code cells, return True.
+
+    This function is the inverse of mark_cells.
+    """
+    if nb.nbformat < 3:
+        return False
+    trusted = True
+    for cell in yield_code_cells(nb):
+        # only distrust a cell if it actually has some output to distrust
+        if not check_cell(cell, nb.nbformat):
+            trusted = False
+
+    return trusted
+
+
+class NotarySession:
+    """Signing operations over a signature store that the session owns.
+
+    A session is what :meth:`NotebookNotary.open_session` hands out::
+
+        with notary.open_session() as session:
+            session.sign(nb)
+
+    The session opens its store (by calling the *store_factory* it is given)
+    and closes it when the ``with`` block exits: the store's lifetime is the
+    session's lifetime. A session therefore has no ``close()`` of its own --
+    it is not meant to be kept alive past the block, which is the whole point
+    of the split. (Holding on to one and using it afterwards is not prevented,
+    but with the default SQLite store it fails, since the store is closed.)
+
+    A session is self-contained: it holds the secret and algorithm it was
+    created with, and does not consult the notary afterwards. Changing the
+    notary's configuration therefore affects later sessions, not open ones.
+
+    .. versionadded:: 5.12
+    """
+
+    def __init__(
+        self,
+        store_factory: t.Callable[[], SignatureStore],
+        secret: bytes,
+        algorithm: str,
+        digestmod: t.Any = None,
+    ) -> None:
+        """Open a session. Use :meth:`NotebookNotary.open_session` instead of calling this."""
+        self._secret = secret
+        self._algorithm = algorithm
+        self._digestmod = digestmod if digestmod is not None else getattr(hashlib, algorithm)
+        self._store = store_factory()
+
+    def compute_signature(self, nb: t.Any) -> str:
+        """Compute a notebook's signature."""
+        return _compute_signature(nb, self._secret, self._digestmod)
+
+    def check_signature(self, nb: t.Any) -> bool:
+        """Check a notebook's stored signature.
+
+        If a signature is stored in the notebook's metadata, a new signature is
+        computed and compared with the stored value.
+
+        Returns True if the signature is found and matches, False otherwise.
+
+        The following conditions must all be met for a notebook to be trusted:
+        - a signature is stored in the form 'scheme:hexdigest'
+        - the stored scheme matches the requested scheme
+        - the requested scheme is available from hashlib
+        - the computed hash from notebook_signature matches the stored hash
+        """
+        if nb.nbformat < 3:
+            return False
+        signature = self.compute_signature(nb)
+        return bool(self._store.check_signature(signature, self._algorithm))
+
+    def sign(self, nb: t.Any) -> None:
+        """Sign a notebook, indicating that its output is trusted on this machine.
+
+        Stores hash algorithm and hmac digest in a local database of trusted notebooks.
+        """
+        if nb.nbformat < 3:
+            return
+        signature = self.compute_signature(nb)
+        self._store.store_signature(signature, self._algorithm)
+
+    def unsign(self, nb: t.Any) -> None:
+        """Ensure that a notebook is untrusted
+
+        by removing its signature from the trusted database, if present.
+        """
+        signature = self.compute_signature(nb)
+        self._store.remove_signature(signature, self._algorithm)
+
+    def mark_cells(self, nb: t.Any, trusted: bool) -> None:
+        """Mark cells as trusted if the notebook's signature can be verified.
+
+        This method is the inverse of check_cells.
+        """
+        _mark_cells(nb, trusted)
+
+    def check_cells(self, nb: t.Any) -> bool:
+        """Return whether all code cells are trusted.
+
+        This method is the inverse of mark_cells.
+        """
+        return bool(_check_cells(nb))
+
+    def _close(self) -> None:
+        """Close the store. Called for you when the ``with`` block exits."""
+        self._store.close()
+
+
+class NotebookNotaryContext(t.Protocol):
+    """The signing operations, as a structural type.
+
+    This protocol was introduced in nbformat 5.11 to type what
+    ``NotebookNotary.__enter__`` returns. It is kept so that annotations
+    written against it keep working: both :class:`NotarySession` and
+    :class:`NotebookNotary` satisfy it structurally.
+
+    .. versionadded:: 5.11
     """
 
     def compute_signature(self, nb: t.Any) -> str:
@@ -458,46 +640,201 @@ class NotebookNotary(LoggingConfigurable):
     def __init__(self, **kwargs):
         """Initialize the notary."""
         super().__init__(**kwargs)
-        self.store = self.store_factory()
-        self._used_as_context_manager = False
-        self._warned_not_context_manager = False
+        self._store: SignatureStore | None = None
+        # whether the store was created by us (and is therefore ours to close)
+        self._store_owned = True
+        self._store_lock = threading.Lock()
+        self._closed = False
+        self._in_context = False
+        self._warned_prefer_session = False
+
+    @contextmanager
+    def open_session(self) -> t.Iterator[NotarySession]:
+        """Open a :class:`NotarySession`, which owns a signature store.
+
+        This is the way to use a notary::
+
+            with notary.open_session() as session:
+                session.sign(nb)
+
+        Each call opens its own store, so sessions are independent: they may be
+        nested, used one after another, or held by different threads. The store
+        is closed when the block exits.
+
+        .. versionadded:: 5.12
+        """
+        session = NotarySession(self.store_factory, self.secret, self.algorithm, self.digestmod)
+        try:
+            yield session
+        finally:
+            session._close()
+
+    @property
+    def store(self) -> SignatureStore:
+        """The shared signature store used by the direct (non-session) API.
+
+        Sessions returned by :meth:`open_session` have their own store; this one
+        backs direct calls such as ``notary.sign(nb)``. It is created lazily, and
+        re-created on demand after an internal close (such as leaving a ``with``
+        block), so that code which keeps using the notary keeps working.
+
+        Once :meth:`close` has been called explicitly, it is not re-created:
+        accessing it raises :exc:`RuntimeError`.
+
+        .. versionchanged:: 5.12
+            Created on first use rather than in ``__init__``, and re-created
+            after an internal close. A store assigned here is never closed by
+            the notary.
+        """
+        with self._store_lock:
+            if self._closed:
+                msg = (
+                    "This NotebookNotary has been closed. Use a new notary, or "
+                    "`with notary.open_session() as session:` for a store whose "
+                    "lifetime is the block."
+                )
+                raise RuntimeError(msg)
+            if self._store is None:
+                self._store = self.store_factory()
+                self._store_owned = True
+            return self._store
+
+    @store.setter
+    def store(self, store: SignatureStore) -> None:
+        # A store assigned by the caller is owned by the caller: we hand out
+        # that same object for the notary's whole lifetime and never close it.
+        with self._store_lock:
+            self._store = store
+            self._store_owned = False
 
     def close(self):
-        """Close the notary's signature store.
+        """Close the notary's shared signature store, for good.
 
-        Should be called when the notary is no longer needed, to release
-        any resources (e.g. database connections) held by the store.
+        Should be called when the notary is no longer needed, to release any
+        resources (e.g. database connections) held by the store. The store is
+        not re-created afterwards: using the notary's direct API again raises
+        :exc:`RuntimeError`. Sessions opened by :meth:`open_session` are
+        unaffected, since they own their stores.
+
+        A store that was assigned to :attr:`store` by the caller is left open,
+        since its lifetime belongs to whoever created it.
+
+        .. versionadded:: 5.11
+
+        .. versionchanged:: 5.12
+            The store is no longer re-created afterwards, and a caller-assigned
+            store is left open.
         """
-        self.store.close()
+        self._close_store()
+        self._closed = True
 
-    def __enter__(self) -> NotebookNotaryContext:
-        """Enter the notary's context, marking it as used within a `with` block."""
-        self._used_as_context_manager = True
+    def _close_store(self):
+        """Close the shared store, leaving the notary usable.
+
+        This is the internal close, used when leaving a ``with`` block: code
+        written before the notary was a context manager may go on using it
+        afterwards, and should keep working.
+        """
+        with self._store_lock:
+            if not self._store_owned:
+                return
+            store, self._store = self._store, None
+        if store is None:
+            return
+        try:
+            store.close()
+        except BaseException:
+            # keep hold of a store we failed to close, so a retry can reach it
+            with self._store_lock:
+                if self._store is None:
+                    self._store = store
+            raise
+
+    def __enter__(self) -> NotebookNotary:  # noqa: PYI034 (typing.Self needs 3.11)
+        """Enter the notary's context, as introduced in nbformat 5.11.
+
+        This returns the notary itself, and leaving the block closes the shared
+        store, exactly as it did in 5.11.
+
+        Open a session instead -- a session is the thing with a lifetime, and it
+        can be opened as many times as you like::
+
+            with notary.open_session() as session:
+                session.sign(nb)
+
+        The notary is not re-entrant: it holds one shared store, so nesting
+        ``with notary:`` blocks closes that store when the inner block exits.
+
+        .. versionadded:: 5.11
+
+        .. versionchanged:: 5.12
+            Warns, recommending :meth:`open_session`. Leaving the block no
+            longer makes the notary unusable.
+        """
+        self._warn_prefer_session(
+            "Using a NotebookNotary itself as a context manager is discouraged. "
+            "Open a session instead:"
+        )
+        self._in_context = True
         return self
 
     def __exit__(self, *exc_info):
-        """Exit the notary's context, closing its signature store."""
-        self.close()
+        """Exit the notary's context, closing the shared store.
 
-    def _warn_if_not_context_manager(self):
-        """Warn once if the store is accessed without using this notary as a context manager.
+        The notary stays usable afterwards: unlike an explicit :meth:`close`,
+        leaving a block is not the caller saying they are done with it.
 
-        Using ``NotebookNotary`` outside of a ``with`` block is deprecated as
-        of nbformat 5.11, since it makes it easy to forget to release the
-        resources (e.g. database connections) held by the store.
+        .. versionadded:: 5.11
+
+        .. versionchanged:: 5.12
+            Leaves the notary usable instead of closing it for good.
         """
-        if self._used_as_context_manager or self._warned_not_context_manager:
+        self._in_context = False
+        self._close_store()
+
+    def _session(self) -> NotarySession:
+        """A session over the shared store, for the non-session API.
+
+        Unlike :meth:`open_session`, this borrows the store held by the notary
+        rather than opening one, so the direct methods keep sharing a single
+        store across calls the way they always have.
+        """
+        session = NotarySession(lambda: self.store, self.secret, self.algorithm, self.digestmod)
+        # a subclass may override compute_signature; keep honouring that here
+        session.compute_signature = self.compute_signature  # type:ignore[method-assign]
+        return session
+
+    def _warn_prefer_session(self, lead, stacklevel=4):
+        """Point at :meth:`open_session`, once per notary."""
+        if self._warned_prefer_session:
             return
-        self._warned_not_context_manager = True
+        self._warned_prefer_session = True
         warnings.warn(
-            "Using NotebookNotary without a `with` block is deprecated as of "
-            "nbformat 5.11. Use it as a context manager instead, e.g.:\n\n"
-            "    with NotebookNotary() as notary:\n"
-            "        notary.sign(nb)\n\n"
-            "so that the underlying signature store is properly closed.",
-            PendingDeprecationWarning,
-            stacklevel=3,
+            f"{lead}\n\n"
+            "    with NotebookNotary().open_session() as session:\n"
+            "        session.sign(nb)\n\n"
+            "A session closes the underlying signature store when its block "
+            "exits, so nothing is left open for you to remember to close.",
+            FutureWarning,
+            stacklevel=stacklevel,
         )
+
+    def _warn_if_no_session(self):
+        """Warn once if a store operation is performed without a session.
+
+        Calling the signing methods on the notary itself leaves the store open
+        until :meth:`close` is called, which is easy to forget, so we point at
+        :meth:`open_session` instead.
+        """
+        if self._in_context:
+            return
+        self._warn_prefer_session(
+            "Prefer opening a session over calling "
+            "NotebookNotary.{sign,unsign,check_signature} directly:"
+        )
+
+    # Alias for the 5.11 name.
+    _warn_if_not_context_manager = _warn_if_no_session
 
     def _write_secret_file(self, secret):
         """write my secret to my secret_file"""
@@ -514,15 +851,11 @@ class NotebookNotary(LoggingConfigurable):
         """Compute a notebook's signature
 
         by hashing the entire contents of the notebook via HMAC digest.
-        """
-        hmac = HMAC(self.secret, digestmod=self.digestmod)
-        # don't include the previous hash in the content to hash
-        with signature_removed(nb):
-            # sign the whole thing
-            for b in yield_everything(nb):
-                hmac.update(b)
 
-        return hmac.hexdigest()
+        This needs no store, so a session is not needed; it is also available as
+        :meth:`NotarySession.compute_signature`.
+        """
+        return _compute_signature(nb, self.secret, self.digestmod)
 
     def check_signature(self, nb):
         """Check a notebook's stored signature
@@ -537,32 +870,46 @@ class NotebookNotary(LoggingConfigurable):
         - the stored scheme matches the requested scheme
         - the requested scheme is available from hashlib
         - the computed hash from notebook_signature matches the stored hash
+
+        .. note::
+            Prefer ``with notary.open_session() as session:
+            session.check_signature(nb)``, which closes the store for you.
+
+        .. versionchanged:: 5.12
+            Warns once, recommending :meth:`open_session`.
         """
-        self._warn_if_not_context_manager()
-        if nb.nbformat < 3:
-            return False
-        signature = self.compute_signature(nb)
-        return self.store.check_signature(signature, self.algorithm)
+        self._warn_if_no_session()
+        return self._session().check_signature(nb)
 
     def sign(self, nb):
         """Sign a notebook, indicating that its output is trusted on this machine
 
         Stores hash algorithm and hmac digest in a local database of trusted notebooks.
+
+        .. note::
+            Prefer ``with notary.open_session() as session: session.sign(nb)``,
+            which closes the store for you.
+
+        .. versionchanged:: 5.12
+            Warns once, recommending :meth:`open_session`.
         """
-        self._warn_if_not_context_manager()
-        if nb.nbformat < 3:
-            return
-        signature = self.compute_signature(nb)
-        self.store.store_signature(signature, self.algorithm)
+        self._warn_if_no_session()
+        self._session().sign(nb)
 
     def unsign(self, nb):
         """Ensure that a notebook is untrusted
 
         by removing its signature from the trusted database, if present.
+
+        .. note::
+            Prefer ``with notary.open_session() as session: session.unsign(nb)``,
+            which closes the store for you.
+
+        .. versionchanged:: 5.12
+            Warns once, recommending :meth:`open_session`.
         """
-        self._warn_if_not_context_manager()
-        signature = self.compute_signature(nb)
-        self.store.remove_signature(signature, self.algorithm)
+        self._warn_if_no_session()
+        self._session().unsign(nb)
 
     def mark_cells(self, nb, trusted):
         """Mark cells as trusted if the notebook's signature can be verified
@@ -571,13 +918,12 @@ class NotebookNotary(LoggingConfigurable):
         depending on the *trusted* parameter. This will typically be the return
         value from ``self.check_signature(nb)``.
 
-        This function is the inverse of check_cells
-        """
-        if nb.nbformat < 3:
-            return
+        This function is the inverse of check_cells.
 
-        for cell in yield_code_cells(nb):
-            cell["metadata"]["trusted"] = trusted
+        This needs no store, so a session is not needed; it is also available as
+        :meth:`NotarySession.mark_cells`.
+        """
+        _mark_cells(nb, trusted)
 
     def _check_cell(self, cell, nbformat_version):
         """Do we trust an individual cell?
@@ -590,27 +936,7 @@ class NotebookNotary(LoggingConfigurable):
         If a cell has no output, or only simple print statements,
         it will always be trusted.
         """
-        # explicitly trusted
-        if cell["metadata"].pop("trusted", False):
-            return True
-
-        # explicitly safe output
-        if nbformat_version >= 4:
-            unsafe_output_types = ["execute_result", "display_data"]
-            safe_keys = {"output_type", "execution_count", "metadata"}
-        else:  # v3
-            unsafe_output_types = ["pyout", "display_data"]
-            safe_keys = {"output_type", "prompt_number", "metadata"}
-
-        for output in cell["outputs"]:
-            output_type = output["output_type"]
-            if output_type in unsafe_output_types:
-                # if there are any data keys not in the safe whitelist
-                output_keys = set(output)
-                if output_keys.difference(safe_keys):
-                    return False
-
-        return True
+        return _check_cell(cell, nbformat_version)
 
     def check_cells(self, nb):
         """Return whether all code cells are trusted.
@@ -620,16 +946,13 @@ class NotebookNotary(LoggingConfigurable):
         If there are no code cells, return True.
 
         This function is the inverse of mark_cells.
-        """
-        if nb.nbformat < 3:
-            return False
-        trusted = True
-        for cell in yield_code_cells(nb):
-            # only distrust a cell if it actually has some output to distrust
-            if not self._check_cell(cell, nb.nbformat):
-                trusted = False
 
-        return trusted
+        This needs no store, so a session is not needed; it is also available as
+        :meth:`NotarySession.check_cells`.
+        """
+        # dispatch through self._check_cell, so that subclasses overriding it
+        # keep working
+        return _check_cells(nb, self._check_cell)
 
 
 trust_flags: dict[str, t.Any] = {
@@ -677,22 +1000,22 @@ class TrustNotebookApp(JupyterApp):
     def _notary_default(self):
         return NotebookNotary(parent=self, data_dir=self.data_dir)
 
-    def sign_notebook_file(self, notebook_path):
-        """Sign a notebook from the filesystem"""
+    def sign_notebook_file(self, notebook_path, *, session):
+        """Sign a notebook from the filesystem, using an open session"""
         if not Path(notebook_path).exists():
             self.log.error("Notebook missing: %s", notebook_path)
             self.exit(1)
         with Path(notebook_path).open(encoding="utf8") as f:
             nb = read(f, NO_CONVERT)
-        self.sign_notebook(nb, notebook_path)
+        self.sign_notebook(nb, notebook_path, session=session)
 
-    def sign_notebook(self, nb, notebook_path="<stdin>"):
-        """Sign a notebook that's been loaded"""
-        if self.notary.check_signature(nb):
+    def sign_notebook(self, nb, notebook_path="<stdin>", *, session):
+        """Sign a notebook that's been loaded, using an open session"""
+        if session.check_signature(nb):
             print("Notebook already signed: %s" % notebook_path)  # noqa: T201
         else:
             print("Signing notebook: %s" % notebook_path)  # noqa: T201
-            self.notary.sign(nb)
+            session.sign(nb)
 
     def generate_new_key(self):
         """Generate a new notebook signature key"""
@@ -701,22 +1024,23 @@ class TrustNotebookApp(JupyterApp):
 
     def start(self):
         """Start the trust notebook app."""
-        with self.notary:
-            if self.reset:
-                if Path(self.notary.db_file).exists():
-                    print("Removing trusted signature cache: %s" % self.notary.db_file)  # noqa: T201
-                    Path(self.notary.db_file).unlink()
-                self.generate_new_key()
-                return
+        if self.reset:
+            # don't open a store we are about to delete
+            if Path(self.notary.db_file).exists():
+                print("Removing trusted signature cache: %s" % self.notary.db_file)  # noqa: T201
+                Path(self.notary.db_file).unlink()
+            self.generate_new_key()
+            return
+        with self.notary.open_session() as session:
             if not self.extra_args:
                 self.log.debug("Reading notebook from stdin")
                 nb_s = sys.stdin.read()
                 assert isinstance(nb_s, str)
                 nb = reads(nb_s, NO_CONVERT)
-                self.sign_notebook(nb, "<stdin>")
+                self.sign_notebook(nb, "<stdin>", session=session)
             else:
                 for notebook_path in self.extra_args:
-                    self.sign_notebook_file(notebook_path)
+                    self.sign_notebook_file(notebook_path, session=session)
 
 
 main = TrustNotebookApp.launch_instance

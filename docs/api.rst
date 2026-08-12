@@ -83,13 +83,50 @@ This machinery is used by the notebook web application to record which notebooks
 are *trusted*, and may show dynamic output as soon as they're loaded. See
 :ref:`jupyter-server:server_security` for more information.
 
+A :class:`NotebookNotary` holds the configuration -- the secret, the hashing
+algorithm, and where signatures are stored -- and hands out sessions. Signing
+happens through a session, which opens a signature store and closes it when the
+block exits::
+
+    from nbformat.sign import NotebookNotary
+
+    notary = NotebookNotary()
+    with notary.open_session() as session:
+        session.sign(nb)
+
+A notary can open as many sessions as you like, one after another or at the same
+time; each session has its own store.
+
+.. versionadded:: 5.12
+   :meth:`NotebookNotary.open_session` and :class:`NotarySession`. Signing
+   through the notary itself still works, but leaves its store open until
+   :meth:`NotebookNotary.close` is called, and warns to that effect.
+
 .. autoclass:: NotebookNotary
+
+   .. automethod:: open_session
+
+   .. automethod:: close
 
    .. automethod:: sign
 
    .. automethod:: unsign
 
    .. automethod:: check_signature
+
+   .. automethod:: mark_cells
+
+   .. automethod:: check_cells
+
+.. autoclass:: NotarySession
+
+   .. automethod:: sign
+
+   .. automethod:: unsign
+
+   .. automethod:: check_signature
+
+   .. automethod:: compute_signature
 
    .. automethod:: mark_cells
 

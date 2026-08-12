@@ -8,6 +8,7 @@ import codecs
 import copy
 import os
 import shutil
+import sqlite3
 import sys
 import tempfile
 import time
@@ -32,7 +33,11 @@ class TestNotary(TestsBase):
             secret=b"secret",
             data_dir=self.data_dir,
         )
-        self.notary.__enter__()
+        # most of these tests exercise the direct (non-session) API; entering
+        # the notary keeps that from warning on every call
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", FutureWarning)
+            self.notary.__enter__()
         with self.fopen("test3.ipynb", "r") as f:
             self.nb = read(f, as_version=4)
         with self.fopen("test3.ipynb", "r") as f:
@@ -47,24 +52,26 @@ class TestNotary(TestsBase):
         with open(invalid_sql_file, "w", encoding="utf-8") as tempfile:
             tempfile.write("[invalid data]")
 
-        with sign.NotebookNotary(
+        invalid_notary = sign.NotebookNotary(
             db_file=invalid_sql_file,
             secret=b"secret",
-        ) as invalid_notary:
-            invalid_notary.sign(self.nb)
+        )
+        with invalid_notary.open_session() as session:
+            session.sign(self.nb)
+        invalid_notary.close()
 
         testpath.assert_isfile(os.path.join(self.data_dir, invalid_sql_file))
         testpath.assert_isfile(os.path.join(self.data_dir, invalid_sql_file + ".bak"))
 
-    def test_not_using_context_manager_warns(self):
-        """Using the store without entering the notary as a context manager warns once."""
+    def test_not_using_a_session_warns(self):
+        """Signing without a session warns once, pointing at open_session()."""
         notary = sign.NotebookNotary(
             db_file=":memory:",
             secret=b"secret",
             data_dir=self.data_dir,
         )
         try:
-            with pytest.warns(PendingDeprecationWarning, match="context manager"):
+            with pytest.warns(FutureWarning, match="Prefer opening a session"):
                 notary.sign(self.nb)
             # only warns once per instance
             with warnings.catch_warnings():
@@ -73,16 +80,253 @@ class TestNotary(TestsBase):
         finally:
             notary.close()
 
-    def test_using_context_manager_does_not_warn(self):
+    def test_using_notary_as_context_manager_warns(self):
+        """The notary is usable as a context manager, but points at sessions."""
+        notary = sign.NotebookNotary(
+            db_file=":memory:",
+            secret=b"secret",
+            data_dir=self.data_dir,
+        )
+        with pytest.warns(FutureWarning, match="itself as a context manager"):
+            ctx = notary.__enter__()
+        with warnings.catch_warnings():
+            # having warned on the way in, it does not warn again per call
+            warnings.simplefilter("error")
+            self.assertIs(ctx, notary)
+            notary.sign(self.nb)
+            self.assertTrue(notary.check_signature(self.nb))
+        notary.__exit__(None, None, None)
+
+    def test_using_a_session_does_not_warn(self):
         with warnings.catch_warnings():
             warnings.simplefilter("error")
-            with sign.NotebookNotary(
+            notary = sign.NotebookNotary(
                 db_file=":memory:",
                 secret=b"secret",
                 data_dir=self.data_dir,
-            ) as notary:
-                notary.sign(self.nb)
+            )
+            with notary.open_session() as session:
+                session.sign(self.nb)
+                self.assertTrue(session.check_signature(self.nb))
+
+    def test_open_session(self):
+        db_file = os.path.join(self.data_dir, "sessions.db")
+        notary = sign.NotebookNotary(db_file=db_file, secret=b"secret", data_dir=self.data_dir)
+        with warnings.catch_warnings():
+            warnings.simplefilter("error")
+            with notary.open_session() as session:
+                self.assertFalse(session.check_signature(self.nb))
+                session.sign(self.nb)
+                self.assertTrue(session.check_signature(self.nb))
+            # the notary is reusable: a later session sees the persisted signature
+            with notary.open_session() as session:
+                self.assertTrue(session.check_signature(self.nb))
+        notary.close()
+
+    def test_sessions_are_independent(self):
+        """Each session owns its own store; closing one leaves the others alone."""
+        db_file = os.path.join(self.data_dir, "nested.db")
+        notary = sign.NotebookNotary(db_file=db_file, secret=b"secret", data_dir=self.data_dir)
+        with notary.open_session() as outer:
+            outer.sign(self.nb)
+            with notary.open_session() as inner:
+                self.assertIsNot(inner._store, outer._store)
+                self.assertTrue(inner.check_signature(self.nb))
+            # closing the inner session must not disturb the outer one
+            self.assertTrue(outer.check_signature(self.nb))
+        notary.close()
+
+    def test_session_public_api(self):
+        """A session exposes its operations and nothing else: no store, no close."""
+        notary = sign.NotebookNotary(db_file=":memory:", secret=b"secret", data_dir=self.data_dir)
+        with notary.open_session() as session:
+            self.assertEqual(
+                sorted(name for name in dir(session) if not name.startswith("_")),
+                [
+                    "check_cells",
+                    "check_signature",
+                    "compute_signature",
+                    "mark_cells",
+                    "sign",
+                    "unsign",
+                ],
+            )
+        notary.close()
+
+    def test_session_snapshots_secret(self):
+        """A session keeps the secret it was opened with; the notary can change under it."""
+        notary = sign.NotebookNotary(db_file=":memory:", secret=b"secret", data_dir=self.data_dir)
+        with notary.open_session() as session:
+            before = session.compute_signature(self.nb)
+            notary.secret = b"different"
+            self.assertEqual(session.compute_signature(self.nb), before)
+        # a later session picks the new secret up
+        with notary.open_session() as session:
+            self.assertNotEqual(session.compute_signature(self.nb), before)
+        notary.close()
+
+    def test_session_snapshots_algorithm(self):
+        """The algorithm a session was opened with drives its digest."""
+        notary = sign.NotebookNotary(db_file=":memory:", secret=b"secret", data_dir=self.data_dir)
+        with notary.open_session() as session:
+            sha256 = session.compute_signature(self.nb)
+            notary.algorithm = "sha512"
+            self.assertEqual(session.compute_signature(self.nb), sha256)
+        with notary.open_session() as session:
+            sha512 = session.compute_signature(self.nb)
+        self.assertEqual(len(sha256), 64)
+        self.assertEqual(len(sha512), 128)
+        notary.close()
+
+    def test_notary_context_manager_still_works(self):
+        """The 5.11 `with notary as ...` spelling keeps working, and closes the store."""
+        stores = []
+
+        def factory():
+            stores.append(sign.SQLiteSignatureStore(":memory:"))
+            return stores[-1]
+
+        notary = sign.NotebookNotary(
+            secret=b"secret",
+            data_dir=self.data_dir,
+            store_factory=factory,
+        )
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", FutureWarning)
+            with notary as entered:
+                # 5.11 yielded the notary itself, and code inside the block may
+                # rely on that, both for signing and for its configuration
+                self.assertIs(entered, notary)
+                self.assertEqual(entered.algorithm, "sha256")
+                entered.sign(self.nb)
                 self.assertTrue(notary.check_signature(self.nb))
+            # reusable: a second block opens a fresh store
+            with notary:
+                notary.sign(self.nb)
+        self.assertEqual(len(stores), 2)
+        for store in stores:
+            with pytest.raises(sqlite3.ProgrammingError):
+                store.check_signature("abc", "sha256")
+
+    def test_session_cell_helpers(self):
+        """mark_cells/check_cells are available on the session and actually work."""
+        notary = sign.NotebookNotary(db_file=":memory:", secret=b"secret", data_dir=self.data_dir)
+        with notary.open_session() as session:
+            session.mark_cells(self.nb, False)
+            self.assertFalse(session.check_cells(self.nb))
+            session.mark_cells(self.nb, True)
+            self.assertTrue(session.check_cells(self.nb))
+        notary.close()
+
+    def test_direct_calls_share_one_store(self):
+        """The non-session API keeps using a single store across calls."""
+        stores = []
+
+        def factory():
+            stores.append(sign.MemorySignatureStore())
+            return stores[-1]
+
+        notary = sign.NotebookNotary(
+            secret=b"secret", data_dir=self.data_dir, store_factory=factory
+        )
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", FutureWarning)
+            notary.sign(self.nb)
+            self.assertTrue(notary.check_signature(self.nb))
+            notary.unsign(self.nb)
+        notary.close()
+        self.assertEqual(len(stores), 1)
+
+    def test_subclass_hooks_are_honoured(self):
+        """Subclasses overriding compute_signature/_check_cell still take effect."""
+        calls = []
+
+        class Sub(sign.NotebookNotary):
+            def compute_signature(self, nb):
+                calls.append("compute_signature")
+                return super().compute_signature(nb)
+
+            def _check_cell(self, cell, nbformat_version):
+                calls.append("_check_cell")
+                return super()._check_cell(cell, nbformat_version)
+
+        notary = Sub(db_file=":memory:", secret=b"secret", data_dir=self.data_dir)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", FutureWarning)
+            notary.sign(self.nb)
+            self.assertTrue(notary.check_signature(self.nb))
+            notary.unsign(self.nb)
+            notary.check_cells(self.nb)
+        notary.close()
+        self.assertEqual(calls.count("compute_signature"), 3)
+        self.assertIn("_check_cell", calls)
+
+    def test_assigned_store_is_not_closed(self):
+        """A store assigned by the caller is owned by the caller."""
+        # a real store, whose close() is observable (unlike MemorySignatureStore's)
+        store = sign.SQLiteSignatureStore(":memory:")
+        notary = sign.NotebookNotary(
+            db_file=":memory:",
+            secret=b"secret",
+            data_dir=self.data_dir,
+        )
+        notary.store = store
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", FutureWarning)
+            notary.sign(self.nb)
+        notary.close()
+        # even an explicit close leaves a caller-owned store alone
+        self.assertTrue(store.check_signature(notary.compute_signature(self.nb), "sha256"))
+        store.close()
+
+    def test_reusable_after_internal_close(self):
+        """Leaving a `with` block closes the store but leaves the notary working."""
+        notary = sign.NotebookNotary(
+            db_file=":memory:",
+            secret=b"secret",
+            data_dir=self.data_dir,
+        )
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", FutureWarning)
+            with notary:
+                notary.sign(self.nb)
+            self.assertIsNone(notary._store)
+            # code that goes on using the notary keeps working: a fresh store
+            # is created on demand
+            self.assertFalse(notary.check_signature(self.nb))
+            notary.sign(self.nb)
+            self.assertTrue(notary.check_signature(self.nb))
+        notary.close()
+
+    def test_explicit_close_is_final(self):
+        """An explicit close() means done: the store is not re-created."""
+        notary = sign.NotebookNotary(
+            db_file=":memory:",
+            secret=b"secret",
+            data_dir=self.data_dir,
+        )
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", FutureWarning)
+            notary.sign(self.nb)
+        notary.close()
+        with pytest.raises(RuntimeError, match="has been closed"):
+            notary.check_signature(self.nb)
+        with pytest.raises(RuntimeError, match="has been closed"):
+            _ = notary.store
+        # closing twice is harmless, and sessions are unaffected
+        notary.close()
+        with notary.open_session() as session:
+            self.assertFalse(session.check_signature(self.nb))
+
+    def test_store_free_methods_need_no_session(self):
+        """compute_signature/mark_cells/check_cells open no store and do not warn."""
+        notary = sign.NotebookNotary(db_file=":memory:", secret=b"secret", data_dir=self.data_dir)
+        with warnings.catch_warnings():
+            warnings.simplefilter("error")
+            notary.compute_signature(self.nb)
+            notary.mark_cells(self.nb, True)
+            notary.check_cells(self.nb)
+        self.assertIsNone(notary._store)
 
     def test_algorithms(self):
         last_sig = ""
@@ -269,6 +513,25 @@ class TestNotary(TestsBase):
         self.assertIn("Signing notebook: <stdin>", out)
         out = sign_stdin(self.nb3)
         self.assertIn("already signed: <stdin>", out)
+
+    def test_trust_reset(self):
+        """`jupyter trust --reset` deletes the cache without reopening it."""
+        app = sign.TrustNotebookApp(data_dir=self.data_dir)
+        app.notary = sign.NotebookNotary(
+            db_file=os.path.join(self.data_dir, "reset.db"),
+            secret_file=os.path.join(self.data_dir, "reset_secret"),
+            data_dir=self.data_dir,
+        )
+        with app.notary.open_session() as session:
+            session.sign(self.nb)
+        testpath.assert_isfile(app.notary.db_file)
+
+        app.reset = True
+        app.start()
+
+        testpath.assert_not_path_exists(app.notary.db_file)
+        # the store must not have been reopened, which would recreate the file
+        self.assertIsNone(app.notary._store)
 
 
 def test_config_store():
