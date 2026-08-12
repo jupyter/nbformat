@@ -97,6 +97,11 @@ block exits::
 A notary can open as many sessions as you like, one after another or at the same
 time; each session has its own store.
 
+.. versionadded:: 5.12
+   :meth:`NotebookNotary.open_session` and :class:`NotarySession`. Signing
+   through the notary itself still works, but leaves its store open until
+   :meth:`NotebookNotary.close` is called, and warns to that effect.
+
 .. autoclass:: NotebookNotary
 
    .. automethod:: open_session

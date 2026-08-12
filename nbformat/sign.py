@@ -436,6 +436,8 @@ class NotarySession:
     A session is self-contained: it holds the secret and algorithm it was
     created with, and does not consult the notary afterwards. Changing the
     notary's configuration therefore affects later sessions, not open ones.
+
+    .. versionadded:: 5.12
     """
 
     def __init__(
@@ -518,6 +520,8 @@ class NotebookNotaryContext(t.Protocol):
     ``NotebookNotary.__enter__`` returns. It is kept so that annotations
     written against it keep working: both :class:`NotarySession` and
     :class:`NotebookNotary` satisfy it structurally.
+
+    .. versionadded:: 5.11
     """
 
     def compute_signature(self, nb: t.Any) -> str:
@@ -656,6 +660,8 @@ class NotebookNotary(LoggingConfigurable):
         Each call opens its own store, so sessions are independent: they may be
         nested, used one after another, or held by different threads. The store
         is closed when the block exits.
+
+        .. versionadded:: 5.12
         """
         session = NotarySession(self.store_factory, self.secret, self.algorithm, self.digestmod)
         try:
@@ -674,6 +680,11 @@ class NotebookNotary(LoggingConfigurable):
 
         Once :meth:`close` has been called explicitly, it is not re-created:
         accessing it raises :exc:`RuntimeError`.
+
+        .. versionchanged:: 5.12
+            Created on first use rather than in ``__init__``, and re-created
+            after an internal close. A store assigned here is never closed by
+            the notary.
         """
         with self._store_lock:
             if self._closed:
@@ -707,6 +718,12 @@ class NotebookNotary(LoggingConfigurable):
 
         A store that was assigned to :attr:`store` by the caller is left open,
         since its lifetime belongs to whoever created it.
+
+        .. versionadded:: 5.11
+
+        .. versionchanged:: 5.12
+            The store is no longer re-created afterwards, and a caller-assigned
+            store is left open.
         """
         self._close_store()
         self._closed = True
@@ -747,6 +764,12 @@ class NotebookNotary(LoggingConfigurable):
 
         The notary is not re-entrant: it holds one shared store, so nesting
         ``with notary:`` blocks closes that store when the inner block exits.
+
+        .. versionadded:: 5.11
+
+        .. versionchanged:: 5.12
+            Warns, recommending :meth:`open_session`. Leaving the block no
+            longer makes the notary unusable.
         """
         self._warn_prefer_session(
             "Using a NotebookNotary itself as a context manager is discouraged. "
@@ -760,6 +783,11 @@ class NotebookNotary(LoggingConfigurable):
 
         The notary stays usable afterwards: unlike an explicit :meth:`close`,
         leaving a block is not the caller saying they are done with it.
+
+        .. versionadded:: 5.11
+
+        .. versionchanged:: 5.12
+            Leaves the notary usable instead of closing it for good.
         """
         self._in_context = False
         self._close_store()
@@ -846,6 +874,9 @@ class NotebookNotary(LoggingConfigurable):
         .. note::
             Prefer ``with notary.open_session() as session:
             session.check_signature(nb)``, which closes the store for you.
+
+        .. versionchanged:: 5.12
+            Warns once, recommending :meth:`open_session`.
         """
         self._warn_if_no_session()
         return self._session().check_signature(nb)
@@ -858,6 +889,9 @@ class NotebookNotary(LoggingConfigurable):
         .. note::
             Prefer ``with notary.open_session() as session: session.sign(nb)``,
             which closes the store for you.
+
+        .. versionchanged:: 5.12
+            Warns once, recommending :meth:`open_session`.
         """
         self._warn_if_no_session()
         self._session().sign(nb)
@@ -870,6 +904,9 @@ class NotebookNotary(LoggingConfigurable):
         .. note::
             Prefer ``with notary.open_session() as session: session.unsign(nb)``,
             which closes the store for you.
+
+        .. versionchanged:: 5.12
+            Warns once, recommending :meth:`open_session`.
         """
         self._warn_if_no_session()
         self._session().unsign(nb)
