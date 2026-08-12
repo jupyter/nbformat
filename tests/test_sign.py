@@ -47,11 +47,13 @@ class TestNotary(TestsBase):
         with open(invalid_sql_file, "w", encoding="utf-8") as tempfile:
             tempfile.write("[invalid data]")
 
-        with sign.NotebookNotary(
+        invalid_notary = sign.NotebookNotary(
             db_file=invalid_sql_file,
             secret=b"secret",
-        ) as invalid_notary:
-            invalid_notary.sign(self.nb)
+        )
+        with invalid_notary.open_session() as session:
+            session.sign(self.nb)
+        invalid_notary.close()
 
         testpath.assert_isfile(os.path.join(self.data_dir, invalid_sql_file))
         testpath.assert_isfile(os.path.join(self.data_dir, invalid_sql_file + ".bak"))
@@ -83,6 +85,124 @@ class TestNotary(TestsBase):
             ) as notary:
                 notary.sign(self.nb)
                 self.assertTrue(notary.check_signature(self.nb))
+
+    def test_open_session(self):
+        db_file = os.path.join(self.data_dir, "sessions.db")
+        notary = sign.NotebookNotary(db_file=db_file, secret=b"secret", data_dir=self.data_dir)
+        with warnings.catch_warnings():
+            warnings.simplefilter("error")
+            with notary.open_session() as session:
+                self.assertFalse(session.check_signature(self.nb))
+                session.sign(self.nb)
+                self.assertTrue(session.check_signature(self.nb))
+            # the notary is reusable: a later session sees the persisted signature
+            with notary.open_session() as session:
+                self.assertTrue(session.check_signature(self.nb))
+        notary.close()
+
+    def test_sessions_are_independent(self):
+        """Each session owns its own store; closing one leaves the others alone."""
+        db_file = os.path.join(self.data_dir, "nested.db")
+        notary = sign.NotebookNotary(db_file=db_file, secret=b"secret", data_dir=self.data_dir)
+        with notary.open_session() as outer:
+            outer.sign(self.nb)
+            with notary.open_session() as inner:
+                self.assertIsNot(inner._store, outer._store)
+                self.assertTrue(inner.check_signature(self.nb))
+            # closing the inner session must not disturb the outer one
+            self.assertTrue(outer.check_signature(self.nb))
+        notary.close()
+
+    def test_session_public_api(self):
+        """A session exposes its operations and nothing else: no store, no close."""
+        notary = sign.NotebookNotary(db_file=":memory:", secret=b"secret", data_dir=self.data_dir)
+        with notary.open_session() as session:
+            self.assertEqual(
+                sorted(name for name in dir(session) if not name.startswith("_")),
+                [
+                    "check_cells",
+                    "check_signature",
+                    "compute_signature",
+                    "mark_cells",
+                    "sign",
+                    "unsign",
+                ],
+            )
+        notary.close()
+
+    def test_session_snapshots_secret(self):
+        """A session keeps the secret it was opened with; the notary can change under it."""
+        notary = sign.NotebookNotary(db_file=":memory:", secret=b"secret", data_dir=self.data_dir)
+        with notary.open_session() as session:
+            before = session.compute_signature(self.nb)
+            notary.secret = b"different"
+            self.assertEqual(session.compute_signature(self.nb), before)
+        # a later session picks the new secret up
+        with notary.open_session() as session:
+            self.assertNotEqual(session.compute_signature(self.nb), before)
+        notary.close()
+
+    def test_session_snapshots_algorithm(self):
+        """The algorithm a session was opened with drives its digest."""
+        notary = sign.NotebookNotary(db_file=":memory:", secret=b"secret", data_dir=self.data_dir)
+        with notary.open_session() as session:
+            sha256 = session.compute_signature(self.nb)
+            notary.algorithm = "sha512"
+            self.assertEqual(session.compute_signature(self.nb), sha256)
+        with notary.open_session() as session:
+            sha512 = session.compute_signature(self.nb)
+        self.assertEqual(len(sha256), 64)
+        self.assertEqual(len(sha512), 128)
+        notary.close()
+
+    def test_session_cell_helpers(self):
+        """mark_cells/check_cells are available on the session and actually work."""
+        notary = sign.NotebookNotary(db_file=":memory:", secret=b"secret", data_dir=self.data_dir)
+        with notary.open_session() as session:
+            session.mark_cells(self.nb, False)
+            self.assertFalse(session.check_cells(self.nb))
+            session.mark_cells(self.nb, True)
+            self.assertTrue(session.check_cells(self.nb))
+        notary.close()
+
+    def test_direct_calls_share_one_store(self):
+        """The non-session API keeps using a single store across calls."""
+        stores = []
+
+        def factory():
+            stores.append(sign.MemorySignatureStore())
+            return stores[-1]
+
+        notary = sign.NotebookNotary(
+            secret=b"secret", data_dir=self.data_dir, store_factory=factory
+        )
+        with notary:
+            notary.sign(self.nb)
+            self.assertTrue(notary.check_signature(self.nb))
+            notary.unsign(self.nb)
+        self.assertEqual(len(stores), 1)
+
+    def test_subclass_hooks_are_honoured(self):
+        """Subclasses overriding compute_signature/_check_cell still take effect."""
+        calls = []
+
+        class Sub(sign.NotebookNotary):
+            def compute_signature(self, nb):
+                calls.append("compute_signature")
+                return super().compute_signature(nb)
+
+            def _check_cell(self, cell, nbformat_version):
+                calls.append("_check_cell")
+                return super()._check_cell(cell, nbformat_version)
+
+        notary = Sub(db_file=":memory:", secret=b"secret", data_dir=self.data_dir)
+        with notary:
+            notary.sign(self.nb)
+            self.assertTrue(notary.check_signature(self.nb))
+            notary.unsign(self.nb)
+            notary.check_cells(self.nb)
+        self.assertEqual(calls.count("compute_signature"), 3)
+        self.assertIn("_check_cell", calls)
 
     def test_algorithms(self):
         last_sig = ""
