@@ -84,6 +84,23 @@ class TestNotary(TestsBase):
                 notary.sign(self.nb)
                 self.assertTrue(notary.check_signature(self.nb))
 
+    def test_context_manager_can_be_reused(self):
+        db_file = os.path.join(self.data_dir, "reusable.db")
+        notary = sign.NotebookNotary(db_file=db_file, secret=b"secret")
+
+        with notary:
+            notary.sign(self.nb)
+
+        with notary:
+            self.assertTrue(notary.check_signature(self.nb))
+
+    def test_context_manager_can_be_nested(self):
+        with self.notary:
+            self.notary.store.store_signature("digest", "sha256")
+            with self.notary:
+                self.assertTrue(self.notary.store.check_signature("digest", "sha256"))
+            self.assertTrue(self.notary.store.check_signature("digest", "sha256"))
+
     def test_algorithms(self):
         last_sig = ""
         for algo in sign.algorithms:

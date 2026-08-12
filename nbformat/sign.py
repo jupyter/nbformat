@@ -459,6 +459,8 @@ class NotebookNotary(LoggingConfigurable):
         """Initialize the notary."""
         super().__init__(**kwargs)
         self.store = self.store_factory()
+        self._context_depth = 0
+        self._store_closed = False
         self._used_as_context_manager = False
         self._warned_not_context_manager = False
 
@@ -468,16 +470,24 @@ class NotebookNotary(LoggingConfigurable):
         Should be called when the notary is no longer needed, to release
         any resources (e.g. database connections) held by the store.
         """
-        self.store.close()
+        if not self._store_closed:
+            self.store.close()
+            self._store_closed = True
 
     def __enter__(self) -> NotebookNotaryContext:
         """Enter the notary's context, marking it as used within a `with` block."""
+        if self._store_closed:
+            self.store = self.store_factory()
+            self._store_closed = False
+        self._context_depth += 1
         self._used_as_context_manager = True
         return self
 
     def __exit__(self, *exc_info):
         """Exit the notary's context, closing its signature store."""
-        self.close()
+        self._context_depth = max(0, self._context_depth - 1)
+        if self._context_depth == 0:
+            self.close()
 
     def _warn_if_not_context_manager(self):
         """Warn once if the store is accessed without using this notary as a context manager.
