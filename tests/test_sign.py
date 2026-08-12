@@ -8,6 +8,7 @@ import codecs
 import copy
 import os
 import shutil
+import sqlite3
 import sys
 import tempfile
 import time
@@ -32,7 +33,11 @@ class TestNotary(TestsBase):
             secret=b"secret",
             data_dir=self.data_dir,
         )
-        self.notary.__enter__()
+        # most of these tests exercise the direct (non-session) API; entering
+        # the notary keeps that from warning on every call
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", FutureWarning)
+            self.notary.__enter__()
         with self.fopen("test3.ipynb", "r") as f:
             self.nb = read(f, as_version=4)
         with self.fopen("test3.ipynb", "r") as f:
@@ -58,15 +63,15 @@ class TestNotary(TestsBase):
         testpath.assert_isfile(os.path.join(self.data_dir, invalid_sql_file))
         testpath.assert_isfile(os.path.join(self.data_dir, invalid_sql_file + ".bak"))
 
-    def test_not_using_context_manager_warns(self):
-        """Using the store without entering the notary as a context manager warns once."""
+    def test_not_using_a_session_warns(self):
+        """Signing without a session warns once, pointing at open_session()."""
         notary = sign.NotebookNotary(
             db_file=":memory:",
             secret=b"secret",
             data_dir=self.data_dir,
         )
         try:
-            with pytest.warns(PendingDeprecationWarning, match="context manager"):
+            with pytest.warns(FutureWarning, match="Prefer opening a session"):
                 notary.sign(self.nb)
             # only warns once per instance
             with warnings.catch_warnings():
@@ -75,16 +80,34 @@ class TestNotary(TestsBase):
         finally:
             notary.close()
 
-    def test_using_context_manager_does_not_warn(self):
+    def test_using_notary_as_context_manager_warns(self):
+        """The notary is usable as a context manager, but points at sessions."""
+        notary = sign.NotebookNotary(
+            db_file=":memory:",
+            secret=b"secret",
+            data_dir=self.data_dir,
+        )
+        with pytest.warns(FutureWarning, match="itself as a context manager"):
+            ctx = notary.__enter__()
+        with warnings.catch_warnings():
+            # having warned on the way in, it does not warn again per call
+            warnings.simplefilter("error")
+            self.assertIs(ctx, notary)
+            notary.sign(self.nb)
+            self.assertTrue(notary.check_signature(self.nb))
+        notary.__exit__(None, None, None)
+
+    def test_using_a_session_does_not_warn(self):
         with warnings.catch_warnings():
             warnings.simplefilter("error")
-            with sign.NotebookNotary(
+            notary = sign.NotebookNotary(
                 db_file=":memory:",
                 secret=b"secret",
                 data_dir=self.data_dir,
-            ) as notary:
-                notary.sign(self.nb)
-                self.assertTrue(notary.check_signature(self.nb))
+            )
+            with notary.open_session() as session:
+                session.sign(self.nb)
+                self.assertTrue(session.check_signature(self.nb))
 
     def test_open_session(self):
         db_file = os.path.join(self.data_dir, "sessions.db")
@@ -155,6 +178,36 @@ class TestNotary(TestsBase):
         self.assertEqual(len(sha512), 128)
         notary.close()
 
+    def test_notary_context_manager_still_works(self):
+        """The 5.11 `with notary as ...` spelling keeps working, and closes the store."""
+        stores = []
+
+        def factory():
+            stores.append(sign.SQLiteSignatureStore(":memory:"))
+            return stores[-1]
+
+        notary = sign.NotebookNotary(
+            secret=b"secret",
+            data_dir=self.data_dir,
+            store_factory=factory,
+        )
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", FutureWarning)
+            with notary as entered:
+                # 5.11 yielded the notary itself, and code inside the block may
+                # rely on that, both for signing and for its configuration
+                self.assertIs(entered, notary)
+                self.assertEqual(entered.algorithm, "sha256")
+                entered.sign(self.nb)
+                self.assertTrue(notary.check_signature(self.nb))
+            # reusable: a second block opens a fresh store
+            with notary:
+                notary.sign(self.nb)
+        self.assertEqual(len(stores), 2)
+        for store in stores:
+            with pytest.raises(sqlite3.ProgrammingError):
+                store.check_signature("abc", "sha256")
+
     def test_session_cell_helpers(self):
         """mark_cells/check_cells are available on the session and actually work."""
         notary = sign.NotebookNotary(db_file=":memory:", secret=b"secret", data_dir=self.data_dir)
@@ -176,10 +229,12 @@ class TestNotary(TestsBase):
         notary = sign.NotebookNotary(
             secret=b"secret", data_dir=self.data_dir, store_factory=factory
         )
-        with notary:
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", FutureWarning)
             notary.sign(self.nb)
             self.assertTrue(notary.check_signature(self.nb))
             notary.unsign(self.nb)
+        notary.close()
         self.assertEqual(len(stores), 1)
 
     def test_subclass_hooks_are_honoured(self):
@@ -196,11 +251,13 @@ class TestNotary(TestsBase):
                 return super()._check_cell(cell, nbformat_version)
 
         notary = Sub(db_file=":memory:", secret=b"secret", data_dir=self.data_dir)
-        with notary:
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", FutureWarning)
             notary.sign(self.nb)
             self.assertTrue(notary.check_signature(self.nb))
             notary.unsign(self.nb)
             notary.check_cells(self.nb)
+        notary.close()
         self.assertEqual(calls.count("compute_signature"), 3)
         self.assertIn("_check_cell", calls)
 
@@ -214,7 +271,8 @@ class TestNotary(TestsBase):
             data_dir=self.data_dir,
         )
         notary.store = store
-        with notary:
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", FutureWarning)
             notary.sign(self.nb)
         notary.close()
         # even an explicit close leaves a caller-owned store alone
@@ -228,15 +286,17 @@ class TestNotary(TestsBase):
             secret=b"secret",
             data_dir=self.data_dir,
         )
-        with notary:
-            notary.sign(self.nb)
-        self.assertIsNone(notary._store)
-        # code that goes on using the notary keeps working: a fresh store is
-        # created on demand
-        with notary:
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", FutureWarning)
+            with notary:
+                notary.sign(self.nb)
+            self.assertIsNone(notary._store)
+            # code that goes on using the notary keeps working: a fresh store
+            # is created on demand
             self.assertFalse(notary.check_signature(self.nb))
             notary.sign(self.nb)
             self.assertTrue(notary.check_signature(self.nb))
+        notary.close()
 
     def test_explicit_close_is_final(self):
         """An explicit close() means done: the store is not re-created."""
@@ -245,7 +305,8 @@ class TestNotary(TestsBase):
             secret=b"secret",
             data_dir=self.data_dir,
         )
-        with notary:
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", FutureWarning)
             notary.sign(self.nb)
         notary.close()
         with pytest.raises(RuntimeError, match="has been closed"):
@@ -257,12 +318,14 @@ class TestNotary(TestsBase):
         with notary.open_session() as session:
             self.assertFalse(session.check_signature(self.nb))
 
-    def test_store_free_methods_open_no_store(self):
-        """compute_signature/mark_cells/check_cells need no store at all."""
+    def test_store_free_methods_need_no_session(self):
+        """compute_signature/mark_cells/check_cells open no store and do not warn."""
         notary = sign.NotebookNotary(db_file=":memory:", secret=b"secret", data_dir=self.data_dir)
-        notary.compute_signature(self.nb)
-        notary.mark_cells(self.nb, True)
-        notary.check_cells(self.nb)
+        with warnings.catch_warnings():
+            warnings.simplefilter("error")
+            notary.compute_signature(self.nb)
+            notary.mark_cells(self.nb, True)
+            notary.check_cells(self.nb)
         self.assertIsNone(notary._store)
 
     def test_algorithms(self):

@@ -641,8 +641,8 @@ class NotebookNotary(LoggingConfigurable):
         self._store_owned = True
         self._store_lock = threading.Lock()
         self._closed = False
-        self._used_as_context_manager = False
-        self._warned_not_context_manager = False
+        self._in_context = False
+        self._warned_prefer_session = False
 
     @contextmanager
     def open_session(self) -> t.Iterator[NotarySession]:
@@ -736,15 +736,23 @@ class NotebookNotary(LoggingConfigurable):
     def __enter__(self) -> NotebookNotary:  # noqa: PYI034 (typing.Self needs 3.11)
         """Enter the notary's context, as introduced in nbformat 5.11.
 
-        This returns the notary itself, and leaving the block closes its store.
+        This returns the notary itself, and leaving the block closes the shared
+        store, exactly as it did in 5.11.
 
         Open a session instead -- a session is the thing with a lifetime, and it
         can be opened as many times as you like::
 
             with notary.open_session() as session:
                 session.sign(nb)
+
+        The notary is not re-entrant: it holds one shared store, so nesting
+        ``with notary:`` blocks closes that store when the inner block exits.
         """
-        self._used_as_context_manager = True
+        self._warn_prefer_session(
+            "Using a NotebookNotary itself as a context manager is discouraged. "
+            "Open a session instead:"
+        )
+        self._in_context = True
         return self
 
     def __exit__(self, *exc_info):
@@ -753,6 +761,7 @@ class NotebookNotary(LoggingConfigurable):
         The notary stays usable afterwards: unlike an explicit :meth:`close`,
         leaving a block is not the caller saying they are done with it.
         """
+        self._in_context = False
         self._close_store()
 
     def _session(self) -> NotarySession:
@@ -767,25 +776,37 @@ class NotebookNotary(LoggingConfigurable):
         session.compute_signature = self.compute_signature  # type:ignore[method-assign]
         return session
 
-    def _warn_if_not_context_manager(self):
-        """Warn once if the store is accessed without using this notary as a context manager.
-
-        Using ``NotebookNotary`` outside of a ``with`` block is deprecated as
-        of nbformat 5.11, since it makes it easy to forget to release the
-        resources (e.g. database connections) held by the store.
-        """
-        if self._used_as_context_manager or self._warned_not_context_manager:
+    def _warn_prefer_session(self, lead, stacklevel=4):
+        """Point at :meth:`open_session`, once per notary."""
+        if self._warned_prefer_session:
             return
-        self._warned_not_context_manager = True
+        self._warned_prefer_session = True
         warnings.warn(
-            "Using NotebookNotary without a `with` block is deprecated as of "
-            "nbformat 5.11. Use it as a context manager instead, e.g.:\n\n"
-            "    with NotebookNotary() as notary:\n"
-            "        notary.sign(nb)\n\n"
-            "so that the underlying signature store is properly closed.",
-            PendingDeprecationWarning,
-            stacklevel=3,
+            f"{lead}\n\n"
+            "    with NotebookNotary().open_session() as session:\n"
+            "        session.sign(nb)\n\n"
+            "A session closes the underlying signature store when its block "
+            "exits, so nothing is left open for you to remember to close.",
+            FutureWarning,
+            stacklevel=stacklevel,
         )
+
+    def _warn_if_no_session(self):
+        """Warn once if a store operation is performed without a session.
+
+        Calling the signing methods on the notary itself leaves the store open
+        until :meth:`close` is called, which is easy to forget, so we point at
+        :meth:`open_session` instead.
+        """
+        if self._in_context:
+            return
+        self._warn_prefer_session(
+            "Prefer opening a session over calling "
+            "NotebookNotary.{sign,unsign,check_signature} directly:"
+        )
+
+    # Alias for the 5.11 name.
+    _warn_if_not_context_manager = _warn_if_no_session
 
     def _write_secret_file(self, secret):
         """write my secret to my secret_file"""
@@ -802,6 +823,9 @@ class NotebookNotary(LoggingConfigurable):
         """Compute a notebook's signature
 
         by hashing the entire contents of the notebook via HMAC digest.
+
+        This needs no store, so a session is not needed; it is also available as
+        :meth:`NotarySession.compute_signature`.
         """
         return _compute_signature(nb, self.secret, self.digestmod)
 
@@ -818,24 +842,36 @@ class NotebookNotary(LoggingConfigurable):
         - the stored scheme matches the requested scheme
         - the requested scheme is available from hashlib
         - the computed hash from notebook_signature matches the stored hash
+
+        .. note::
+            Prefer ``with notary.open_session() as session:
+            session.check_signature(nb)``, which closes the store for you.
         """
-        self._warn_if_not_context_manager()
+        self._warn_if_no_session()
         return self._session().check_signature(nb)
 
     def sign(self, nb):
         """Sign a notebook, indicating that its output is trusted on this machine
 
         Stores hash algorithm and hmac digest in a local database of trusted notebooks.
+
+        .. note::
+            Prefer ``with notary.open_session() as session: session.sign(nb)``,
+            which closes the store for you.
         """
-        self._warn_if_not_context_manager()
+        self._warn_if_no_session()
         self._session().sign(nb)
 
     def unsign(self, nb):
         """Ensure that a notebook is untrusted
 
         by removing its signature from the trusted database, if present.
+
+        .. note::
+            Prefer ``with notary.open_session() as session: session.unsign(nb)``,
+            which closes the store for you.
         """
-        self._warn_if_not_context_manager()
+        self._warn_if_no_session()
         self._session().unsign(nb)
 
     def mark_cells(self, nb, trusted):
@@ -845,7 +881,10 @@ class NotebookNotary(LoggingConfigurable):
         depending on the *trusted* parameter. This will typically be the return
         value from ``self.check_signature(nb)``.
 
-        This function is the inverse of check_cells
+        This function is the inverse of check_cells.
+
+        This needs no store, so a session is not needed; it is also available as
+        :meth:`NotarySession.mark_cells`.
         """
         _mark_cells(nb, trusted)
 
@@ -870,6 +909,9 @@ class NotebookNotary(LoggingConfigurable):
         If there are no code cells, return True.
 
         This function is the inverse of mark_cells.
+
+        This needs no store, so a session is not needed; it is also available as
+        :meth:`NotarySession.check_cells`.
         """
         # dispatch through self._check_cell, so that subclasses overriding it
         # keep working
