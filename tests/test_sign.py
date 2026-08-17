@@ -56,6 +56,7 @@ class TestNotary(TestsBase):
         testpath.assert_isfile(os.path.join(self.data_dir, invalid_sql_file))
         testpath.assert_isfile(os.path.join(self.data_dir, invalid_sql_file + ".bak"))
 
+    @pytest.mark.skip(reason="Undo for 5.11.1 as it breaks too many thing upstream")
     def test_not_using_context_manager_warns(self):
         """Using the store without entering the notary as a context manager warns once."""
         notary = sign.NotebookNotary(

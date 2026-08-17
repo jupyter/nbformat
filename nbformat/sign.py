@@ -8,7 +8,6 @@ import hashlib
 import os
 import sys
 import typing as t
-import warnings
 from collections import OrderedDict
 from contextlib import contextmanager
 from datetime import datetime, timezone
@@ -486,18 +485,20 @@ class NotebookNotary(LoggingConfigurable):
         of nbformat 5.11, since it makes it easy to forget to release the
         resources (e.g. database connections) held by the store.
         """
-        if self._used_as_context_manager or self._warned_not_context_manager:
-            return
-        self._warned_not_context_manager = True
-        warnings.warn(
-            "Using NotebookNotary without a `with` block is deprecated as of "
-            "nbformat 5.11. Use it as a context manager instead, e.g.:\n\n"
-            "    with NotebookNotary() as notary:\n"
-            "        notary.sign(nb)\n\n"
-            "so that the underlying signature store is properly closed.",
-            PendingDeprecationWarning,
-            stacklevel=3,
-        )
+        # disable for 5.11.1 until we find a better way.
+        return
+        # if self._used_as_context_manager or self._warned_not_context_manager:
+        #     return
+        # self._warned_not_context_manager = True
+        # warnings.warn(
+        #     "Using NotebookNotary without a `with` block is deprecated as of "
+        #     "nbformat 5.11. Use it as a context manager instead, e.g.:\n\n"
+        #     "    with NotebookNotary() as notary:\n"
+        #     "        notary.sign(nb)\n\n"
+        #     "so that the underlying signature store is properly closed.",
+        #     PendingDeprecationWarning,
+        #     stacklevel=3,
+        # )
 
     def _write_secret_file(self, secret):
         """write my secret to my secret_file"""
