@@ -4,6 +4,29 @@
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 5.11.1
+
+([Full Changelog](https://github.com/jupyter/nbformat/compare/v5.11.0...4db76de6d373a1eb445f921a78c160892646392c))
+
+### Merged PRs
+
+- Try to skip publishing to NPM to be able to publish a patch version on PYPI [#459](https://github.com/jupyter/nbformat/pull/459) ([@Carreau](https://github.com/Carreau))
+- disable pendingdeprecationWarnings for now [#458](https://github.com/jupyter/nbformat/pull/458) ([@Carreau](https://github.com/Carreau))
+- Bump github/codeql-action from 4.37.3 to 4.37.5 in the actions group [#453](https://github.com/jupyter/nbformat/pull/453) ([@Carreau](https://github.com/Carreau))
+- Clarify normalize guidance in the changelog [#451](https://github.com/jupyter/nbformat/pull/451) ([@aryansk](https://github.com/aryansk), [@Carreau](https://github.com/Carreau))
+- fix steps to skip [#450](https://github.com/jupyter/nbformat/pull/450) ([@Carreau](https://github.com/Carreau))
+
+### Contributors to this release
+
+The following people contributed discussions, new ideas, code and documentation contributions, and review.
+See [our definition of contributors](https://github-activity.readthedocs.io/en/latest/use/#how-does-this-tool-define-contributions-in-the-reports).
+
+([GitHub contributors page for this release](https://github.com/jupyter/nbformat/graphs/contributors?from=2026-08-06&to=2026-08-17&type=c))
+
+@aryansk ([activity](https://github.com/search?q=repo%3Ajupyter%2Fnbformat+involves%3Aaryansk+updated%3A2026-08-06..2026-08-17&type=Issues)) | @Carreau ([activity](https://github.com/search?q=repo%3Ajupyter%2Fnbformat+involves%3ACarreau+updated%3A2026-08-06..2026-08-17&type=Issues))
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 5.11.0
 
 ([Full Changelog](https://github.com/jupyter/nbformat/compare/v5.10.4...434f6ca75aa615d228d4f68cb4dcbc04a97c14d2))
@@ -50,8 +73,6 @@ See [our definition of contributors](https://github-activity.readthedocs.io/en/l
 ([GitHub contributors page for this release](https://github.com/jupyter/nbformat/graphs/contributors?from=2024-04-04&to=2026-08-06&type=c))
 
 @blink1073 ([activity](https://github.com/search?q=repo%3Ajupyter%2Fnbformat+involves%3Ablink1073+updated%3A2024-04-04..2026-08-06&type=Issues)) | @Carreau ([activity](https://github.com/search?q=repo%3Ajupyter%2Fnbformat+involves%3ACarreau+updated%3A2024-04-04..2026-08-06&type=Issues)) | @claude ([activity](https://github.com/search?q=repo%3Ajupyter%2Fnbformat+involves%3Aclaude+updated%3A2024-04-04..2026-08-06&type=Issues)) | @crypdick ([activity](https://github.com/search?q=repo%3Ajupyter%2Fnbformat+involves%3Acrypdick+updated%3A2024-04-04..2026-08-06&type=Issues)) | @jasongrout ([activity](https://github.com/search?q=repo%3Ajupyter%2Fnbformat+involves%3Ajasongrout+updated%3A2024-04-04..2026-08-06&type=Issues)) | @LecrisUT ([activity](https://github.com/search?q=repo%3Ajupyter%2Fnbformat+involves%3ALecrisUT+updated%3A2024-04-04..2026-08-06&type=Issues)) | @rgbkrk ([activity](https://github.com/search?q=repo%3Ajupyter%2Fnbformat+involves%3Argbkrk+updated%3A2024-04-04..2026-08-06&type=Issues))
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 5.10.4
 
