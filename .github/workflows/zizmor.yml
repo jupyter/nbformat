@@ -46,7 +46,7 @@ jobs:
         run: uvx "zizmor@${ZIZMOR_VERSION}" --format=sarif . > results.sarif
 
       - name: Upload SARIF report
-        uses: github/codeql-action/upload-sarif@v4.37.5
+        uses: github/codeql-action/upload-sarif@v4.37.6
         with:
           sarif_file: results.sarif
           category: zizmor
