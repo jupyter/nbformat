@@ -253,3 +253,11 @@ ignore = ["GH102"]
 
 [tool.codespell]
 skip = "*.ipynb"
+
+[tool.jupyter-releaser]
+# The `nbformat-schema` npm package is no longer published from CI (no npm
+# credentials are configured for this repo). Skipping `build-npm` means no
+# `*.tgz` ends up in the dist folder, so `publish-assets` never invokes
+# `npm publish`; `check-npm` is skipped since it only checks that tarball.
+# Pass `--force` (or remove these entries) if npm publishing is restored.
+skip = ["build-npm", "check-npm"]
