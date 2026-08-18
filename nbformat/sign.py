@@ -332,6 +332,90 @@ def signature_removed(nb):
             nb["metadata"]["signature"] = save_signature
 
 
+def _compute_signature(nb: t.Any, secret: bytes, digestmod: t.Any) -> str:
+    """Compute a notebook's signature
+
+    by hashing the entire contents of the notebook via HMAC digest.
+    """
+    hmac = HMAC(secret, digestmod=digestmod)
+    # don't include the previous hash in the content to hash
+    with signature_removed(nb):
+        # sign the whole thing
+        for b in yield_everything(nb):
+            hmac.update(b)
+
+    return hmac.hexdigest()
+
+
+def _mark_cells(nb, trusted):
+    """Mark cells as trusted if the notebook's signature can be verified
+
+    Sets ``cell.metadata.trusted = True | False`` on all code cells,
+    depending on the *trusted* parameter.
+
+    This function is the inverse of check_cells.
+    """
+    if nb.nbformat < 3:
+        return
+
+    for cell in yield_code_cells(nb):
+        cell["metadata"]["trusted"] = trusted
+
+
+def _check_cell(cell, nbformat_version):
+    """Do we trust an individual cell?
+
+    Return True if:
+
+    - cell is explicitly trusted
+    - cell has no potentially unsafe rich output
+
+    If a cell has no output, or only simple print statements,
+    it will always be trusted.
+    """
+    # explicitly trusted
+    if cell["metadata"].pop("trusted", False):
+        return True
+
+    # explicitly safe output
+    if nbformat_version >= 4:
+        unsafe_output_types = ["execute_result", "display_data"]
+        safe_keys = {"output_type", "execution_count", "metadata"}
+    else:  # v3
+        unsafe_output_types = ["pyout", "display_data"]
+        safe_keys = {"output_type", "prompt_number", "metadata"}
+
+    for output in cell["outputs"]:
+        output_type = output["output_type"]
+        if output_type in unsafe_output_types:
+            # if there are any data keys not in the safe whitelist
+            output_keys = set(output)
+            if output_keys.difference(safe_keys):
+                return False
+
+    return True
+
+
+def _check_cells(nb: t.Any, check_cell: t.Callable[[t.Any, int], bool] = _check_cell) -> bool:
+    """Return whether all code cells are trusted.
+
+    A cell is trusted if the 'trusted' field in its metadata is truthy, or
+    if it has no potentially unsafe outputs.
+    If there are no code cells, return True.
+
+    This function is the inverse of mark_cells.
+    """
+    if nb.nbformat < 3:
+        return False
+    trusted = True
+    for cell in yield_code_cells(nb):
+        # only distrust a cell if it actually has some output to distrust
+        if not check_cell(cell, nb.nbformat):
+            trusted = False
+
+    return trusted
+
+
 class NotebookNotaryContext(t.Protocol):
     """The operations available on a :class:`NotebookNotary` used as a context manager.
 
@@ -516,14 +600,7 @@ class NotebookNotary(LoggingConfigurable):
 
         by hashing the entire contents of the notebook via HMAC digest.
         """
-        hmac = HMAC(self.secret, digestmod=self.digestmod)
-        # don't include the previous hash in the content to hash
-        with signature_removed(nb):
-            # sign the whole thing
-            for b in yield_everything(nb):
-                hmac.update(b)
-
-        return hmac.hexdigest()
+        return _compute_signature(nb, self.secret, self.digestmod)
 
     def check_signature(self, nb):
         """Check a notebook's stored signature
@@ -574,11 +651,7 @@ class NotebookNotary(LoggingConfigurable):
 
         This function is the inverse of check_cells
         """
-        if nb.nbformat < 3:
-            return
-
-        for cell in yield_code_cells(nb):
-            cell["metadata"]["trusted"] = trusted
+        _mark_cells(nb, trusted)
 
     def _check_cell(self, cell, nbformat_version):
         """Do we trust an individual cell?
@@ -591,27 +664,7 @@ class NotebookNotary(LoggingConfigurable):
         If a cell has no output, or only simple print statements,
         it will always be trusted.
         """
-        # explicitly trusted
-        if cell["metadata"].pop("trusted", False):
-            return True
-
-        # explicitly safe output
-        if nbformat_version >= 4:
-            unsafe_output_types = ["execute_result", "display_data"]
-            safe_keys = {"output_type", "execution_count", "metadata"}
-        else:  # v3
-            unsafe_output_types = ["pyout", "display_data"]
-            safe_keys = {"output_type", "prompt_number", "metadata"}
-
-        for output in cell["outputs"]:
-            output_type = output["output_type"]
-            if output_type in unsafe_output_types:
-                # if there are any data keys not in the safe whitelist
-                output_keys = set(output)
-                if output_keys.difference(safe_keys):
-                    return False
-
-        return True
+        return _check_cell(cell, nbformat_version)
 
     def check_cells(self, nb):
         """Return whether all code cells are trusted.
@@ -622,15 +675,9 @@ class NotebookNotary(LoggingConfigurable):
 
         This function is the inverse of mark_cells.
         """
-        if nb.nbformat < 3:
-            return False
-        trusted = True
-        for cell in yield_code_cells(nb):
-            # only distrust a cell if it actually has some output to distrust
-            if not self._check_cell(cell, nb.nbformat):
-                trusted = False
-
-        return trusted
+        # dispatch through self._check_cell, so that subclasses overriding it
+        # keep working
+        return _check_cells(nb, self._check_cell)
 
 
 trust_flags: dict[str, t.Any] = {
