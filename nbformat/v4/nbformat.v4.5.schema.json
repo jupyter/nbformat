@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "description": "Jupyter Notebook v4.5 JSON schema.",
+  "description": "Jupyter Notebook v4.6 JSON schema.",
   "type": "object",
   "additionalProperties": false,
   "required": ["metadata", "nbformat_minor", "nbformat", "cells"],
@@ -146,7 +146,17 @@
           }
         },
         "attachments": { "$ref": "#/definitions/misc/attachments" },
-        "source": { "$ref": "#/definitions/misc/source" }
+        "source": { "$ref": "#/definitions/misc/source" },
+        "execution_count": {
+          "$ref": "$/definitions/misc/execution_count"
+        },
+        "user_expressions": {
+          "description": "User expressions evaluated along side the cell.",
+          "type": "array",
+          "items": {
+            "$ref": "#definitions/user_expression"
+          }
+        }
       }
     },
 
@@ -180,7 +190,17 @@
           "additionalProperties": true
         },
         "attachments": { "$ref": "#/definitions/misc/attachments" },
-        "source": { "$ref": "#/definitions/misc/source" }
+        "source": { "$ref": "#/definitions/misc/source" },
+        "execution_count": {
+          "$ref": "$/definitions/misc/execution_count"
+        },
+        "user_expressions": {
+          "description": "User expressions evaluated along side the cell.",
+          "type": "array",
+          "items": {
+            "$ref": "#definitions/user_expression"
+          }
+        }
       }
     },
 
@@ -267,9 +287,14 @@
           "items": { "$ref": "#/definitions/output" }
         },
         "execution_count": {
-          "description": "The code cell's prompt number. Will be null if the cell has not been run.",
-          "type": ["integer", "null"],
-          "minimum": 0
+          "$ref": "$/definitions/misc/execution_count"
+        },
+        "user_expressions": {
+          "description": "User expressions evaluated along side the cell.",
+          "type": "array",
+          "items": {
+            "$ref": "#definitions/user_expression"
+          }
         }
       }
     },
@@ -403,6 +428,60 @@
           }
         }
       }
+    },
+
+    "user_expression": {
+      "type": "object",
+      "properties": {
+        "expression": {
+          "description": "Code snippet evaluated by the kernel",
+          "type": "string"
+        },
+        "result": {
+          "oneOf": [
+            {
+              "description": "Successful result of the expression evaluation.",
+              "type": "object",
+              "properties": {
+                "status": {
+                  "description": "Expression evaluation status",
+                  "type": "string",
+                  "enum": ["ok"]
+                },
+                "data": { "$ref": "#/definitions/misc/mimebundle" },
+                "metadata": { "$ref": "#/definitions/misc/output_metadata" }
+              },
+              "additionalProperties": false
+            },
+            {
+              "description": "Failed result of the expression evaluation.",
+              "type": "object",
+              "properties": {
+                "status": {
+                  "description": "Expression evaluation status",
+                  "type": "string",
+                  "enum": ["error"]
+                },
+                "ename": {
+                  "description": "The name of the error.",
+                  "type": "string"
+                },
+                "evalue": {
+                  "description": "The value, or message, of the error.",
+                  "type": "string"
+                },
+                "traceback": {
+                  "description": "The error's traceback, represented as an array of strings.",
+                  "type": "array",
+                  "items": { "type": "string" }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        }
+      },
+      "additionalProperties": false
     },
 
     "misc": {
