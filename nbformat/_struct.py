@@ -46,7 +46,9 @@ class Struct(dict[Any, Any]):
         >>> sorted(s2.keys())
         ['a', 'b', 'c']
         """
-        object.__setattr__(self, "_allownew", True)
+        # `_allownew` is already True as a class attribute; setting it per
+        # instance here would materialize an instance `__dict__` (304 bytes,
+        # larger than the node itself) on every node just to hold one bool.
         dict.__init__(self, *args, **kw)
 
     def __setitem__(self, key, value):
