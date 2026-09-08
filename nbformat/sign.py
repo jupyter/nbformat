@@ -542,6 +542,7 @@ class NotebookNotary(LoggingConfigurable):
         """Initialize the notary."""
         super().__init__(**kwargs)
         self.store = self.store_factory()
+        self._store_closed = False
         self._used_as_context_manager = False
         self._warned_not_context_manager = False
 
@@ -552,9 +553,13 @@ class NotebookNotary(LoggingConfigurable):
         any resources (e.g. database connections) held by the store.
         """
         self.store.close()
+        self._store_closed = True
 
     def __enter__(self) -> NotebookNotaryContext:
         """Enter the notary's context, marking it as used within a `with` block."""
+        if self._store_closed:
+            self.store = self.store_factory()
+            self._store_closed = False
         self._used_as_context_manager = True
         return self
 

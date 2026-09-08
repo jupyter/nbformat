@@ -85,6 +85,20 @@ class TestNotary(TestsBase):
                 notary.sign(self.nb)
                 self.assertTrue(notary.check_signature(self.nb))
 
+    def test_context_manager_can_be_reused(self):
+        db_file = os.path.join(self.data_dir, "reusable.db")
+        notary = sign.NotebookNotary(
+            db_file=db_file,
+            secret=b"secret",
+            data_dir=self.data_dir,
+        )
+
+        with notary:
+            notary.sign(self.nb)
+
+        with notary:
+            self.assertTrue(notary.check_signature(self.nb))
+
     def test_algorithms(self):
         last_sig = ""
         for algo in sign.algorithms:
