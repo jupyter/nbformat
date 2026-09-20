@@ -289,6 +289,20 @@ def test_invalid_validator_raises_value_error_after_read():
         validate(nb)
 
 
+@pytest.mark.parametrize("validator_name", VALIDATORS)
+def test_validate_does_not_mutate_invalid_notebook(validator_name):
+    set_validator(validator_name)
+    with TestsBase.fopen("invalid.ipynb", "r") as f:
+        nb = read(f, as_version=4)
+
+    original = deepcopy(nb)
+
+    with pytest.raises(ValidationError):
+        validate(nb)
+
+    assert nb == original
+
+
 def test_fallback_validator_with_iter_errors_using_ref(recwarn):
     """
     Test that when creating a standalone object (code_cell etc)
