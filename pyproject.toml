@@ -86,44 +86,6 @@ jupyter-trust = "nbformat.sign:TrustNotebookApp.launch_instance"
 [tool.hatch.version]
 source = "nodejs"
 
-[tool.hatch.envs.default]
-installer = "uv"
-
-[tool.hatch.envs.docs]
-features = ["docs"]
-[tool.hatch.envs.docs.scripts]
-build = "make -C docs html SPHINXOPTS='-W'"
-
-[tool.hatch.envs.test]
-features = ["test"]
-[tool.hatch.envs.test.scripts]
-test = "PYTHONWARNDEFAULTENCODING=1 python -m pytest -vv {args}"
-nowarn = "test -W default {args}"
-
-[tool.hatch.envs.cov]
-features = ["test"]
-dependencies = ["coverage", "pytest-cov"]
-[tool.hatch.envs.cov.scripts]
-test = "python -m pytest -vv --cov nbformat --cov-branch --cov-report term-missing:skip-covered {args}"
-nowarn = "test -W default {args}"
-
-[tool.hatch.envs.lint]
-detached = true
-installer = "uv"
-dependencies = ["pre-commit"]
-[tool.hatch.envs.lint.scripts]
-build = [
-  "pre-commit run --all-files ruff-check",
-  "pre-commit run --all-files ruff-format"
-]
-
-[tool.hatch.envs.typing]
-dependencies = [ "pre-commit"]
-detached = true
-installer = "uv"
-[tool.hatch.envs.typing.scripts]
-test = "pre-commit run --all-files --hook-stage manual mypy"
-
 [tool.pytest.ini_options]
 minversion = "6.0"
 xfail_strict = true
@@ -163,6 +125,10 @@ strict = true
 enable_error_code = ["ignore-without-code", "redundant-expr", "truthy-bool"]
 disable_error_code = ["no-untyped-def", "no-untyped-call"]
 warn_unreachable = true
+
+[[tool.mypy.overrides]]
+module = "fastjsonschema"
+ignore_missing_imports = true
 
 [tool.ruff]
 line-length = 100
@@ -249,7 +215,13 @@ fail-under=100
 ignore = ["W002"]
 
 [tool.repo-review]
-ignore = ["GH102"]
+ignore = [
+  "GH102",
+  "PY007",  # No task runner (nox/tox/pixi) by design, see PR discussion on hatch/pre-commit indirection
+  "PP006",  # No dev dependency group
+  "PP304",  # pytest log_level not set
+  "PC902",  # Default pre-commit.ci autofix commit message is fine
+]
 
 [tool.codespell]
 skip = "*.ipynb"
