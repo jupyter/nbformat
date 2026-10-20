@@ -6,8 +6,6 @@ from __future__ import annotations
 
 import json
 
-from .validator import ValidationError
-
 
 class NotJSONError(ValueError):
     """An error raised when an object is not valid JSON."""
@@ -78,6 +76,8 @@ def reads(s, **kwargs):
         try:
             return versions[major].to_notebook_json(nb_dict, minor=minor)
         except AttributeError as e:
+            from .validator import ValidationError  # noqa: PLC0415
+
             msg = f"The notebook is invalid and is missing an expected key: {e}"
             raise ValidationError(msg) from None
     else:

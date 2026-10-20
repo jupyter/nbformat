@@ -4,6 +4,7 @@
 # Distributed under the terms of the Modified BSD License.
 from __future__ import annotations
 
+import functools
 import json
 import pprint
 import warnings
@@ -14,7 +15,7 @@ from typing import Any
 
 from ._imports import import_item
 from .corpus.words import generate_corpus_id
-from .json_compat import ValidationError, _validator_for_name, get_current_validator
+from .json_compat import _validator_for_name, get_current_validator
 from .reader import get_version
 from .warnings import DuplicateCellId, MissingIDFieldWarning
 
@@ -22,8 +23,8 @@ validators: dict[tuple[str, int | None, int | None, bool], Any] = {}
 
 
 __all__ = [
-    "NotebookValidationError",
-    "ValidationError",
+    "NotebookValidationError",  # noqa: F822 (provided by __getattr__)
+    "ValidationError",  # noqa: F822 (provided by __getattr__)
     "better_validation_error",
     "get_validator",
     "isvalid",
@@ -118,6 +119,8 @@ def isvalid(nbjson, ref=None, version=None, version_minor=None):
     To see the individual errors that were encountered, please use the
     `validate` function instead.
     """
+    from .json_compat import ValidationError  # noqa: PLC0415
+
     orig = deepcopy(nbjson)
     try:
         with warnings.catch_warnings():
@@ -178,46 +181,65 @@ def _truncate_obj(obj):
     return obj
 
 
-class NotebookValidationError(ValidationError):  # type:ignore[misc]
-    """Schema ValidationError with truncated representation
+@functools.cache
+def _notebook_validation_error_class():
+    """Build NotebookValidationError on first use, as it subclasses jsonschema's ValidationError."""
+    from .json_compat import ValidationError  # noqa: PLC0415
 
-    to avoid massive verbose tracebacks.
-    """
+    class NotebookValidationError(ValidationError):  # type:ignore[misc]
+        """Schema ValidationError with truncated representation
 
-    def __init__(self, original, ref=None):
-        """Initialize the error class."""
-        self.original = original
-        self.ref = getattr(self.original, "ref", ref)
-        self.message = self.original.message
-
-    def __getattr__(self, key):
-        """Get an attribute from the error."""
-        return getattr(self.original, key)
-
-    def __unicode__(self):
-        """Custom str for validation errors
-
-        avoids dumping full schema and notebook to logs
+        to avoid massive verbose tracebacks.
         """
-        error = self.original
-        instance = _truncate_obj(error.instance)
 
-        return "\n".join(
-            [
-                error.message,
-                "",
-                "Failed validating {!r} in {}{}:".format(
-                    error.validator,
-                    self.ref or "notebook",
-                    _format_as_index(list(error.relative_schema_path)[:-1]),
-                ),
-                "",
-                "On instance%s:" % _format_as_index(error.relative_path),
-                pprint.pformat(instance, width=78),
-            ]
-        )
+        def __init__(self, original, ref=None):
+            """Initialize the error class."""
+            self.original = original
+            self.ref = getattr(self.original, "ref", ref)
+            self.message = self.original.message
 
-    __str__ = __unicode__
+        def __getattr__(self, key):
+            """Get an attribute from the error."""
+            return getattr(self.original, key)
+
+        def __unicode__(self):
+            """Custom str for validation errors
+
+            avoids dumping full schema and notebook to logs
+            """
+            error = self.original
+            instance = _truncate_obj(error.instance)
+
+            return "\n".join(
+                [
+                    error.message,
+                    "",
+                    "Failed validating {!r} in {}{}:".format(
+                        error.validator,
+                        self.ref or "notebook",
+                        _format_as_index(list(error.relative_schema_path)[:-1]),
+                    ),
+                    "",
+                    "On instance%s:" % _format_as_index(error.relative_path),
+                    pprint.pformat(instance, width=78),
+                ]
+            )
+
+        __str__ = __unicode__
+
+    return NotebookValidationError
+
+
+def __getattr__(name):
+    """Lazily provide the jsonschema-based error classes, so importing this module is cheap."""
+    if name == "NotebookValidationError":
+        return _notebook_validation_error_class()
+    if name == "ValidationError":
+        from .json_compat import ValidationError  # noqa: PLC0415
+
+        return ValidationError
+    msg = f"module {__name__!r} has no attribute {name!r}"
+    raise AttributeError(msg)
 
 
 def better_validation_error(error, version, version_minor):
@@ -227,6 +249,8 @@ def better_validation_error(error, version, version_minor):
     if it's a cell type or output_type error,
     try validating directly based on the type for a better error message
     """
+    from .json_compat import ValidationError  # noqa: PLC0415
+
     if not len(error.schema_path):
         return error
     key = error.schema_path[-1]
@@ -258,7 +282,7 @@ def better_validation_error(error, version, version_minor):
                 # if it fails for some reason,
                 # let the original error through
                 pass
-    return NotebookValidationError(error, ref)
+    return _notebook_validation_error_class()(error, ref)
 
 
 def normalize(
@@ -375,6 +399,8 @@ def _normalize(
                         stacklevel=3,
                     )
                 else:
+                    from .json_compat import ValidationError  # noqa: PLC0415
+
                     msg = f"Non-unique cell id '{cell_id}' detected."
                     raise ValidationError(msg)
             seen_ids.add(cell_id)
@@ -491,6 +517,8 @@ def _get_errors(
 ) -> Any:
     validator = get_validator(version, version_minor, relax_add_props=relax_add_props)
     if not validator:
+        from .json_compat import ValidationError  # noqa: PLC0415
+
         msg = f"No schema for validating v{version}.{version_minor} notebooks"
         raise ValidationError(msg)
     # Peek at the first error rather than draining the iterator: callers that only
@@ -548,6 +576,8 @@ def _strip_invalida_metadata(
             name="jsonschema",
         )
         if not validator:
+            from .json_compat import ValidationError  # noqa: PLC0415
+
             msg = f"No jsonschema for validating v{version}.{version_minor} notebooks"
             raise ValidationError(msg)
         errors = validator.iter_errors(nbdict)
@@ -614,6 +644,8 @@ def iter_validate(
     else:
         msg = "iter_validate() missing 1 required argument: 'nbdict'"
         raise TypeError(msg)
+
+    from .json_compat import ValidationError  # noqa: PLC0415
 
     if version is None:
         version, version_minor = get_version(nbdict)

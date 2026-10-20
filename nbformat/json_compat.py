@@ -10,16 +10,13 @@ from __future__ import annotations
 import os
 
 import fastjsonschema
-import jsonschema
 from fastjsonschema import JsonSchemaException as _JsonSchemaException
-from jsonschema import Draft4Validator as _JsonSchemaValidator
-from jsonschema.exceptions import ErrorTree, ValidationError
 
 __all__ = [
     "VALIDATORS",
     "FastJsonSchemaValidator",
     "JsonSchemaValidator",
-    "ValidationError",
+    "ValidationError",  # noqa: F822 (provided by __getattr__)
     "get_current_validator",
 ]
 
@@ -31,8 +28,11 @@ class JsonSchemaValidator:
 
     def __init__(self, schema):
         """Initialize the validator."""
+        # jsonschema is slow to import, so only load it when it is used.
+        from jsonschema import Draft4Validator  # noqa: PLC0415
+
         self._schema = schema
-        self._default_validator = _JsonSchemaValidator(schema)  # Default
+        self._default_validator = Draft4Validator(schema)  # Default
         self._validator = self._default_validator
 
     def validate(self, data):
@@ -49,6 +49,8 @@ class JsonSchemaValidator:
 
     def error_tree(self, errors):
         """Create an error tree for the errors."""
+        from jsonschema.exceptions import ErrorTree  # noqa: PLC0415
+
         return ErrorTree(errors=errors)
 
 
@@ -64,6 +66,8 @@ class FastJsonSchemaValidator(JsonSchemaValidator):
 
     def validate(self, data):
         """Validate incoming data."""
+        from jsonschema.exceptions import ValidationError  # noqa: PLC0415
+
         try:
             self._validator(data)
         except _JsonSchemaException as error:
@@ -73,6 +77,8 @@ class FastJsonSchemaValidator(JsonSchemaValidator):
         """Iterate over errors in incoming data."""
         if schema is not None:
             return super().iter_errors(data, schema)
+
+        from jsonschema.exceptions import ValidationError  # noqa: PLC0415
 
         errors = []
         validate_func = self._validator
@@ -96,10 +102,20 @@ class FastJsonSchemaValidator(JsonSchemaValidator):
 
 
 _VALIDATOR_MAP = [
-    ("fastjsonschema", fastjsonschema, FastJsonSchemaValidator),
-    ("jsonschema", jsonschema, JsonSchemaValidator),
+    ("fastjsonschema", FastJsonSchemaValidator),
+    ("jsonschema", JsonSchemaValidator),
 ]
 VALIDATORS = [item[0] for item in _VALIDATOR_MAP]
+
+
+def __getattr__(name):
+    """Lazily provide ValidationError, so importing this module does not load jsonschema."""
+    if name == "ValidationError":
+        from jsonschema.exceptions import ValidationError  # noqa: PLC0415
+
+        return ValidationError
+    msg = f"module {__name__!r} has no attribute {name!r}"
+    raise AttributeError(msg)
 
 
 def _validator_for_name(validator_name):
@@ -107,8 +123,8 @@ def _validator_for_name(validator_name):
         msg = f"Invalid validator '{validator_name}' value!\nValid values are: {VALIDATORS}"
         raise ValueError(msg)
 
-    for name, module, validator_cls in _VALIDATOR_MAP:
-        if module and validator_name == name:
+    for name, validator_cls in _VALIDATOR_MAP:
+        if validator_name == name:
             return validator_cls
     # we always return something.
     msg = f"Missing validator for {validator_name!r}"

@@ -47,7 +47,17 @@ from .converter import convert
 from .notebooknode import NotebookNode, from_dict
 from .v4 import nbformat as current_nbformat
 from .v4 import nbformat_minor as current_nbformat_minor
-from .validator import ValidationError, validate
+from .validator import validate
+
+
+def __getattr__(name):
+    """Lazily provide ValidationError, so importing nbformat does not load jsonschema."""
+    if name == "ValidationError":
+        from .validator import ValidationError  # noqa: PLC0415
+
+        return ValidationError
+    msg = f"module {__name__!r} has no attribute {name!r}"
+    raise AttributeError(msg)
 
 
 class NBFormatError(ValueError):
@@ -92,6 +102,8 @@ def reads(s, as_version, capture_validation_error=None, **kwargs):
     nb = reader.reads(s, **kwargs)
     if as_version is not NO_CONVERT:
         nb = convert(nb, as_version)
+    from .validator import ValidationError  # noqa: PLC0415
+
     try:
         validate(nb)
     except ValidationError as e:
@@ -128,6 +140,8 @@ def writes(nb, version=NO_CONVERT, capture_validation_error=None, **kwargs):
         nb = convert(nb, version)
     else:
         version, _ = reader.get_version(nb)
+    from .validator import ValidationError  # noqa: PLC0415
+
     try:
         validate(nb)
     except ValidationError as e:

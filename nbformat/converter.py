@@ -6,7 +6,6 @@ from __future__ import annotations
 
 from . import versions
 from .reader import get_version
-from .validator import ValidationError
 
 
 def convert(nb, to_version):
@@ -59,6 +58,8 @@ def convert(nb, to_version):
                 msg = "Failed to convert notebook from v%d to v%d." % (version, step_version)
                 raise ValueError(msg)
         except AttributeError as e:
+            from .validator import ValidationError  # noqa: PLC0415
+
             msg = f"Notebook could not be converted from version {version} to version {step_version} because it's missing a key: {e}"
             raise ValidationError(msg) from None
 
