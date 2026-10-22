@@ -37,7 +37,7 @@ class NotebookNode(Struct):
             elif value_type is list:
                 # a plain dict inside a list stays a plain dict, as it would
                 # under the generic deepcopy
-                dict.__setitem__(new, key, [_deepcopy(item, memo) for item in value])
+                dict.__setitem__(new, key, _deepcopy(value, memo))
             else:
                 # assign through __setitem__ so a Mapping value is coerced to a
                 # NotebookNode, which is what the generic deepcopy path did
