@@ -8,6 +8,7 @@ import codecs
 import copy
 import os
 import shutil
+import sqlite3
 import sys
 import tempfile
 import time
@@ -307,3 +308,41 @@ class SignatureStoreTests(unittest.TestCase):
 class SQLiteSignatureStoreTests(SignatureStoreTests):
     def setUp(self):
         self.store = sign.SQLiteSignatureStore(":memory:")  # type:ignore[assignment]
+
+
+@pytest.mark.parametrize("automatic", [True, False])
+def test_sqlite_cull_persists_after_close(tmp_path, automatic):
+    db_file = str(tmp_path / "signatures.db")
+    store = sign.SQLiteSignatureStore(db_file, cache_size=4 if automatic else 8)
+    try:
+        for i in range(5):
+            store.store_signature(str(i), "sha256")
+        if not automatic:
+            store.cache_size = 4
+            store.cull_db()
+        retained = set(store.db.execute("SELECT signature FROM nbsignatures"))
+        assert len(retained) == 3
+    finally:
+        store.close()
+
+    reopened = sign.SQLiteSignatureStore(db_file)
+    try:
+        assert set(reopened.db.execute("SELECT signature FROM nbsignatures")) == retained
+    finally:
+        reopened.close()
+
+
+def test_sqlite_cull_releases_write_lock(tmp_path):
+    db_file = str(tmp_path / "signatures.db")
+    store = sign.SQLiteSignatureStore(db_file, cache_size=4)
+    try:
+        for i in range(5):
+            store.store_signature(str(i), "sha256")
+        other = sqlite3.connect(db_file, timeout=0)
+        try:
+            other.execute("BEGIN IMMEDIATE")
+            other.rollback()
+        finally:
+            other.close()
+    finally:
+        store.close()

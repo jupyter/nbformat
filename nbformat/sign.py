@@ -279,6 +279,7 @@ class SQLiteSignatureStore(SignatureStore, LoggingConfigurable):
         """,
             (max(int(0.75 * self.cache_size), 1),),
         )
+        self.db.commit()
 
 
 def yield_everything(obj):
