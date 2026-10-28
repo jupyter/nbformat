@@ -8,6 +8,7 @@ libraries.
 from __future__ import annotations
 
 import os
+from typing import Any
 
 import fastjsonschema
 import jsonschema
@@ -33,7 +34,7 @@ class JsonSchemaValidator:
         """Initialize the validator."""
         self._schema = schema
         self._default_validator = _JsonSchemaValidator(schema)  # Default
-        self._validator = self._default_validator
+        self._validator: Any = self._default_validator
 
     def validate(self, data):
         """Validate incoming data."""
