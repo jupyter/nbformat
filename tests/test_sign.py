@@ -8,6 +8,7 @@ import codecs
 import copy
 import os
 import shutil
+import sqlite3
 import sys
 import tempfile
 import time
@@ -304,6 +305,60 @@ class SignatureStoreTests(unittest.TestCase):
         assert not self.store.check_signature(digest, algo)
 
 
+def corrupt_sqlite_db(path):
+    """Flip bits near the end of a SQLite file until its integrity check fails."""
+    with open(path, "rb") as f:
+        original = f.read()
+
+    def is_corrupt(p):
+        db = sqlite3.connect(p)
+        try:
+            (status,) = db.execute("PRAGMA quick_check(1)").fetchone()
+            return status != "ok"
+        except sqlite3.DatabaseError:
+            return True
+        finally:
+            db.close()
+
+    for offset in range(1, min(len(original), 4096) + 1):
+        mutated = bytearray(original)
+        mutated[-offset] ^= 0x01
+        with open(path, "wb") as f:
+            f.write(mutated)
+        if is_corrupt(path):
+            return
+
+    msg = "failed to create a structurally corrupted sqlite db"
+    raise AssertionError(msg)
+
+
 class SQLiteSignatureStoreTests(SignatureStoreTests):
     def setUp(self):
         self.store = sign.SQLiteSignatureStore(":memory:")  # type:ignore[assignment]
+
+    def test_recover_corrupted_db(self):
+        with tempfile.TemporaryDirectory() as td:
+            db_file = os.path.join(td, "nbsignatures.db")
+
+            seeded_store = sign.SQLiteSignatureStore(db_file)
+            algorithm = "sha256"
+            digests = [f"digest-{i:02d}" for i in range(4)]
+            for digest in digests:
+                seeded_store.store_signature(digest, algorithm)
+            seeded_store.close()
+
+            corrupt_sqlite_db(db_file)
+
+            recovered_store = sign.SQLiteSignatureStore(db_file)
+
+            try:
+                recovered = [
+                    digest
+                    for digest in digests
+                    if recovered_store.check_signature(digest, algorithm)
+                ]
+                assert recovered, "expected at least one signature to be recovered"
+                testpath.assert_isfile(db_file)
+                testpath.assert_isfile(db_file + ".bak")
+            finally:
+                recovered_store.close()
