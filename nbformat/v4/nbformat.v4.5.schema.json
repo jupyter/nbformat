@@ -211,13 +211,15 @@
               "description": "Official Jupyter Metadata for Code Cells",
               "type": "object",
               "additionalProperties": true,
-              "source_hidden": {
-                "description": "Whether the source is hidden.",
-                "type": "boolean"
-              },
-              "outputs_hidden": {
-                "description": "Whether the outputs are hidden.",
-                "type": "boolean"
+              "properties": {
+                "source_hidden": {
+                  "description": "Whether the source is hidden.",
+                  "type": "boolean"
+                },
+                "outputs_hidden": {
+                  "description": "Whether the outputs are hidden.",
+                  "type": "boolean"
+                }
               }
             },
             "execution": {
