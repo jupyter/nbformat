@@ -34,7 +34,7 @@ def test_read_invalid_pathlikeobj(tmpdir):
     Path(ipynb_filepath).write_text("{}", encoding="utf8")
 
     with pytest.raises(ValidationError) as excinfo:
-        read(str(ipynb_filepath), as_version=4)
+        read(Path(ipynb_filepath), as_version=4)
     assert "cells" in str(excinfo.value)
 
 
