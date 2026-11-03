@@ -28,6 +28,17 @@ def test_downgrade_notebook():
     validate(nb03)
 
 
+def test_downgrade_output_metadata():
+    output = v4.new_output(
+        "display_data",
+        data={"image/png": nbexamples.png, "text/plain": "<Figure>"},
+        metadata={"image/png": {"width": 640}, "isolated": True},
+    )
+    downgraded = convert.downgrade_output(copy.deepcopy(output))
+    assert downgraded.metadata == {"png": {"width": 640}, "isolated": True}
+    assert convert.upgrade_output(downgraded) == output
+
+
 def test_upgrade_heading():
     # Fake the uuid generation for ids
     cell_ids = ["cell-1", "cell-2", "cell-3"]
