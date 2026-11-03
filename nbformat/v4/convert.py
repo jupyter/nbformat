@@ -249,7 +249,10 @@ def downgrade_output(output):
             data["application/json"] = json.dumps(data["application/json"])
         data = from_mime_key(data)
         output.update(data)
-        from_mime_key(output.get("metadata", {}))
+        metadata = output.get("metadata", {})
+        for alias, mime in _mime_map.items():
+            if mime in metadata:
+                metadata[alias] = metadata.pop(mime)
     elif output["output_type"] == "error":
         output["output_type"] = "pyerr"
     elif output["output_type"] == "stream":
