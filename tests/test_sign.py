@@ -281,6 +281,29 @@ def test_config_store():
     assert notary.store is store
 
 
+def test_trust_app_uses_configured_notary_data_dir(tmp_path):
+    # https://github.com/jupyter/nbformat/issues/186
+    c = Config()
+    c.NotebookNotary.data_dir = str(tmp_path)
+    c.NotebookNotary.db_file = ":memory:"
+    notary = sign.TrustNotebookApp(config=c).notary
+    try:
+        assert notary.data_dir == str(tmp_path)
+    finally:
+        notary.store.close()
+
+
+def test_trust_app_notary_data_dir_defaults_to_app_data_dir():
+    c = Config()
+    c.NotebookNotary.db_file = ":memory:"
+    app = sign.TrustNotebookApp(config=c)
+    notary = app.notary
+    try:
+        assert notary.data_dir == app.data_dir
+    finally:
+        notary.store.close()
+
+
 class SignatureStoreTests(unittest.TestCase):
     def setUp(self):
         self.store = sign.MemorySignatureStore()
