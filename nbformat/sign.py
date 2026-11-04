@@ -723,7 +723,7 @@ class TrustNotebookApp(JupyterApp):
 
     @default("notary")
     def _notary_default(self):
-        return NotebookNotary(parent=self, data_dir=self.data_dir)
+        return NotebookNotary(parent=self)
 
     def sign_notebook_file(self, notebook_path):
         """Sign a notebook from the filesystem"""
