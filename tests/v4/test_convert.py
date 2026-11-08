@@ -85,6 +85,22 @@ def test_downgrade_heading():
         assert downgraded == expected
 
 
+def test_downgrade_output_metadata_mime_keys():
+    out = v4.new_output(
+        "display_data",
+        data={"text/plain": "<Figure>", "image/png": "abc"},
+        metadata={"image/png": {"width": 640}, "collapsed": True},
+    )
+
+    downgraded = convert.downgrade_output(out)
+
+    assert downgraded.metadata["png"] == {"width": 640}
+    assert "image/png" not in downgraded.metadata
+    assert downgraded.metadata["collapsed"] is True
+    assert downgraded["png"] == "abc"
+    assert "image/png" not in downgraded
+
+
 def test_upgrade_v4_to_4_dot_5():
     here = os.path.dirname(__file__)
     with open(os.path.join(here, os.pardir, "test4.ipynb"), encoding="utf-8") as f:
