@@ -31,6 +31,13 @@ class TestJSON(formattest.NBFormatTest, TestCase):
         s = writes(nb0, split_lines=True)
         self.assertEqual(nbjson.reads(s), nb0)
 
+    def test_roundtrip_split_form_feed(self):
+        """Ensure that splitting on other line boundaries is safe"""
+        nb = copy.deepcopy(nb0)
+        nb.worksheets[0].cells[1].input = "import numpy\x0c\na = 10\n"
+        s = writes(nb, split_lines=True)
+        self.assertEqual(nbjson.reads(s), nb)
+
     def test_strip_transient(self):
         """transient values aren't written to files"""
         nb = copy.deepcopy(nb0)

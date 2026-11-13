@@ -37,7 +37,7 @@ def _join_lines(lines):
     Has logic to protect against `splitlines()`, which
     should have been `splitlines(True)`
     """
-    if lines and lines[0].endswith(("\n", "\r")):
+    if lines and lines[0].splitlines(True) != lines[0].splitlines():
         # created by splitlines(True)
         return "".join(lines)
     # created by splitlines()
