@@ -464,8 +464,12 @@ def _validate(
         version, version_minor = 1, 0
 
     if ref is None:
-        assert isinstance(version, int)
-        assert isinstance(version_minor, int)
+        if not isinstance(version, int) or isinstance(version, bool):
+            msg = "nbformat must be an integer"
+            raise ValidationError(msg, path=["nbformat"], instance=version)
+        if not isinstance(version_minor, int) or isinstance(version_minor, bool):
+            msg = "nbformat_minor must be an integer"
+            raise ValidationError(msg, path=["nbformat_minor"], instance=version_minor)
         _normalize(
             nbdict,
             version,
