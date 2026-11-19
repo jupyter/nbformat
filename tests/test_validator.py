@@ -152,6 +152,19 @@ def test_nb4(validator_name, nbfile):
     assert isvalid(nb)
 
 
+@pytest.mark.parametrize("field", ["nbformat", "nbformat_minor"])
+@pytest.mark.parametrize("value", [None, "4", 4.0, True])
+def test_validate_non_integer_notebook_version(field, value):
+    nb = nbformat.v4.new_notebook()
+    nb[field] = value
+
+    with pytest.raises(ValidationError, match=rf"{field} must be an integer") as excinfo:
+        validate(nb)
+
+    assert list(excinfo.value.path) == [field]
+    assert not isvalid(nb)
+
+
 @pytest.mark.parametrize("validator_name", VALIDATORS)
 def test_nb4_document_info(validator_name):
     """Test that a notebook with document_info passes validation"""

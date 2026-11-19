@@ -14,7 +14,7 @@ from jsonschema import ValidationError
 from packaging import version
 
 from nbformat import __version__ as nbf_version
-from nbformat import current_nbformat, read, write, writes
+from nbformat import current_nbformat, read, reads, write, writes
 from nbformat.reader import get_version
 from nbformat.validator import isvalid
 
@@ -23,6 +23,17 @@ from .base import TestsBase
 
 def test_canonical_version():
     assert str(version.parse(nbf_version)) == nbf_version
+
+
+def test_reads_captures_invalid_minor_version():
+    raw = '{"cells": [], "metadata": {}, "nbformat": 4, "nbformat_minor": "1"}'
+    errors = {}
+
+    nb = reads(raw, as_version=4, capture_validation_error=errors)
+
+    assert nb.nbformat_minor == "1"
+    assert isinstance(errors["ValidationError"], ValidationError)
+    assert list(errors["ValidationError"].path) == ["nbformat_minor"]
 
 
 class TestAPI(TestsBase):
