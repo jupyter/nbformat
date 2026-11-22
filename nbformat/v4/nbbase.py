@@ -75,7 +75,8 @@ def output_from_msg(msg):
 
     Returns
     -------
-    NotebookNode: the output as a notebook node.
+    NotebookNode
+        The output as a notebook node.
 
     Raises
     ------
