@@ -73,14 +73,14 @@ def reads(s, as_version, capture_validation_error=None, **kwargs):
 
     Parameters
     ----------
-    s : unicode
-        The raw unicode string to read the notebook from.
-    as_version : int
+    s : str or bytes or bytearray
+        The JSON input to read the notebook from.
+    as_version : int or ``NO_CONVERT``
         The version of the notebook format to return.
         The notebook will be converted, if necessary.
         Pass nbformat.NO_CONVERT to prevent conversion.
-    capture_validation_error : dict, optional
-        If provided, a key of "ValidationError" with a
+    capture_validation_error : dict or None
+        If a dictionary is provided, a key of "ValidationError" with a
         value of the ValidationError instance will be added
         to the dictionary.
 
@@ -110,18 +110,18 @@ def writes(nb, version=NO_CONVERT, capture_validation_error=None, **kwargs):
     ----------
     nb : NotebookNode
         The notebook to write.
-    version : int, optional
+    version : int or ``NO_CONVERT``
         The nbformat version to write.
         If unspecified, or specified as nbformat.NO_CONVERT,
         the notebook's own version will be used and no conversion performed.
-    capture_validation_error : dict, optional
-        If provided, a key of "ValidationError" with a
+    capture_validation_error : dict or None
+        If a dictionary is provided, a key of "ValidationError" with a
         value of the ValidationError instance will be added
         to the dictionary.
 
     Returns
     -------
-    s : unicode
+    s : str
         The notebook as a JSON string.
     """
     if version is not NO_CONVERT:
@@ -147,15 +147,15 @@ def read(fp, as_version, capture_validation_error=None, **kwargs):
 
     Parameters
     ----------
-    fp : file or str
-        A file-like object with a read method that returns unicode (use
-        ``io.open()`` in Python 2), or a path to a file.
-    as_version : int
+    fp : str or os.PathLike or ``file-like object``
+        A file path or an object with a read method that returns a string, bytes,
+        or bytearray.
+    as_version : int or ``NO_CONVERT``
         The version of the notebook format to return.
         The notebook will be converted, if necessary.
         Pass nbformat.NO_CONVERT to prevent conversion.
-    capture_validation_error : dict, optional
-        If provided, a key of "ValidationError" with a
+    capture_validation_error : dict or None
+        If a dictionary is provided, a key of "ValidationError" with a
         value of the ValidationError instance will be added
         to the dictionary.
 
@@ -177,22 +177,21 @@ def read(fp, as_version, capture_validation_error=None, **kwargs):
 def write(nb, fp, version=NO_CONVERT, capture_validation_error=None, **kwargs):
     """Write a notebook to a file in a given nbformat version.
 
-    The file-like object must accept unicode input.
+    The file-like object must accept text.
 
     Parameters
     ----------
     nb : NotebookNode
         The notebook to write.
-    fp : file or str
-        Any file-like object with a write method that accepts unicode, or
-        a path to write a file.
-    version : int, optional
+    fp : str or os.PathLike or ``file-like object``
+        A file path or an object with a write method that accepts text.
+    version : int or ``NO_CONVERT``
         The nbformat version to write.
         If nb is not this version, it will be converted.
         If unspecified, or specified as nbformat.NO_CONVERT,
         the notebook's own version will be used and no conversion performed.
-    capture_validation_error : dict, optional
-        If provided, a key of "ValidationError" with a
+    capture_validation_error : dict or None
+        If a dictionary is provided, a key of "ValidationError" with a
         value of the ValidationError instance will be added
         to the dictionary.
     """
