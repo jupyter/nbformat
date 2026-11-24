@@ -8,6 +8,7 @@ Use this module to read or write notebook files as particular nbformat versions.
 from __future__ import annotations
 
 from pathlib import Path
+from typing import TYPE_CHECKING, Any, TypeAlias, cast
 
 from traitlets.log import get_logger
 
@@ -63,7 +64,26 @@ NO_CONVERT = Sentinel(
 )
 
 
-def reads(s, as_version, capture_validation_error=None, **kwargs):
+_NotebookNode: TypeAlias = (
+    NotebookNode | v1.nbbase.NotebookNode | v2.nbbase.NotebookNode | v3.NotebookNode
+)
+_NotebookJSON: TypeAlias = str | bytes | bytearray
+
+if TYPE_CHECKING:
+    from typing import Protocol
+
+    from _typeshed import FileDescriptorOrPath, StrPath, SupportsWrite
+
+    class _SupportsRead(Protocol):
+        def read(self) -> _NotebookJSON: ...
+
+
+def reads(
+    s: _NotebookJSON,
+    as_version: int | Sentinel,
+    capture_validation_error: dict[str, Any] | None = None,
+    **kwargs: object,
+) -> _NotebookNode:
     """Read a notebook from a string and return the NotebookNode object as the given version.
 
     The string can contain a notebook of any version.
@@ -89,7 +109,7 @@ def reads(s, as_version, capture_validation_error=None, **kwargs):
     nb : NotebookNode
         The notebook that was read.
     """
-    nb = reader.reads(s, **kwargs)
+    nb: _NotebookNode = reader.reads(s, **kwargs)
     if as_version is not NO_CONVERT:
         nb = convert(nb, as_version)
     try:
@@ -101,7 +121,12 @@ def reads(s, as_version, capture_validation_error=None, **kwargs):
     return nb
 
 
-def writes(nb, version=NO_CONVERT, capture_validation_error=None, **kwargs):
+def writes(
+    nb: _NotebookNode,
+    version: int | Sentinel = NO_CONVERT,
+    capture_validation_error: dict[str, Any] | None = None,
+    **kwargs: object,
+) -> str:
     """Write a notebook to a string in a given format in the given nbformat version.
 
     Any notebook format errors will be logged.
@@ -134,10 +159,16 @@ def writes(nb, version=NO_CONVERT, capture_validation_error=None, **kwargs):
         get_logger().error("Notebook JSON is invalid: %s", e)
         if isinstance(capture_validation_error, dict):
             capture_validation_error["ValidationError"] = e
-    return versions[version].writes_json(nb, **kwargs)
+    serialized: str = versions[cast(int, version)].writes_json(nb, **kwargs)
+    return serialized
 
 
-def read(fp, as_version, capture_validation_error=None, **kwargs):
+def read(
+    fp: _SupportsRead | FileDescriptorOrPath,
+    as_version: int | Sentinel,
+    capture_validation_error: dict[str, Any] | None = None,
+    **kwargs: object,
+) -> _NotebookNode:
     """Read a notebook from a file as a NotebookNode of the given version.
 
     The string can contain a notebook of any version.
@@ -166,15 +197,21 @@ def read(fp, as_version, capture_validation_error=None, **kwargs):
     """
 
     try:
-        buf = fp.read()
+        buf = fp.read()  # type: ignore[union-attr]
     except AttributeError:
-        with open(fp, encoding="utf8") as f:  # noqa: PTH123
+        with open(cast("FileDescriptorOrPath", fp), encoding="utf8") as f:  # noqa: PTH123
             return reads(f.read(), as_version, capture_validation_error, **kwargs)
 
     return reads(buf, as_version, capture_validation_error, **kwargs)
 
 
-def write(nb, fp, version=NO_CONVERT, capture_validation_error=None, **kwargs):
+def write(
+    nb: _NotebookNode,
+    fp: SupportsWrite[str] | StrPath,
+    version: int | Sentinel = NO_CONVERT,
+    capture_validation_error: dict[str, Any] | None = None,
+    **kwargs: object,
+) -> None:
     """Write a notebook to a file in a given nbformat version.
 
     The file-like object must accept unicode input.
@@ -196,16 +233,16 @@ def write(nb, fp, version=NO_CONVERT, capture_validation_error=None, **kwargs):
         value of the ValidationError instance will be added
         to the dictionary.
     """
-    s = writes(nb, version, capture_validation_error, **kwargs)
+    s: str | bytes = writes(nb, version, capture_validation_error, **kwargs)
     if isinstance(s, bytes):
         s = s.decode("utf8")
 
     try:
-        fp.write(s)
+        fp.write(s)  # type: ignore[union-attr]
         if not s.endswith("\n"):
-            fp.write("\n")
+            fp.write("\n")  # type: ignore[union-attr]
     except AttributeError:
-        with Path(fp).open("w", encoding="utf8") as f:
+        with Path(cast("StrPath", fp)).open("w", encoding="utf8") as f:
             f.write(s)
             if not s.endswith("\n"):
                 f.write("\n")
