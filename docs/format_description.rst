@@ -108,24 +108,27 @@ Code cells are the primary content of Jupyter notebooks.
 They contain source code in the language of the document's associated kernel,
 and a list of outputs associated with executing that code.
 They also have an execution_count, which must be an integer or ``null``.
+The optional metadata fields ``collapsed`` and ``scrolled`` use JSON
+booleans. ``scrolled`` also accepts the string ``"auto"``.
 
-.. sourcecode:: python
+.. sourcecode:: json
 
     {
         "cell_type": "code",
-        "execution_count": 1,  # integer or null
+        "id": "example-code-cell",
+        "execution_count": 1,
         "metadata": {
-            "collapsed": True,  # whether the output of the cell is collapsed
-            "scrolled": False,  # any of true, false or "auto"
+            "collapsed": true,
+            "scrolled": false
         },
-        "source": "[some multi-line code]",
+        "source": "print('Hello')",
         "outputs": [
             {
-                # list of output dicts (described below)
                 "output_type": "stream",
-                # ...
+                "name": "stdout",
+                "text": "Hello\n"
             }
-        ],
+        ]
     }
 
 .. versionchanged:: nbformat 4.0
